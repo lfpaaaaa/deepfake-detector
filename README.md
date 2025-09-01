@@ -18,6 +18,8 @@ YuchengWang :
 
 Yuzhao Ouyang : 
 
+Xiyu Guan : Product onwer
+
 ## Technologies
 
 - 
