@@ -14,7 +14,7 @@ Baojun Liu : frontend lead
 
 Ruidong Zhang : scrum master
 
-YuchengWang : 
+YuchengWang : database
 
 Yuzhao Ouyang :  backend
 
