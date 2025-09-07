@@ -12,7 +12,7 @@ This project develops a forensic tool to detect and analyse deepfake and synthet
 
 Baojun Liu : frontend lead
 
-Ruidong Zhang : 
+Ruidong Zhang : scrum master
 
 YuchengWang : 
 
