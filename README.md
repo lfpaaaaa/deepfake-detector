@@ -27,3 +27,21 @@ Xiyu Guan : Product onwer
 - 
 - 
 - 
+# DeepForensics
+
+Deepfake detection
+
+## Quick Start
+
+1. Install dependencies
+
+2. Run server:
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+3. For updating UI, remember to run 
+```bash
+npm run build
+``` 
+to compile the latest `app-compiled.css`
