@@ -16,7 +16,7 @@ Ruidong Zhang : scrum master
 
 YuchengWang : 
 
-Yuzhao Ouyang :  
+Yuzhao Ouyang :  backend
 
 Xiyu Guan : Product onwer
 
