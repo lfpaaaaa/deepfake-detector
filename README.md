@@ -18,22 +18,28 @@ YuchengWang : database
 
 Yuzhao Ouyang :  backend
 
-Xiyu Guan : Product onwer
+Xiyu Guan : Product owner
 
 ## Technologies
 
-- 
-- 
-- 
-- 
-- 
-# DeepForensics
+- Reality Defender
+- FastAPI
+- Ngrok
+- Tailwind CSS
+- daisyUI
+
+## DeepForensics
 
 Deepfake detection
 
 ## Quick Start
 
-1. Install dependencies
+1. Install dependencies:
+```powershell
+python -m venv .venv
+pip install -r requirements.txt
+.\.venv\Scripts\Activate.ps1
+```
 
 2. Run server:
 ```bash
