@@ -2,4 +2,8 @@ fastapi
 uvicorn
 python-dotenv
 python-multipart
-realitydefender
+torch
+torchvision
+opencv-python
+pillow
+numpy

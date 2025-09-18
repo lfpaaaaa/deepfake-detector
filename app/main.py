@@ -1,11 +1,12 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
-from app.adapters.reality_defender import RealityDefenderAdapter
+from app.adapters.local_resnet_adapter import LocalResNetAdapter
 import uvicorn
 
 # Load environment variables
@@ -19,18 +20,21 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Initialize adapter as global variable
-rd_adapter = None
+detection_adapter = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize resources on startup"""
-    global rd_adapter
+    global detection_adapter
     try:
-        rd_adapter = RealityDefenderAdapter()
-        logger.info("Reality Defender adapter initialized successfully")
+        # Initialize local ResNet50 model
+        model_path = os.getenv("MODEL_PATH", "deepfake_resnet50.pth")
+        detection_adapter = LocalResNetAdapter(model_path=model_path)
+        logger.info("Local ResNet50 adapter initialized successfully")
+            
     except Exception as e:
-        logger.error(f"Failed to initialize RD adapter: {e}")
+        logger.error(f"Failed to initialize detection adapter: {e}")
         raise
     yield
     logger.info("Shutting down application")
@@ -39,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Deepfake Detection API",
     version="1.0.0",
-    description="Minimal deepfake detection service using Reality Defender",
+    description="Local deepfake detection service using ResNet50 model",
     lifespan=lifespan
 )
 
@@ -104,8 +108,8 @@ async def detect_deepfake(file: UploadFile = File(...)):
     logger.info(f"Processing {media_type}: {file.filename} ({len(content)} bytes)")
     
     try:
-        # Call Reality Defender
-        result = await rd_adapter.detect(
+        # Call detection adapter
+        result = await detection_adapter.detect(
             file_bytes=content,
             filename=file.filename,
             mime_type=mime_type

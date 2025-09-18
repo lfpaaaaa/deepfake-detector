@@ -22,15 +22,17 @@ Xiyu Guan : Product owner
 
 ## Technologies
 
-- Reality Defender
+- Local ResNet50 Model
 - FastAPI
+- PyTorch
+- OpenCV
 - Ngrok
 - Tailwind CSS
 - daisyUI
 
 ## DeepForensics
 
-Deepfake detection
+Local deepfake detection using ResNet50 machine learning model for secure offline operation.
 
 ## Quick Start
 
@@ -41,13 +43,35 @@ pip install -r requirements.txt
 .\.venv\Scripts\Activate.ps1
 ```
 
-2. Run server:
+2. Test your model:
 ```bash
-uvicorn app.main:app --reload --port 8000
+python test_model.py
 ```
 
-3. For updating UI, remember to run 
+3. Start server:
+```bash
+python start_local_model.py
+```
+
+### UI Development
+
+For updating UI, remember to run:
 ```bash
 npm run build
 ``` 
 to compile the latest `app-compiled.css`
+
+## Model Configuration
+
+The system uses a local ResNet50 model for secure offline deepfake detection:
+
+- **Model File**: `deepfake_resnet50.pth`
+- **Architecture**: ResNet50 with 2-class output (authentic/fake)
+- **Operation**: Completely offline, no internet connection required
+
+## API Endpoints
+
+- `GET /` - Web interface
+- `POST /detect` - Upload and detect deepfakes
+- `GET /health` - Health check
+- `GET /docs` - API documentation
