@@ -1,0 +1,22 @@
+@startuml
+actor "User (Browser)" as User
+participant "Frontend (JS Page)" as FE
+participant "Backend (FastAPI)" as BE
+participant "Deepfake Model API" as Model
+
+User -> FE: Select & upload file
+FE -> BE: POST /detect (multipart/form-data)\n[file content]
+activate BE
+
+BE -> Model: Call Deepfake Detection API\n(pass media file/URL)
+activate Model
+
+Model --> BE: JSON {status, confidence, details}
+deactivate Model
+
+BE --> FE: JSON {status, confidence, details}
+deactivate BE
+
+FE -> User: Render results\n- Status (Authentic/Fake)\n- Confidence %\n- Metadata report\n- Heatmap overlay
+@enduml
+

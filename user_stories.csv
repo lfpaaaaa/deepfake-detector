@@ -1,0 +1,15 @@
+User Story ID,As a,I want to,So that,Priority,Epic,Sprint Story Points
+1,Investigator,upload an image or video,I can quickly check if it has been manipulated or AI-generated,Must have,Ingestion & Preprocessing (SCRUM-8),8
+2,Investigator,see clear visual indicators (heatmaps / highlighted frames),I can easily identify suspicious areas,Must have,Visualization (SCRUM-10),7
+3,Investigator,download a simple report in PDF,I can use it as supporting material in my case files,Must have,Reporting & Export (SCRUM-11),5
+4,Forensic Analyst,review detailed metadata and anomaly scores,I can perform deeper verification of suspicious content,Must have,MVP (Detection Engine) (SCRUM-9),8
+5,Forensic Analyst,export results in JSON,I can integrate findings into my forensic workflow,Should have,Reporting & Export (SCRUM-11),3
+6,Forensic Analyst,see frame-by-frame video analysis,I can identify which exact moments were altered,Should have,Visualization (SCRUM-10),8
+7,Legal Officer,include file hashes and chain-of-custody records in reports,the evidence can be admissible in court,Must have,Reporting & Export (SCRUM-11),8
+8,Client,work offline,it can be used in secure environments without cloud dependencies,Should have,MVP (Detection Engine) (SCRUM-9),13
+9,Client,provide a reliable confidence score with every detection,I can judge how trustworthy the results are,Must have,MVP (Detection Engine) (SCRUM-9),5
+10,Product Owner,prioritize user stories based on client feedback,the backlog reflects the most urgent needs,Should have,Prototype & IA (Figma) (SCRUM-1),3
+11,Developer,have modular detection components,I can easily replace or upgrade models in the future,Must have,MVP (Detection Engine) (SCRUM-9),8
+12,Developer,log every analysis,I can debug issues and trace outputs for audit purposes,Must have,MVP (Detection Engine) (SCRUM-9),5
+13,Journalist,verify the authenticity of online videos,I can avoid spreading misinformation,Must have,MVP (Detection Engine) (SCRUM-9),5
+14,Public User,use the tool easily and accessibly,I don’t need technical expertise to check content,Must have,Prototype & IA (Figma) (SCRUM-1),5
