@@ -1,4 +1,7 @@
 {
+  "name": "deepfake-detection-system",
+  "version": "1.0.0",
+  "description": "A comprehensive forensic tool for detecting and analyzing deepfake and synthetic media",
   "dependencies": {
     "@tailwindcss/cli": "^4.1.13",
     "tailwindcss": "^4.1.13"
@@ -7,6 +10,21 @@
     "daisyui": "^5.1.7"
   },
   "scripts": {
-    "build": "npx @tailwindcss/cli -i app/web/css/app.css -o app/web/css/app-compiled.css"
-  }
+    "build": "npx @tailwindcss/cli -i app/web/css/app.css -o app/web/css/app-compiled.css",
+    "build:watch": "npx @tailwindcss/cli -i app/web/css/app.css -o app/web/css/app-compiled.css --watch",
+    "dev": "npm run build:watch",
+    "start": "python start_trufor.py",
+    "start:resnet": "python start_local_model.py",
+    "test": "python test_model.py"
+  },
+  "keywords": [
+    "deepfake",
+    "detection",
+    "forensics",
+    "ai",
+    "machine-learning",
+    "computer-vision"
+  ],
+  "author": "Deepfake Detection Team",
+  "license": "MIT"
 }

@@ -6,7 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
-from app.adapters.local_resnet_adapter import LocalResNetAdapter
+try:
+    # Try relative imports first (when run from app directory)
+    from adapters.local_resnet_adapter import LocalResNetAdapter
+    from adapters.trufor_adapter import TruForAdapter
+except ImportError:
+    # Fallback to absolute imports (when run from project root)
+    from app.adapters.local_resnet_adapter import LocalResNetAdapter
+    from app.adapters.trufor_adapter import TruForAdapter
 import uvicorn
 
 # Load environment variables
@@ -28,10 +35,19 @@ async def lifespan(app: FastAPI):
     """Initialize resources on startup"""
     global detection_adapter
     try:
-        # Initialize local ResNet50 model
-        model_path = os.getenv("MODEL_PATH", "deepfake_resnet50.pth")
-        detection_adapter = LocalResNetAdapter(model_path=model_path)
-        logger.info("Local ResNet50 adapter initialized successfully")
+        # Get model type from environment variable
+        model_type = os.getenv("MODEL_TYPE", "resnet50").lower()
+        
+        if model_type == "trufor":
+            # Initialize TruFor model
+            model_path = os.getenv("MODEL_PATH", "trufor.pth.tar")
+            detection_adapter = TruForAdapter(model_path=model_path)
+            logger.info("TruFor adapter initialized successfully")
+        else:
+            # Initialize local ResNet50 model (default)
+            model_path = os.getenv("MODEL_PATH", "deepfake_resnet50.pth")
+            detection_adapter = LocalResNetAdapter(model_path=model_path)
+            logger.info("Local ResNet50 adapter initialized successfully")
             
     except Exception as e:
         logger.error(f"Failed to initialize detection adapter: {e}")
@@ -43,12 +59,13 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Deepfake Detection API",
     version="1.0.0",
-    description="Local deepfake detection service using ResNet50 model",
+    description="Local deepfake detection service supporting ResNet50 and TruFor models",
     lifespan=lifespan
 )
 
 # Mount static files
 app.mount("/web", StaticFiles(directory="app/web"), name="web")
+app.mount("/static", StaticFiles(directory=".", html=True), name="static")
 
 # Configure CORS
 app.add_middleware(
