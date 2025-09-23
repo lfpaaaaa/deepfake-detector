@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  deepfake-detector:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_TYPE=trufor
+      - MODEL_PATH=trufor.pth.tar
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+    volumes:
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Alternative service with ResNet50 model
+  deepfake-detector-resnet:
+    build: .
+    ports:
+      - "8001:8000"
+    environment:
+      - MODEL_TYPE=resnet50
+      - MODEL_PATH=deepfake_resnet50.pth
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+    volumes:
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+    restart: unless-stopped
+    profiles:
+      - resnet
+
+
