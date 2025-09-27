@@ -175,7 +175,7 @@
 
 ---
 
-## AC01 – Upload image/video for manipulation check (Test Case)
+## AC01 – Upload image/video for manipulation check
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -197,7 +197,7 @@
 - Verify result is saved in dashboard history.
 
 
-## AC02 – Show suspicious areas (heatmap/highlighted frames) (Test Case)
+## AC02 – Show suspicious areas (heatmap/highlighted frames)
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -217,7 +217,7 @@
 - Confirm that explanation tooltips show anomaly scores when hovering.
 
 
-## AC03 – Download PDF report (Test Case)
+## AC03 – Download PDF report
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -240,7 +240,7 @@
   - Timestamp of analysis
 
 
-## AC04 – Metadata and anomaly scores (Test Case)
+## AC04 – Metadata and anomaly scores
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -260,7 +260,7 @@
 - Confirm anomaly score matches visualization highlights.
 
 
-## AC05 – Export JSON results (Test Case)
+## AC05 – Export JSON results
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -280,7 +280,7 @@
 - Open JSON and confirm it contains: metadata, anomaly scores, confidence score, suspicious regions.
 
 
-## AC06 – Frame-by-frame video analysis (Test Case)
+## AC06 – Frame-by-frame video analysis
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -300,7 +300,7 @@
 - Confirm user can click a frame to preview anomaly.
 
 
-## AC07 – Report includes file hash + chain-of-custody (Test Case)
+## AC07 – Report includes file hash + chain-of-custody
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -320,7 +320,7 @@
 - Verify chain-of-custody log with timestamps.
 
 
-## AC08 – Offline functionality (Test Case)
+## AC08 – Offline functionality
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -339,7 +339,7 @@
 - Confirm result is displayed without requiring server connection.
 
 
-## AC09 – Reliable confidence score (Test Case)
+## AC09 – Reliable confidence score
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -358,8 +358,7 @@
 - Confirm score is consistent with anomaly visualization.
 
 
-## AC10 – Prioritize backlog by feedback (Test Case)
-
+## AC10 – Prioritize backlog by feedback
 **Test Type:** Functional  
 **Execution Type:** Manual  
 **Objective:** Verify backlog reflects client feedback priority.
@@ -377,7 +376,7 @@
 - Verify story “Offline Mode” appears higher in priority list.
 
 
-## AC11 – Modular detection components (Test Case)
+## AC11 – Modular detection components
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -396,7 +395,7 @@
 - Verify analysis runs successfully with new model.
 
 
-## AC12 – Logs for debugging (Test Case)
+## AC12 – Logs for debugging
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
@@ -415,7 +414,7 @@
 - Verify log entry with timestamp, file name, model version, and confidence score.
 
 
-## AC13 – Simple verification for journalists/public (Test Case)
+## AC13 – Simple verification for journalists/public
 
 **Test Type:** Functional  
 **Execution Type:** Manual  
