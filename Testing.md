@@ -45,12 +45,10 @@
 
 **User Story:** As an investigator, I want to download a PDF report for case files.
 
-**Result:** Pass
+**Result:** Fail
 
-**Evidence:**
-- User uploads file and completes analysis
-- User clicks “Export PDF”
-- PDF downloaded with summary, heatmap snapshot, and confidence score
+**Error analysis:**
+- User can not download the PDF file
 
 
 ## AC04 – Metadata and anomaly scores
@@ -81,12 +79,10 @@
 
 **User Story:** As a forensic analyst, I want to see frame-by-frame analysis for videos.
 
-**Result:** Pass
+**Result:** Fail
 
-**Evidence:**
-- User uploads manipulated video
-- Selects “Frame Analysis” tab
-- System shows timeline with flagged suspicious frames
+**Error analysis:**
+- Video analysis took a lot of time and produced no results.
 
 
 ## AC07 – Report includes file hash + chain-of-custody
@@ -129,12 +125,7 @@
 
 **User Story:** As a product owner, I want user feedback to prioritize backlog items.
 
-**Result:** Pass
-
-**Evidence:**
-- User submits “Offline mode needed urgently” feedback
-- Product backlog refreshes
-- Story “Offline mode” moves to top priority
+**Result:** Fail
 
 
 ## AC11 – Modular detection components
@@ -153,12 +144,8 @@
 
 **User Story:** As a developer, I want logs of every analysis for debugging/audit.
 
-**Result:** Pass
+**Result:** Fail
 
-**Evidence:**
-- User uploads file
-- Runs analysis
-- Log file created with timestamp, filename, detection model, result
 
 
 ## AC13 – Simple verification for journalists/public
@@ -217,29 +204,6 @@
 - Confirm that explanation tooltips show anomaly scores when hovering.
 
 
-## AC03 – Download PDF report
-
-**Test Type:** Functional  
-**Execution Type:** Manual  
-**Objective:** Verify user can export a PDF report including detection results.
-
-**Setup:**
-- Reporting module active.
-
-**Pre-Conditions:**
-- A file has been analyzed successfully.
-
-**Notes:**
-- Upload an image and complete analysis.
-- Click “Export PDF” button.
-- System generates and downloads PDF.
-- Verify PDF contains:
-  - File name and type
-  - Detection result with confidence score
-  - Suspicious area visualization snapshot
-  - Timestamp of analysis
-
-
 ## AC04 – Metadata and anomaly scores
 
 **Test Type:** Functional  
@@ -278,26 +242,6 @@
 - Click “Export JSON”.
 - Verify JSON file is downloaded.
 - Open JSON and confirm it contains: metadata, anomaly scores, confidence score, suspicious regions.
-
-
-## AC06 – Frame-by-frame video analysis
-
-**Test Type:** Functional  
-**Execution Type:** Manual  
-**Objective:** Verify system provides flagged frames in video.
-
-**Setup:**
-- Video analysis module active.
-
-**Pre-Conditions:**
-- Valid video file uploaded.
-
-**Notes:**
-- Upload manipulated_clip.mp4.
-- Wait until analysis completes.
-- Open “Frame Analysis” tab.
-- Verify suspicious frames are highlighted in timeline.
-- Confirm user can click a frame to preview anomaly.
 
 
 ## AC07 – Report includes file hash + chain-of-custody
@@ -358,24 +302,6 @@
 - Confirm score is consistent with anomaly visualization.
 
 
-## AC10 – Prioritize backlog by feedback
-**Test Type:** Functional  
-**Execution Type:** Manual  
-**Objective:** Verify backlog reflects client feedback priority.
-
-**Setup:**
-- Feedback system active.
-
-**Pre-Conditions:**
-- Client submits feedback.
-
-**Notes:**
-- Enter feedback as “High priority: offline mode”.
-- Submit feedback.
-- Open backlog dashboard.
-- Verify story “Offline Mode” appears higher in priority list.
-
-
 ## AC11 – Modular detection components
 
 **Test Type:** Functional  
@@ -393,25 +319,6 @@
 - Restart application.
 - Upload test image.
 - Verify analysis runs successfully with new model.
-
-
-## AC12 – Logs for debugging
-
-**Test Type:** Functional  
-**Execution Type:** Manual  
-**Objective:** Verify logs are generated for every analysis.
-
-**Setup:**
-- Logging module active.
-
-**Pre-Conditions:**
-- File available for upload.
-
-**Notes:**
-- Upload sample.jpg.
-- Wait for analysis.
-- Open logs directory.
-- Verify log entry with timestamp, file name, model version, and confidence score.
 
 
 ## AC13 – Simple verification for journalists/public
