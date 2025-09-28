@@ -16,76 +16,72 @@
 | 14            | As a lab analyst, I want to save results under a named project so that I can retrieve them later.                                                       | I have created a project                         | I save analyzed results                       | The results are stored under the project and can be retrieved later             |
 
 
-US-01 – Upload an image
-Result: Pass
-Evidence: Uploaded test.jpg → heatmap + confidence 85% + integrity shown. .exe rejected.
-
-
-US-02 – Toggle heatmap overlay
-Result: Pass
-Evidence: Overlay toggled on/off, threshold adjusted, legend displayed.
-
-
-US-03 – Confidence map
-Result: Fail
-Evidence: Map displayed but tooltip help missing.
-
-
-US-04 – Offline environment
-Result: Pass
-Evidence: App launched offline, no outbound logs, analysis succeeded.
-
-
-US-05 – Securely share reports
-Result: Fail
-Evidence: Report exported but unencrypted when shared via intranet.
-
-
-US-06 – Export human-readable report
-Result: Pass
-Evidence: Exported PDF contained original, heatmap, confidence, metadata.
-
-
-US-07 – Metadata view
-Result: Pass
-Evidence: Metadata shown, missing GPS handled with “N/A”.
-
-
-US-08 – Short video timeline
-Result: Pass
-Evidence: Video analyzed, flagged timestamps 0:35, 1:20 with snapshots.
-
-
-US-09 – Object persistence
-Result: Fail
-Evidence: Video with disappearing object uploaded, disappearance at 0:45 not flagged.
-
-
-US-10 – Progress indicators
-Result: Pass
-Evidence: 1GB upload showed progress bar, cancel/retry worked.
-
-
-US-11 – Modest hardware
-Result: Pass
-Evidence: On 8GB RAM dual-core CPU, image processed in 2 min.
-
-
-US-12 – Batch multiple files
-Result: Fail
-Evidence: Batch of 10 files uploaded, only 6 processed, 4 stuck “Pending”.
-
-
-US-13 – Switch models
-Result: Pass
-Evidence: Switched from ResNet → TruFor, UI/report updated.
-
-
-US-14 – Save results under project
-Result: Pass
-Evidence: Project “Case-X” created, results saved, later retrieved.
-
-
+US-01 – Upload an image  
+Result: Pass  
+Evidence: Uploaded test.jpg → heatmap + confidence 85% + integrity shown. .exe rejected.  
+  
+  
+US-02 – Toggle heatmap overlay  
+Result: Pass  
+Evidence: Overlay toggled on/off, threshold adjusted, legend displayed.  
+  
+  
+US-03 – Confidence map  
+Result: Fail  
+  
+  
+US-04 – Offline environment  
+Result: Pass  
+Evidence: App launched offline, no outbound logs, analysis succeeded.  
+  
+  
+US-05 – Securely share reports  
+Result: Fail  
+  
+  
+US-06 – Export human-readable report  
+Result: Pass  
+Evidence: Exported PDF contained original, heatmap, confidence, metadata.  
+  
+  
+US-07 – Metadata view  
+Result: Pass  
+Evidence: Metadata shown, missing GPS handled with “N/A”.  
+  
+  
+US-08 – Short video timeline  
+Result: Pass  
+Evidence: Video analyzed, flagged timestamps 0:35, 1:20 with snapshots.  
+  
+  
+US-09 – Object persistence  
+Result: Fail  
+  
+  
+US-10 – Progress indicators  
+Result: Pass  
+Evidence: 1GB upload showed progress bar, cancel/retry worked.  
+  
+  
+US-11 – Modest hardware  
+Result: Pass  
+Evidence: On 8GB RAM dual-core CPU, image processed in 2 min.  
+  
+  
+US-12 – Batch multiple files  
+Result: Fail  
+  
+  
+US-13 – Switch models  
+Result: Pass  
+Evidence: Switched from ResNet → TruFor, UI/report updated.  
+  
+  
+US-14 – Save results under project  
+Result: Pass  
+Evidence: Project “Case-X” created, results saved, later retrieved.  
+  
+  
 | User Story ID | Test Type            | Execution Type | Objective                      | Setup                         | Pre-Conditions              | Notes                                                                                                                                                         |
 | ------------- | -------------------- | -------------- | ------------------------------ | ----------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | US-01         | Functional           | Manual         | Verify upload & analysis works | System online, user logged in | Valid `.jpg` file available | 1. Open upload page<br>2. Select `test.jpg`<br>3. Click upload<br>4. Verify heatmap, confidence, integrity displayed<br>5. Try uploading `.exe` → error shown |
