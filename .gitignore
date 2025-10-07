@@ -49,10 +49,12 @@ logs/
 !deepfake_resnet50.pth
 !deepfake_resnet18.pth
 *.pth.tar
-!trufor.pth.tar
 *.pt
 *.bin
 *.safetensors
+
+# TruFor source code directory
+TruFor-main/
 
 # Temporary files
 *.tmp

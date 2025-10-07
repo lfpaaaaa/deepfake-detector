@@ -217,18 +217,35 @@
                         <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; grid-template-rows: 1fr 1fr !important; gap: 1rem !important; margin-bottom: 0.25rem !important; width: 100% !important;">
                             <!-- Original Image -->
                             <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important;">
+                                <!-- Spacer to align with toggle button (button height + border + margin-bottom) -->
+                                <div style="margin-bottom: 0.5rem !important;">
+                                    <div style="display: inline-flex !important; border-radius: 0.375rem !important; overflow: hidden !important; border: 1px solid transparent !important; visibility: hidden !important;">
+                                        <button class="btn btn-xs" style="padding: 0.25rem 0.5rem !important; font-size: 0.625rem !important; opacity: 0 !important; pointer-events: none !important;">Raw</button>
+                                        <button class="btn btn-xs" style="padding: 0.25rem 0.5rem !important; font-size: 0.625rem !important; opacity: 0 !important; pointer-events: none !important;">Weighted</button>
+                                    </div>
+                                </div>
+                                
                                 <h4 style="font-size: 0.875rem !important; font-weight: 500 !important; margin-bottom: 0.75rem !important;">Original Image</h4>
                            <div style="position: relative !important; display: inline-block !important;">
-                               <img id="originalImage" style="width: 300px !important; height: 300px !important; object-fit: contain !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important;" alt="Original image">
+                               <img id="originalImage" style="max-width: 300px !important; max-height: 300px !important; object-fit: contain !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important;" alt="Original image">
                                <canvas id="predictionOverlay" style="position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; opacity: 0.7 !important; pointer-events: none !important;"></canvas>
                            </div>
                             </div>
                             
                             <!-- Weighted Anomaly Map -->
                             <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important;">
-                                <h4 style="font-size: 0.875rem !important; font-weight: 500 !important; margin-bottom: 0.75rem !important;">Weighted Anomaly</h4>
+                                <!-- Toggle Button -->
+                                <div style="margin-bottom: 0.5rem !important;">
+                                    <div class="btn-group" style="display: inline-flex !important; border-radius: 0.375rem !important; overflow: hidden !important; border: 1px solid #d1d5db !important;">
+                                        <button id="btnRawAnomaly" class="btn btn-xs" style="padding: 0.25rem 0.5rem !important; font-size: 0.625rem !important; background: #3b82f6 !important; color: white !important; border: none !important; cursor: pointer !important;">Raw</button>
+                                        <button id="btnWeightedAnomaly" class="btn btn-xs" style="padding: 0.25rem 0.5rem !important; font-size: 0.625rem !important; background: white !important; color: #6b7280 !important; border: none !important; cursor: pointer !important;">Weighted</button>
+                                    </div>
+                                </div>
+                                
+                                <h4 style="font-size: 0.875rem !important; font-weight: 500 !important; margin-bottom: 0.75rem !important;">Anomaly Map</h4>
+                                
                                 <div style="position: relative !important; display: inline-block !important;">
-                                    <canvas id="predictionHeatmap" style="width: 300px !important; height: 300px !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important; cursor: crosshair !important;" onmousemove="showHoverValues(event, 'anomaly')" onmouseleave="hideHoverValues()"></canvas>
+                                    <canvas id="predictionHeatmap" style="max-width: 300px !important; max-height: 300px !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important; cursor: crosshair !important;" onmousemove="showHoverValues(event, 'anomaly')" onmouseleave="hideHoverValues()"></canvas>
                                     <div id="hoverTooltip" style="position: absolute !important; background: rgba(0, 0, 0, 0.8) !important; color: white !important; padding: 8px !important; border-radius: 4px !important; font-size: 12px !important; pointer-events: none !important; z-index: 1000 !important; display: none !important;"></div>
                                 </div>
                                 <!-- Anomaly Legend -->
@@ -260,7 +277,7 @@
                             <!-- Confidence Map -->
                             <div id="confidenceMapSection" style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important;">
                                 <h4 style="font-size: 0.875rem !important; font-weight: 500 !important; margin-bottom: 0.75rem !important;">Confidence Map</h4>
-                           <canvas id="confidenceMap" style="width: 300px !important; height: 300px !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important;"></canvas>
+                           <canvas id="confidenceMap" style="max-width: 300px !important; max-height: 300px !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important;"></canvas>
                            <!-- Confidence Legend -->
                            <div style="margin-top: 0.5rem !important; text-align: center !important;">
                                <div style="display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 0.25rem !important;">
@@ -287,7 +304,7 @@
                             <!-- Noiseprint++ -->
                             <div id="noiseprintSection" style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important;">
                                 <h4 style="font-size: 0.875rem !important; font-weight: 500 !important; margin-bottom: 0.75rem !important;">Noiseprint++</h4>
-                           <canvas id="noiseprintMap" style="width: 300px !important; height: 300px !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important;"></canvas>
+                           <canvas id="noiseprintMap" style="max-width: 300px !important; max-height: 300px !important; border-radius: 0.5rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; border: 2px solid #e5e7eb !important;"></canvas>
                            <!-- Noiseprint Legend -->
                            <div style="margin-top: 0.5rem !important; text-align: center !important;">
                                <div style="display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 0.25rem !important;">
@@ -362,7 +379,9 @@
             fakeLikelihoodStat: document.getElementById('fakeLikelihoodStat'),
             fakeLikelihoodText: document.getElementById('fakeLikelihoodText'),
             fakeLikelihoodBar: document.getElementById('fakeLikelihoodBar'),
-            decisionStat: document.getElementById('decisionStat')
+            decisionStat: document.getElementById('decisionStat'),
+            btnRawAnomaly: document.getElementById('btnRawAnomaly'),
+            btnWeightedAnomaly: document.getElementById('btnWeightedAnomaly')
         };
         
         // Check for missing elements
@@ -539,8 +558,9 @@
         }
 
         function displayResult(data) {
-            // Store current image data for hover functionality
-            currentImageData = data;
+            // Store current image data for hover functionality and toggle
+            window.currentImageData = data;
+            currentImageData = data;  // Keep for backward compatibility
             
             // Determine if this is TruFor response
             const isTruFor = data.model === 'TruFor';
@@ -650,16 +670,32 @@
                     const imgHeight = elements.originalImage.naturalHeight;
                     console.log('Image size:', imgWidth, 'x', imgHeight);
                     
-                    // Set canvas size - use a reasonable size for display
-                    const displayWidth = Math.min(imgWidth, 400);
-                    const displayHeight = Math.min(imgHeight, 400);
+                    // Calculate aspect ratio preserving dimensions with max size 300px
+                    const maxSize = 300;
+                    let displayWidth, displayHeight;
                     
+                    if (imgWidth > imgHeight) {
+                        // Landscape
+                        displayWidth = maxSize;
+                        displayHeight = Math.round(maxSize * (imgHeight / imgWidth));
+                    } else {
+                        // Portrait or square
+                        displayHeight = maxSize;
+                        displayWidth = Math.round(maxSize * (imgWidth / imgHeight));
+                    }
+                    
+                    console.log('Canvas size set to:', displayWidth, 'x', displayHeight, '(aspect ratio preserved)');
+                    
+                    // Set canvas sizes with aspect ratio
                     elements.predictionOverlay.width = displayWidth;
                     elements.predictionOverlay.height = displayHeight;
+                    elements.predictionOverlay.style.width = displayWidth + 'px';
+                    elements.predictionOverlay.style.height = displayHeight + 'px';
+                    
                     elements.predictionHeatmap.width = displayWidth;
                     elements.predictionHeatmap.height = displayHeight;
-                    
-                    console.log('Canvas size set to:', displayWidth, 'x', displayHeight);
+                    elements.predictionHeatmap.style.width = displayWidth + 'px';
+                    elements.predictionHeatmap.style.height = displayHeight + 'px';
                     
                     // Draw heatmap after image is fully loaded
                     if (data.prediction_map) {
@@ -678,6 +714,8 @@
                         elements.confidenceMapSection.classList.remove('hidden');
                         elements.confidenceMap.width = displayWidth;
                         elements.confidenceMap.height = displayHeight;
+                        elements.confidenceMap.style.width = displayWidth + 'px';
+                        elements.confidenceMap.style.height = displayHeight + 'px';
                         drawHeatmap(elements.confidenceMap, data.confidence_map, 'confidence');
                     }
                     
@@ -687,6 +725,8 @@
                         elements.noiseprintSection.classList.remove('hidden');
                         elements.noiseprintMap.width = displayWidth;
                         elements.noiseprintMap.height = displayHeight;
+                        elements.noiseprintMap.style.width = displayWidth + 'px';
+                        elements.noiseprintMap.style.height = displayHeight + 'px';
                         drawHeatmap(elements.noiseprintMap, data.noiseprint_map, 'noiseprint');
                     }
                 };
@@ -911,25 +951,27 @@
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             
-            const canvasX = Math.floor((x / canvas.width) * canvas.width);
-            const canvasY = Math.floor((y / canvas.height) * canvas.height);
-            
             let value = 0;
             let confidence = 0;
             
             if (type === 'anomaly' && currentImageData.prediction_map && currentImageData.prediction_map.length > 0) {
-                const dataY = Math.floor((canvasY / canvas.height) * currentImageData.prediction_map.length);
-                const dataX = Math.floor((canvasX / canvas.width) * currentImageData.prediction_map[0].length);
+                // Map mouse position to data array indices
+                // Use canvas.width/height (the actual canvas size, not display size)
+                const dataY = Math.floor((y / rect.height) * currentImageData.prediction_map.length);
+                const dataX = Math.floor((x / rect.width) * currentImageData.prediction_map[0].length);
                 
-                if (dataY < currentImageData.prediction_map.length && dataX < currentImageData.prediction_map[0].length) {
+                // Bounds check with safety margins
+                if (dataY >= 0 && dataY < currentImageData.prediction_map.length && 
+                    dataX >= 0 && dataX < currentImageData.prediction_map[dataY].length) {
                     value = currentImageData.prediction_map[dataY][dataX];
                 }
                 
                 if (currentImageData.confidence_map && currentImageData.confidence_map.length > 0) {
-                    const confY = Math.floor((canvasY / canvas.height) * currentImageData.confidence_map.length);
-                    const confX = Math.floor((canvasX / canvas.width) * currentImageData.confidence_map[0].length);
+                    const confY = Math.floor((y / rect.height) * currentImageData.confidence_map.length);
+                    const confX = Math.floor((x / rect.width) * currentImageData.confidence_map[0].length);
                     
-                    if (confY < currentImageData.confidence_map.length && confX < currentImageData.confidence_map[0].length) {
+                    if (confY >= 0 && confY < currentImageData.confidence_map.length && 
+                        confX >= 0 && confX < currentImageData.confidence_map[confY].length) {
                         confidence = currentImageData.confidence_map[confY][confX];
                     }
                 }
@@ -1098,6 +1140,55 @@
         
         // Initialize event listeners
         initializeEventListeners();
+        
+        // Add anomaly map toggle button event listeners
+        if (elements.btnRawAnomaly && elements.btnWeightedAnomaly) {
+            elements.btnRawAnomaly.addEventListener('click', function() {
+                console.log('🔵 Switching to RAW anomaly map');
+                // Update button styles
+                elements.btnRawAnomaly.style.background = '#3b82f6';
+                elements.btnRawAnomaly.style.color = 'white';
+                elements.btnWeightedAnomaly.style.background = 'white';
+                elements.btnWeightedAnomaly.style.color = '#6b7280';
+                
+                // Redraw with raw prediction map
+                if (window.currentImageData && window.currentImageData.prediction_map) {
+                    console.log('Drawing raw prediction_map, size:', 
+                        window.currentImageData.prediction_map.length, 'x', 
+                        window.currentImageData.prediction_map[0].length);
+                    drawHeatmap(elements.predictionHeatmap, window.currentImageData.prediction_map, 'forgery');
+                } else {
+                    console.error('No prediction_map available!');
+                }
+            });
+            
+            elements.btnWeightedAnomaly.addEventListener('click', function() {
+                console.log('🟢 Switching to WEIGHTED anomaly map');
+                // Update button styles
+                elements.btnWeightedAnomaly.style.background = '#3b82f6';
+                elements.btnWeightedAnomaly.style.color = 'white';
+                elements.btnRawAnomaly.style.background = 'white';
+                elements.btnRawAnomaly.style.color = '#6b7280';
+                
+                // Debug: Check what data is available
+                console.log('Available data keys:', Object.keys(window.currentImageData || {}));
+                console.log('Has weighted_prediction_map?', !!window.currentImageData?.weighted_prediction_map);
+                
+                // Redraw with weighted prediction map
+                if (window.currentImageData && window.currentImageData.weighted_prediction_map) {
+                    console.log('Drawing weighted_prediction_map, size:', 
+                        window.currentImageData.weighted_prediction_map.length, 'x', 
+                        window.currentImageData.weighted_prediction_map[0].length);
+                    console.log('Sample values - Raw:', window.currentImageData.prediction_map[100][100], 
+                        'Weighted:', window.currentImageData.weighted_prediction_map[100][100]);
+                    drawHeatmap(elements.predictionHeatmap, window.currentImageData.weighted_prediction_map, 'forgery');
+                } else {
+                    console.error('No weighted_prediction_map available!');
+                }
+            });
+            
+            console.log('✅ Anomaly map toggle buttons initialized');
+        }
         
         // Ensure modal is hidden on page load
         const modal = document.getElementById('decisionModal');

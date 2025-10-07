@@ -117,12 +117,16 @@ class TruForAdapter:
         pil_image = ImageOps.exif_transpose(pil_image)
         
         # Get original dimensions
-        W0, H0 = pil_image.size
+        # PIL.Image.size returns (width, height)
+        W0, H0 = pil_image.size  # W0=width, H0=height
         L = 512  # Target size
+        
+        print(f'Original image dimensions: W={W0}, H={H0} (PIL returns width×height)')
         
         # Calculate scale factor to fit in 512x512 while maintaining aspect ratio
         s = L / max(W0, H0)
         W1, H1 = int(round(W0 * s)), int(round(H0 * s))
+        print(f'Resized dimensions: W={W1}, H={H1}')
         
         # Resize maintaining aspect ratio
         pil_resized = pil_image.resize((W1, H1), Image.BICUBIC)
@@ -133,6 +137,7 @@ class TruForAdapter:
         right = pad_w - left
         top = pad_h // 2
         bottom = pad_h - top
+        print(f'Padding: left={left}, right={right}, top={top}, bottom={bottom}')
         
         # Convert to tensor and normalize
         tensor = TF.to_tensor(pil_resized)  # [0,1]
@@ -162,13 +167,16 @@ class TruForAdapter:
         Returns:
             Restored probability map as numpy array (H0, W0)
         """
-        # Remove padding
+        # Remove padding: 512×512 → (H1, W1)
+        # Note: PyTorch uses [batch, channel, height, width] format
         x = prob_map[..., meta['top']:512-meta['bottom'], meta['left']:512-meta['right']]
         
-        # Resize to original dimensions
+        # Resize to original dimensions: (H1, W1) → (H0, W0)
+        # F.interpolate expects size=(height, width), so use (H0, W0)
+        # PIL.Image.size returns (width, height), so W0=width, H0=height
         x = F.interpolate(x, size=(meta['H0'], meta['W0']), mode='bilinear', align_corners=False)
         
-        return x.squeeze().cpu().numpy()  # (H0, W0)
+        return x.squeeze().cpu().numpy()  # Returns (H0, W0) array
     
     def _weighted_statistics_pooling(self, x: torch.Tensor, log_w: torch.Tensor = None) -> torch.Tensor:
         """
@@ -348,15 +356,21 @@ class TruForAdapter:
                 fake_prob = 1.0 - integrity
                 
                 # Restore maps to original image size
-                pred_map = self._restore_to_orig(a, meta)  # (H0, W0)
-                conf_map = self._restore_to_orig(c, meta)  # (H0, W0)
+                pred_map = self._restore_to_orig(a, meta)  # numpy array shape (H0, W0)
+                conf_map = self._restore_to_orig(c, meta)  # numpy array shape (H0, W0)
+                
+                # Create confidence-weighted anomaly map (like official TruFor demos)
+                weighted_pred_map = pred_map * conf_map
+                print(f'weighted_pred_map stats: mean={weighted_pred_map.mean():.4f}, max={weighted_pred_map.max():.4f}')
                 
                 # Debug: Print processed values
                 print(f'a (prob): {a.shape}, min: {a.min().item():.4f}, max: {a.max().item():.4f}')
                 print(f'c (prob): {c.shape}, min: {c.min().item():.4f}, max: {c.max().item():.4f}')
                 print(f'integrity: {integrity:.4f}, fake_prob: {fake_prob:.4f}')
-                print(f'a_orig: mean={pred_map.mean():.4f}, max={pred_map.max():.4f}')
-                print(f'c_orig: mean={conf_map.mean():.4f}, min={conf_map.min():.4f}, max={conf_map.max():.4f}')
+                print(f'pred_map restored shape: {pred_map.shape} (should be H×W = {meta["H0"]}×{meta["W0"]})')
+                print(f'conf_map restored shape: {conf_map.shape}')
+                print(f'pred_map stats: mean={pred_map.mean():.4f}, max={pred_map.max():.4f}')
+                print(f'conf_map stats: mean={conf_map.mean():.4f}, min={conf_map.min():.4f}, max={conf_map.max():.4f}')
                 
                 # Process noiseprint++ (restore to original size if available)
                 npp_map = None
@@ -388,8 +402,9 @@ class TruForAdapter:
                 "fake_prob": float(fake_prob),                     # For frontend direct usage
                 "detection_score": float(integrity),               # Keep compatibility
                 "prediction_map": pred_map.tolist(),               # anomaly ∈[0,1] (original size)
+                "weighted_prediction_map": weighted_pred_map.tolist(),  # anomaly × confidence (official style)
                 "confidence_map": conf_map.tolist(),               # confidence ∈[0,1] (original size)
-                "image_size": (meta['H0'], meta['W0']),            # Original image size
+                "image_size": (meta['H0'], meta['W0']),            # Original image size (H, W)
                 "has_confidence_map": True,
                 "has_noiseprint": npp_map is not None,
                 "original_image_url": image_data_url,

@@ -318,65 +318,86 @@ function displayTruForVisualization(data) {
     // Store current image data for visualization
     window.currentImageData = data;
     
+    // Function to setup canvas and draw visualizations
+    function setupVisualizationsWithAspectRatio() {
+        // Get actual image dimensions
+        const imgWidth = elements.originalImage.naturalWidth;
+        const imgHeight = elements.originalImage.naturalHeight;
+        
+        console.log(`🖼️ Image loaded: ${imgWidth}x${imgHeight}`);
+        
+        // Calculate aspect ratio preserving dimensions with max size 300px
+        const maxSize = 300;
+        let canvasWidth, canvasHeight;
+        
+        if (imgWidth > imgHeight) {
+            // Landscape
+            canvasWidth = maxSize;
+            canvasHeight = Math.round(maxSize * (imgHeight / imgWidth));
+        } else {
+            // Portrait or square
+            canvasHeight = maxSize;
+            canvasWidth = Math.round(maxSize * (imgWidth / imgHeight));
+        }
+        
+        console.log(`📐 Calculated canvas size: ${canvasWidth}x${canvasHeight}`);
+        
+        // Set canvas size to match aspect ratio (both element properties and CSS style)
+        elements.predictionOverlay.width = canvasWidth;
+        elements.predictionOverlay.height = canvasHeight;
+        elements.predictionOverlay.style.width = canvasWidth + 'px';
+        elements.predictionOverlay.style.height = canvasHeight + 'px';
+        
+        elements.predictionHeatmap.width = canvasWidth;
+        elements.predictionHeatmap.height = canvasHeight;
+        elements.predictionHeatmap.style.width = canvasWidth + 'px';
+        elements.predictionHeatmap.style.height = canvasHeight + 'px';
+        
+        elements.confidenceMap.width = canvasWidth;
+        elements.confidenceMap.height = canvasHeight;
+        elements.confidenceMap.style.width = canvasWidth + 'px';
+        elements.confidenceMap.style.height = canvasHeight + 'px';
+        
+        elements.noiseprintMap.width = canvasWidth;
+        elements.noiseprintMap.height = canvasHeight;
+        elements.noiseprintMap.style.width = canvasWidth + 'px';
+        elements.noiseprintMap.style.height = canvasHeight + 'px';
+        
+        console.log(`✅ Canvas sizes set: ${canvasWidth}x${canvasHeight}`);
+        
+        // Redraw all visualizations with correct aspect ratio
+        if (data.prediction_map) {
+            drawHeatmap(elements.predictionHeatmap, data.prediction_map, 'forgery');
+            drawPredictionOverlay(elements.predictionOverlay, data.prediction_map);
+        }
+        
+        if (data.confidence_map) {
+            drawHeatmap(elements.confidenceMap, data.confidence_map, 'confidence');
+        }
+        
+        if (data.noiseprint_map) {
+            drawHeatmap(elements.noiseprintMap, data.noiseprint_map, 'noiseprint');
+        }
+    }
+    
     // Display original image
     if (data.original_image_url) {
+        elements.originalImage.onload = setupVisualizationsWithAspectRatio;
         elements.originalImage.src = data.original_image_url;
-        elements.originalImage.onload = function() {
-            // Set canvas size to match image size
-            const imgWidth = elements.originalImage.naturalWidth;
-            const imgHeight = elements.originalImage.naturalHeight;
-            
-            // Set canvas size to fixed 300x300 for consistent layout
-            const canvasSize = 300;
-            elements.predictionOverlay.width = canvasSize;
-            elements.predictionOverlay.height = canvasSize;
-            elements.predictionHeatmap.width = canvasSize;
-            elements.predictionHeatmap.height = canvasSize;
-            elements.confidenceMap.width = canvasSize;
-            elements.confidenceMap.height = canvasSize;
-            elements.noiseprintMap.width = canvasSize;
-            elements.noiseprintMap.height = canvasSize;
-            
-            // Redraw visualizations with correct size
-            if (data.prediction_map) {
-                drawHeatmap(elements.predictionHeatmap, data.prediction_map, 'forgery');
-                drawPredictionOverlay(elements.predictionOverlay, data.prediction_map);
-            }
-        };
+        
+        // Handle case where image is already cached and loaded
+        if (elements.originalImage.complete && elements.originalImage.naturalWidth > 0) {
+            console.log('🔄 Image already loaded from cache, calling setup immediately');
+            setupVisualizationsWithAspectRatio();
+        }
     } else {
         // If no original image URL, we'll need to create one from the uploaded file
         // For now, we'll show a placeholder
         elements.originalImage.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFByZXZpZXc8L3RleHQ+PC9zdmc+';
     }
     
-    // Set canvas sizes to 300x300 for consistent layout
-    const canvasSize = 300;
-    elements.predictionHeatmap.width = canvasSize;
-    elements.predictionHeatmap.height = canvasSize;
-    elements.confidenceMap.width = canvasSize;
-    elements.confidenceMap.height = canvasSize;
-    elements.noiseprintMap.width = canvasSize;
-    elements.noiseprintMap.height = canvasSize;
-    
-    // Draw prediction heatmap
-    if (data.prediction_map) {
-        drawHeatmap(elements.predictionHeatmap, data.prediction_map, 'forgery');
-    }
-    
-    // Draw confidence map
-    if (data.confidence_map) {
-        drawHeatmap(elements.confidenceMap, data.confidence_map, 'confidence');
-    }
-    
-    // Draw noiseprint map
-    if (data.noiseprint_map) {
-        drawHeatmap(elements.noiseprintMap, data.noiseprint_map, 'noiseprint');
-    }
-    
-    // Draw prediction overlay on original image
-    if (data.prediction_map) {
-        drawPredictionOverlay(elements.predictionOverlay, data.prediction_map);
-    }
+    // Note: All visualizations are drawn in the onload handler to ensure correct aspect ratio
+    // This prevents the issue of drawing with wrong dimensions before image loads
     
     // Update Integrity Score and Fake Likelihood
     if (data.integrity !== undefined) {
