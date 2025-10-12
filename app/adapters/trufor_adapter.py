@@ -397,7 +397,9 @@ class TruForAdapter:
                 "model": "TruFor",
                 "filename": filename,
                 "is_fake": is_fake,
+                "decision": "fake" if is_fake else "real",         # For frontend compatibility
                 "confidence": float(confidence),
+                "score": float(1 - fake_prob),                     # Authenticity score for display
                 "integrity": float(integrity),                     # Higher value means more authentic
                 "fake_prob": float(fake_prob),                     # For frontend direct usage
                 "detection_score": float(integrity),               # Keep compatibility

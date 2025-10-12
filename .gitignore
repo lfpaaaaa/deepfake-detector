@@ -62,6 +62,15 @@ TruFor-main/
 temp/
 tmp/
 
+# Job data and analysis results
+data/jobs/
+data/*.json
+
+# Backup files
+*_old.*
+*_new.*
+*_backup.*
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
