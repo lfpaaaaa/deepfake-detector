@@ -1,59 +1,59 @@
-# 🎯 DeepfakeBench V2.0 快速参考
+# 🎯 DeepfakeBench V2.0 Quick Reference
 
-## 🚀 一行命令快速开始
+## 🚀 One-Line Commands to Get Started
 
-### 单视频（带完整可视化）
+### Single Video (with Complete Visualization)
 ```bash
 python tools/predict_frames.py --input video.mp4 --model xception --fps 3 --save-vis
 ```
 
-### 批量处理（2个并行）
+### Batch Processing (2 workers in parallel)
 ```bash
 python tools/batch_predict.py --input-dir data/videos --model xception --workers 2
 ```
 
-### 生成汇总报告
+### Generate Summary Report
 ```bash
 python tools/aggregate_runs.py
 ```
 
-## 📁 输出文件一览
+## 📁 Output Files Overview
 
 ```
 runs/image_infer/<model>/<video>/
-├── scores.csv       # 逐帧分数
-├── timeline.json    # 可疑片段
-├── plot.png        # 📊 概率图表
-├── segments.srt    # 📝 SRT 字幕
-├── vis.mp4        # 🎬 可视化视频
-└── meta.txt       # 📄 元数据
+├── scores.csv       # Frame-by-frame scores
+├── timeline.json    # Suspicious segments
+├── plot.png        # 📊 Probability chart
+├── segments.srt    # 📝 SRT subtitles
+├── vis.mp4        # 🎬 Visualization video
+└── meta.txt       # 📄 Metadata
 ```
 
-## 🎬 可视化视频说明
+## 🎬 Visualization Video Explanation
 
-### 画面布局
+### Screen Layout
 ```
 ┌─────────────────────────────────────┐
-│ p_fake=0.xxx  t=mm:ss    MODEL  0.6 │ ← 文字信息
+│ p_fake=0.xxx  t=mm:ss    MODEL  0.6 │ ← Text info
 │                                     │
-│         原视频内容（960×540）        │
+│         Original video (960×540)     │
 │                                     │
 ├─────────────────────────────────────┤
-│ [████████████████░░░░░░░░░░░░░] │ | │ ← 概率条
-│  └── sparkline 曲线 ──┘        ↑   │
+│ [████████████████░░░░░░░░░░░░░] │ | │ ← Probability bar
+│  └── sparkline curve ──┘        ↑   │
 └─────────────────────────────────────┘
-                                阈值线
+                                Threshold line
 ```
 
-### 颜色说明
-- **绿色**: 低概率（可能真实）
-- **橙色**: 中等概率
-- **红色**: 高概率（可疑）
-- **红框**: 当前帧超过阈值
+### Color Explanation
+- **Green**: Low probability (likely authentic)
+- **Orange**: Medium probability
+- **Red**: High probability (suspicious)
+- **Red Border**: Current frame exceeds threshold
 
-## 🔧 常用命令模板
+## 🔧 Common Command Templates
 
-### 快速筛查（轻量模型）
+### Quick Screening (Lightweight Model)
 ```bash
 python tools/batch_predict.py \
   --input-dir data/videos \
@@ -62,7 +62,7 @@ python tools/batch_predict.py \
   --workers 4
 ```
 
-### 高精度检测（强力模型）
+### High Accuracy Detection (Powerful Model)
 ```bash
 python tools/batch_predict.py \
   --input-dir data/videos \
@@ -73,7 +73,7 @@ python tools/batch_predict.py \
   --save-vis
 ```
 
-### 多 GPU 加速
+### Multi-GPU Acceleration
 ```bash
 python tools/batch_predict.py \
   --input-dir data/videos \
@@ -82,16 +82,16 @@ python tools/batch_predict.py \
   --workers 8
 ```
 
-### 断点续跑（跳过已完成）
+### Resume Processing (Skip Completed)
 ```bash
 python tools/batch_predict.py \
   --input-dir data/videos \
   --model xception \
   --workers 3
-  # 自动跳过已有 timeline.json 的视频
+  # Automatically skip videos with timeline.json
 ```
 
-### 强制重新处理
+### Force Reprocess
 ```bash
 python tools/batch_predict.py \
   --input-dir data/videos \
@@ -100,7 +100,7 @@ python tools/batch_predict.py \
   --overwrite
 ```
 
-### 模式过滤（只处理匹配的文件）
+### Pattern Filtering (Only Process Matching Files)
 ```bash
 python tools/batch_predict.py \
   --input-dir data/videos \
@@ -109,77 +109,77 @@ python tools/batch_predict.py \
   --workers 2
 ```
 
-## 📊 汇总报告
+## 📊 Summary Reports
 
-### 基本用法
+### Basic Usage
 ```bash
 python tools/aggregate_runs.py
-# 输出: runs/summary.csv
+# Output: runs/summary.csv
 ```
 
-### 自定义输出路径
+### Custom Output Path
 ```bash
 python tools/aggregate_runs.py \
   --root runs/image_infer \
   --out my_report.csv
 ```
 
-### 详细模式
+### Verbose Mode
 ```bash
 python tools/aggregate_runs.py --verbose
 ```
 
-### CSV 列说明
-| 列名 | 说明 |
+### CSV Column Descriptions
+| Column | Description |
 |------|------|
-| model | 模型名称 |
-| video | 视频名称 |
-| overall_score | 最高分数 |
-| average_score | 平均分数 |
-| segments | 可疑片段数 |
-| flagged_sec | 标记总时长（秒） |
-| total_frames | 总帧数 |
-| fps | 采样率 |
-| threshold | 检测阈值 |
-| dir | 输出目录 |
+| model | Model name |
+| video | Video name |
+| overall_score | Highest score |
+| average_score | Average score |
+| segments | Number of suspicious segments |
+| flagged_sec | Total flagged duration (seconds) |
+| total_frames | Total frames |
+| fps | Sampling rate |
+| threshold | Detection threshold |
+| dir | Output directory |
 
-## 🎯 典型工作流
+## 🎯 Typical Workflows
 
-### 流程 1: 快速批量筛查
+### Workflow 1: Quick Batch Screening
 ```bash
-# 1. 批量处理
+# 1. Batch processing
 python tools/batch_predict.py \
   --input-dir data/videos \
   --model meso4 \
   --workers 4
 
-# 2. 生成汇总
+# 2. Generate summary
 python tools/aggregate_runs.py
 
-# 3. 查看 runs/summary.csv
-# 4. 筛选 overall_score > 0.7 的视频
-# 5. 对可疑视频用强力模型重新分析
+# 3. View runs/summary.csv
+# 4. Filter videos with overall_score > 0.7
+# 5. Re-analyze suspicious videos with powerful model
 ```
 
-### 流程 2: 多模型对比
+### Workflow 2: Multi-Model Comparison
 ```bash
-# 1. 多个模型处理
+# 1. Process with multiple models
 python tools/batch_predict.py --input-dir data/videos --model xception --workers 2
 python tools/batch_predict.py --input-dir data/videos --model f3net --workers 2
 python tools/batch_predict.py --input-dir data/videos --model recce --workers 2
 
-# 2. 汇总所有结果
+# 2. Aggregate all results
 python tools/aggregate_runs.py --out runs/multi_model.csv
 
-# 3. 对比单个视频
+# 3. Compare single video
 python tools/quick_compare.py \
   --results_dir runs/image_infer \
   --video video_name
 ```
 
-### 流程 3: 高质量完整分析
+### Workflow 3: High-Quality Complete Analysis
 ```bash
-# 1. 高 FPS + 可视化
+# 1. High FPS + visualization
 python tools/predict_frames.py \
   --input important_video.mp4 \
   --model xception \
@@ -187,26 +187,26 @@ python tools/predict_frames.py \
   --threshold 0.6 \
   --save-vis
 
-# 2. 查看输出
-# - plot.png: 查看概率曲线
-# - vis.mp4: 观看可视化视频
-# - segments.srt: 加载到播放器
-# - timeline.json: 查看检测结果
+# 2. View output
+# - plot.png: View probability curve
+# - vis.mp4: Watch visualization video
+# - segments.srt: Load into player
+# - timeline.json: View detection results
 ```
 
-## 📝 SRT 字幕使用
+## 📝 Using SRT Subtitles
 
 ### VLC Player
-1. 将 `segments.srt` 重命名为与视频同名
-2. 放在同一目录
-3. 打开视频即可看到字幕
+1. Rename `segments.srt` to match video filename
+2. Place in same directory
+3. Open video to see subtitles
 
 ### MPV Player
 ```bash
 mpv video.mp4 --sub-file=segments.srt
 ```
 
-### 浏览器
+### Browser
 ```html
 <video controls>
   <source src="video.mp4" type="video/mp4">
@@ -214,34 +214,34 @@ mpv video.mp4 --sub-file=segments.srt
 </video>
 ```
 
-## 🔍 结果分析
+## 🔍 Results Analysis
 
-### 查看单个视频结果
+### View Single Video Results
 ```bash
-# 所有文件在这里
+# All files are here
 cd runs/image_infer/xception/video_name/
 
-# 查看元数据
+# View metadata
 cat meta.txt
 
-# 查看时间线
+# View timeline
 cat timeline.json
 
-# 查看图表
+# View chart
 open plot.png  # Mac
 start plot.png # Windows
 
-# 观看可视化
+# Watch visualization
 vlc vis.mp4
 ```
 
-### 查看批量汇总
+### View Batch Summary
 ```bash
-# 用 Excel/LibreOffice 打开
-# 或用命令行查看
+# Open with Excel/LibreOffice
+# Or view from command line
 cat runs/summary.csv | column -t -s,
 
-# Python 查看
+# View with Python
 python -c "
 import pandas as pd
 df = pd.read_csv('runs/summary.csv')
@@ -250,45 +250,45 @@ print(df[df['overall_score'] > 0.7])
 "
 ```
 
-## 🚨 常见问题速查
+## 🚨 Common Issues Quick Reference
 
-### 问题：可视化视频无法生成
+### Issue: Visualization Video Cannot Be Generated
 ```bash
-# 确认参数
---save-vis  # 必须加这个参数
+# Check parameters
+--save-vis  # Must add this parameter
 
-# 检查 OpenCV
+# Check OpenCV
 python -c "import cv2; print(cv2.__version__)"
 ```
 
-### 问题：批量处理卡住
+### Issue: Batch Processing Stuck
 ```bash
-# 减少 workers
---workers 2  # 降到 2
+# Reduce workers
+--workers 2  # Reduce to 2
 
-# 检查 GPU 内存
+# Check GPU memory
 nvidia-smi
 
-# 不生成可视化（节省资源）
-# 移除 --save-vis
+# Don't generate visualization (save resources)
+# Remove --save-vis
 ```
 
-### 问题：没有 plot.png
+### Issue: No plot.png
 ```bash
-# 安装 matplotlib
+# Install matplotlib
 pip install matplotlib
 ```
 
-### 问题：所有视频都被跳过
+### Issue: All Videos Skipped
 ```bash
-# 使用 --overwrite 强制重新处理
+# Use --overwrite to force reprocess
 --overwrite
 ```
 
-## ⚡ 性能参考
+## ⚡ Performance Reference
 
-### 单视频处理时间（参考）
-| 模型 | CPU (2fps) | GPU (3fps) | GPU (5fps) |
+### Single Video Processing Time (Reference)
+| Model | CPU (2fps) | GPU (3fps) | GPU (5fps) |
 |------|-----------|-----------|-----------|
 | meso4 | ~8s | ~3s | ~5s |
 | capsule_net | ~10s | ~4s | ~6s |
@@ -296,46 +296,45 @@ pip install matplotlib
 | xception | ~30s | ~8s | ~12s |
 | recce | ~20s | ~6s | ~10s |
 
-### 批量处理吞吐量（100 个视频）
-| 配置 | 时间 | 速度 |
+### Batch Processing Throughput (100 videos)
+| Configuration | Time | Speed |
 |------|------|------|
-| 串行 | ~500s | 1 视频/5s |
-| 2 workers | ~250s | 1 视频/2.5s |
-| 4 workers | ~125s | 1 视频/1.25s |
-| 8 workers (多GPU) | ~62s | 1 视频/0.6s |
+| Serial | ~500s | 1 video/5s |
+| 2 workers | ~250s | 1 video/2.5s |
+| 4 workers | ~125s | 1 video/1.25s |
+| 8 workers (multi-GPU) | ~62s | 1 video/0.6s |
 
-## 📚 更多文档
+## 📚 More Documentation
 
-- **快速开始**: `QUICK_START.md`
-- **完整文档**: `FRAME_INFERENCE_SETUP.md`
-- **批量处理**: `BATCH_PROCESSING_GUIDE.md`
-- **升级说明**: `UPGRADE_SUMMARY_V2.md`
-- **工具文档**: `tools/README.md`
+- **Quick Start**: `QUICK_START.md`
+- **Complete Documentation**: `FRAME_INFERENCE_SETUP.md`
+- **Batch Processing**: `BATCH_PROCESSING_GUIDE.md`
+- **Upgrade Notes**: `UPGRADE_SUMMARY_V2.md`
+- **Tool Documentation**: `tools/README.md`
 
-## 💡 专家提示
+## 💡 Expert Tips
 
-1. **先快后慢**: 用轻量模型快速筛查，再用强力模型精确分析
-2. **合理并行**: workers 数不要超过 CPU 核心数
-3. **断点续跑**: 大批量任务记得定期检查，中断后可直接继续
-4. **保存可视化**: 重要视频务必用 `--save-vis`，方便后续审查
-5. **多模型验证**: 可疑视频用多个模型交叉验证，提高准确率
+1. **Fast then Slow**: Use lightweight model for quick screening, then powerful model for detailed analysis
+2. **Reasonable Parallelism**: Workers should not exceed CPU core count
+3. **Resume Support**: For large batch tasks, check periodically - can continue after interruption
+4. **Save Visualization**: Important videos should use `--save-vis` for later review
+5. **Multi-Model Validation**: Cross-validate suspicious videos with multiple models for higher accuracy
 
-## 🎉 开始使用
+## 🎉 Get Started
 
 ```bash
-# 1. 测试系统
+# 1. Test system
 test_inference.bat
 
-# 2. 批量处理你的视频
+# 2. Batch process your videos
 python tools/batch_predict.py \
   --input-dir your_videos \
   --model xception \
   --workers 2 \
   --save-vis
 
-# 3. 查看结果
+# 3. View results
 python tools/aggregate_runs.py
 ```
 
-祝你使用愉快！🚀
-
+Enjoy! 🚀

@@ -1,32 +1,32 @@
-# 🚀 DeepfakeBench 单帧推理 - 快速开始
+# 🚀 DeepfakeBench Frame-Level Inference - Quick Start
 
-## ⚡ 3 步开始使用
+## ⚡ Get Started in 3 Steps
 
-### 1️⃣ 查看可用模型
+### 1️⃣ View Available Models
 
 ```bash
 python tools/list_models.py
 ```
 
-### 2️⃣ 运行第一个推理
+### 2️⃣ Run Your First Inference
 
 ```batch
 # Windows
 test_inference.bat
 
-# 或手动运行
+# Or run manually
 python tools/predict_frames.py --input data/jobs/job_440557d4147f_1760275209/input.mp4 --model meso4 --fps 2
 ```
 
-### 3️⃣ 查看结果
+### 3️⃣ Check Results
 
-检查输出目录：
-- `runs/test_infer/meso4/input/scores.csv` - 逐帧分数
-- `runs/test_infer/meso4/input/timeline.json` - 可疑时间段
+Check the output directory:
+- `runs/test_infer/meso4/input/scores.csv` - Frame-by-frame scores
+- `runs/test_infer/meso4/input/timeline.json` - Suspicious time segments
 
-## 📋 常用命令
+## 📋 Common Commands
 
-### 单个视频分析
+### Single Video Analysis
 ```bash
 python tools/predict_frames.py \
   --input video.mp4 \
@@ -35,7 +35,7 @@ python tools/predict_frames.py \
   --threshold 0.6
 ```
 
-### 批量处理
+### Batch Processing
 ```bash
 python tools/predict_frames.py \
   --input data/jobs/ \
@@ -43,16 +43,16 @@ python tools/predict_frames.py \
   --fps 2
 ```
 
-### 多模型对比
+### Multi-Model Comparison
 ```batch
-# 测试 5 个不同模型
+# Test 5 different models
 test_all_models.bat
 
-# 对比结果
+# Compare results
 python tools/quick_compare.py --results_dir runs/model_comparison --video input
 ```
 
-### 融合 VideoMAE 分数
+### Fuse with VideoMAE Scores
 ```bash
 python tools/fuse_scores.py \
   --frame_csv runs/image_infer/xception/video/scores.csv \
@@ -61,27 +61,27 @@ python tools/fuse_scores.py \
   --out runs/fused/video
 ```
 
-## 🎯 推荐模型选择
+## 🎯 Recommended Model Selection
 
-| 场景 | 模型 | FPS | 特点 |
+| Scenario | Model | FPS | Features |
 |------|------|-----|------|
-| 快速筛查 | `meso4` | 2 | 轻量快速 |
-| 标准检测 | `f3net` | 3 | 平衡性能 |
-| 高精度 | `xception` | 5 | 最高精度 |
-| 实时处理 | `capsule_net` | 2 | 超快速度 |
+| Quick Screening | `meso4` | 2 | Lightweight and fast |
+| Standard Detection | `f3net` | 3 | Balanced performance |
+| High Accuracy | `xception` | 5 | Highest accuracy |
+| Real-time Processing | `capsule_net` | 2 | Ultra-fast speed |
 
-## 📊 参数说明
+## 📊 Parameter Descriptions
 
-| 参数 | 说明 | 默认值 | 示例 |
+| Parameter | Description | Default | Example |
 |------|------|--------|------|
-| `--input` | 视频文件或目录 | 必填 | `video.mp4` |
-| `--model` | 模型名称 | 必填 | `xception` |
-| `--fps` | 提取帧率 | 3.0 | `2`, `5` |
-| `--threshold` | 检测阈值 | 0.5 | `0.6` |
-| `--device` | 计算设备 | `cuda` | `cpu` |
-| `--outdir` | 输出目录 | `runs/image_infer` | 自定义路径 |
+| `--input` | Video file or directory | Required | `video.mp4` |
+| `--model` | Model name | Required | `xception` |
+| `--fps` | Frame extraction rate | 3.0 | `2`, `5` |
+| `--threshold` | Detection threshold | 0.5 | `0.6` |
+| `--device` | Compute device | `cuda` | `cpu` |
+| `--outdir` | Output directory | `runs/image_infer` | Custom path |
 
-## 🔍 输出文件说明
+## 🔍 Output File Descriptions
 
 ### scores.csv
 ```csv
@@ -101,20 +101,19 @@ frame_idx,timestamp,prob_fake
 }
 ```
 
-## 📚 更多信息
+## 📚 More Information
 
-- **完整文档**: `FRAME_INFERENCE_SETUP.md`
-- **详细教程**: `tools/README.md`
-- **支持的模型**: 13 个 DeepfakeBench 检测器
+- **Complete Documentation**: `FRAME_INFERENCE_SETUP.md`
+- **Detailed Tutorial**: `tools/README.md`
+- **Supported Models**: 13 DeepfakeBench detectors
 
-## 💡 提示
+## 💡 Tips
 
-1. 首次运行会较慢（模型加载）
-2. GPU 推理速度约是 CPU 的 10-20 倍
-3. FPS 越高越精确，但处理时间也越长
-4. 可同时运行多个模型进行对比
+1. First run will be slower (model loading)
+2. GPU inference is approximately 10-20x faster than CPU
+3. Higher FPS is more accurate but takes longer to process
+4. Can run multiple models simultaneously for comparison
 
-## 🐛 问题？
+## 🐛 Issues?
 
-查看 `FRAME_INFERENCE_SETUP.md` 的故障排查部分
-
+See the troubleshooting section in `FRAME_INFERENCE_SETUP.md`

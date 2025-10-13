@@ -1,64 +1,64 @@
-# DeepfakeBench 单帧模型推理 - 设置完成
+# DeepfakeBench Frame-Level Model Inference - Setup Complete
 
-## ✅ 已完成的工作
+## ✅ Completed Work
 
-### 1. 核心文件创建
+### 1. Core Files Created
 
-已创建以下工具文件：
+The following tool files have been created:
 
-- **`tools/weight_registry.py`** - 权重文件映射表
-- **`tools/build_dfbench_model.py`** - 模型加载工厂
-- **`tools/predict_frames.py`** - 主推理脚本
-- **`tools/fuse_scores.py`** - 分数融合脚本
-- **`tools/test_setup.py`** - 系统测试脚本
-- **`tools/__init__.py`** - Python 包初始化文件
+- **`tools/weight_registry.py`** - Weight file mapping table
+- **`tools/build_dfbench_model.py`** - Model loading factory
+- **`tools/predict_frames.py`** - Main inference script
+- **`tools/fuse_scores.py`** - Score fusion script
+- **`tools/test_setup.py`** - System test script
+- **`tools/__init__.py`** - Python package initialization file
 
-### 2. 支持的模型
+### 2. Supported Models
 
-已配置 13 个 DeepfakeBench 模型：
+13 DeepfakeBench models have been configured:
 
-| 模型 | 权重文件 | 输入尺寸 | 状态 |
+| Model | Weight File | Input Size | Status |
 |------|---------|---------|------|
-| Xception | xception_best.pth | 299x299 | ✅ 已就绪 |
-| MesoNet-4 | meso4_best.pth | 256x256 | ✅ 已就绪 |
-| MesoNet-4 Inception | meso4Incep_best.pth | 256x256 | ✅ 已就绪 |
-| F3Net | f3net_best.pth | 224x224 | ✅ 已就绪 |
-| EfficientNet-B4 | effnb4_best.pth | 380x380 | ✅ 已就绪 |
-| Capsule Net | capsule_best.pth | 128x128 | ✅ 已就绪 |
-| SRM | srm_best.pth | 299x299 | ✅ 已就绪 |
-| RECCE | recce_best.pth | 224x224 | ✅ 已就绪 |
-| SPSL | spsl_best.pth | 224x224 | ✅ 已就绪 |
-| FFD | ffd_best.pth | 224x224 | ✅ 已就绪 |
-| UCF | ucf_best.pth | 224x224 | ✅ 已就绪 |
-| CNN-AUG | cnnaug_best.pth | 224x224 | ✅ 已就绪 |
-| CORE | core_best.pth | 224x224 | ✅ 已就绪 |
+| Xception | xception_best.pth | 299x299 | ✅ Ready |
+| MesoNet-4 | meso4_best.pth | 256x256 | ✅ Ready |
+| MesoNet-4 Inception | meso4Incep_best.pth | 256x256 | ✅ Ready |
+| F3Net | f3net_best.pth | 224x224 | ✅ Ready |
+| EfficientNet-B4 | effnb4_best.pth | 380x380 | ✅ Ready |
+| Capsule Net | capsule_best.pth | 128x128 | ✅ Ready |
+| SRM | srm_best.pth | 299x299 | ✅ Ready |
+| RECCE | recce_best.pth | 224x224 | ✅ Ready |
+| SPSL | spsl_best.pth | 224x224 | ✅ Ready |
+| FFD | ffd_best.pth | 224x224 | ✅ Ready |
+| UCF | ucf_best.pth | 224x224 | ✅ Ready |
+| CNN-AUG | cnnaug_best.pth | 224x224 | ✅ Ready |
+| CORE | core_best.pth | 224x224 | ✅ Ready |
 
-所有权重文件已放置在: `vendors/DeepfakeBench/training/weights/`
+All weight files are placed in: `vendors/DeepfakeBench/training/weights/`
 
-### 3. 功能特性
+### 3. Feature Capabilities
 
-✅ **逐帧分析**: 可设置任意 FPS 提取帧率
-✅ **多模型支持**: 支持 13 种不同的检测模型
-✅ **批量处理**: 可处理单个视频或整个目录
-✅ **时间线生成**: 自动识别可疑时间段
-✅ **分数融合**: 可与 VideoMAE 结果融合
-✅ **灵活配置**: 可调整阈值、FPS 等参数
-✅ **设备选择**: 支持 GPU (CUDA) 和 CPU 推理
+✅ **Frame-by-Frame Analysis**: Can set any FPS extraction rate
+✅ **Multi-Model Support**: Supports 13 different detection models
+✅ **Batch Processing**: Can process single videos or entire directories
+✅ **Timeline Generation**: Automatically identifies suspicious time periods
+✅ **Score Fusion**: Can fuse with VideoMAE results
+✅ **Flexible Configuration**: Adjustable threshold, FPS and other parameters
+✅ **Device Selection**: Supports GPU (CUDA) and CPU inference
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 方式 1: 使用批处理脚本（推荐）
+### Method 1: Using Batch Script (Recommended)
 
-运行提供的测试脚本：
+Run the provided test script:
 
 ```batch
 test_inference.bat
 ```
 
-### 方式 2: 命令行运行
+### Method 2: Command Line Execution
 
 ```bash
-# 单个视频推理
+# Single video inference
 python tools/predict_frames.py \
   --input data/jobs/job_440557d4147f_1760275209/input.mp4 \
   --model xception \
@@ -66,7 +66,7 @@ python tools/predict_frames.py \
   --threshold 0.6 \
   --device cuda
 
-# 批量处理
+# Batch processing
 python tools/predict_frames.py \
   --input data/jobs/ \
   --model meso4 \
@@ -75,11 +75,11 @@ python tools/predict_frames.py \
   --device cpu
 ```
 
-## 📊 输出说明
+## 📊 Output Description
 
-每个视频会在输出目录生成：
+For each video, the following will be generated in the output directory:
 
-### 1. `scores.csv` - 逐帧分数
+### 1. `scores.csv` - Frame-by-Frame Scores
 ```csv
 frame_idx,timestamp,prob_fake
 0,0.000,0.234567
@@ -88,7 +88,7 @@ frame_idx,timestamp,prob_fake
 ...
 ```
 
-### 2. `timeline.json` - 可疑片段汇总
+### 2. `timeline.json` - Suspicious Segment Summary
 ```json
 {
   "video": "input",
@@ -105,9 +105,9 @@ frame_idx,timestamp,prob_fake
 }
 ```
 
-## 🔧 常用命令示例
+## 🔧 Common Command Examples
 
-### 快速筛查（低 FPS + 轻量模型）
+### Quick Screening (Low FPS + Lightweight Model)
 ```bash
 python tools/predict_frames.py \
   --input video.mp4 \
@@ -116,7 +116,7 @@ python tools/predict_frames.py \
   --threshold 0.5
 ```
 
-### 高精度检测（高 FPS + 强力模型）
+### High Accuracy Detection (High FPS + Powerful Model)
 ```bash
 python tools/predict_frames.py \
   --input video.mp4 \
@@ -126,7 +126,7 @@ python tools/predict_frames.py \
   --device cuda
 ```
 
-### 批量处理目录
+### Batch Process Directory
 ```bash
 python tools/predict_frames.py \
   --input data/jobs/ \
@@ -135,7 +135,7 @@ python tools/predict_frames.py \
   --threshold 0.55
 ```
 
-### CPU 模式（无 GPU 时）
+### CPU Mode (When No GPU Available)
 ```bash
 python tools/predict_frames.py \
   --input video.mp4 \
@@ -144,9 +144,9 @@ python tools/predict_frames.py \
   --device cpu
 ```
 
-## 🔗 分数融合（与 VideoMAE 结合）
+## 🔗 Score Fusion (Combining with VideoMAE)
 
-如果已有 VideoMAE 的分析结果：
+If you already have VideoMAE analysis results:
 
 ```bash
 python tools/fuse_scores.py \
@@ -157,131 +157,130 @@ python tools/fuse_scores.py \
   --out runs/fused/video
 ```
 
-**参数说明：**
-- `--alpha`: VideoMAE 的权重（0.6 = 60% VideoMAE + 40% 单帧）
-- `--threshold`: 融合后的检测阈值
+**Parameter Descriptions:**
+- `--alpha`: VideoMAE weight (0.6 = 60% VideoMAE + 40% frame model)
+- `--threshold`: Post-fusion detection threshold
 
-**输出文件：**
-- `scores_fused.csv`: 融合后的逐帧分数
-- `timeline_fused.json`: 融合后的可疑片段
+**Output Files:**
+- `scores_fused.csv`: Fused frame-by-frame scores
+- `timeline_fused.json`: Fused suspicious segments
 
-## 📈 性能建议
+## 📈 Performance Recommendations
 
-### 速度优先
-- 模型: `meso4` 或 `capsule_net`
+### Speed Priority
+- Model: `meso4` or `capsule_net`
 - FPS: 2
-- 设备: GPU (如果可用)
+- Device: GPU (if available)
 
-### 精度优先
-- 模型: `xception` 或 `efficientnetb4`
+### Accuracy Priority
+- Model: `xception` or `efficientnetb4`
 - FPS: 5
-- 融合: 与 VideoMAE 结合
+- Fusion: Combine with VideoMAE
 
-### 平衡选择
-- 模型: `f3net` 或 `recce`
+### Balanced Choice
+- Model: `f3net` or `recce`
 - FPS: 3
-- 设备: GPU
+- Device: GPU
 
-## 📁 文件结构
+## 📁 File Structure
 
 ```
 deepfake-detector/
 ├── tools/
 │   ├── __init__.py
-│   ├── weight_registry.py          # 权重映射
-│   ├── build_dfbench_model.py      # 模型构建
-│   ├── predict_frames.py           # 主推理脚本
-│   ├── fuse_scores.py              # 分数融合
-│   ├── test_setup.py               # 测试脚本
-│   └── README.md                   # 详细文档
+│   ├── weight_registry.py          # Weight mapping
+│   ├── build_dfbench_model.py      # Model building
+│   ├── predict_frames.py           # Main inference script
+│   ├── fuse_scores.py              # Score fusion
+│   ├── test_setup.py               # Test script
+│   └── README.md                   # Detailed documentation
 │
 ├── vendors/DeepfakeBench/
 │   └── training/
-│       ├── detectors/              # 模型定义
-│       ├── config/detector/        # 模型配置
-│       └── weights/                # 权重文件 (13个 .pth)
+│       ├── detectors/              # Model definitions
+│       ├── config/detector/        # Model configurations
+│       └── weights/                # Weight files (13 .pth files)
 │
-├── runs/                           # 推理结果输出
-│   ├── image_infer/                # 单帧推理结果
+├── runs/                           # Inference result output
+│   ├── image_infer/                # Frame inference results
 │   │   └── <model_name>/
 │   │       └── <video_name>/
 │   │           ├── scores.csv
 │   │           └── timeline.json
-│   └── fused/                      # 融合结果
+│   └── fused/                      # Fusion results
 │       └── <video_name>/
 │           ├── scores_fused.csv
 │           └── timeline_fused.json
 │
-├── test_inference.bat              # Windows 快速测试
-└── FRAME_INFERENCE_SETUP.md        # 本文档
+├── test_inference.bat              # Windows quick test
+└── FRAME_INFERENCE_SETUP.md        # This document
 ```
 
-## 🐛 故障排查
+## 🐛 Troubleshooting
 
-### 问题: 找不到模型
+### Issue: Model Not Found
 
-**解决方案:**
-1. 检查模型名称是否正确（参考支持的模型表）
-2. 运行 `python tools/test_setup.py` 检查系统状态
+**Solution:**
+1. Check if model name is correct (refer to supported models table)
+2. Run `python tools/test_setup.py` to check system status
 
-### 问题: CUDA 内存不足
+### Issue: CUDA Out of Memory
 
-**解决方案:**
+**Solution:**
 ```bash
-# 降低 FPS
+# Reduce FPS
 python tools/predict_frames.py --input video.mp4 --model meso4 --fps 2
 
-# 或使用 CPU
+# Or use CPU
 python tools/predict_frames.py --input video.mp4 --model meso4 --device cpu
 ```
 
-### 问题: 权重加载失败
+### Issue: Weight Loading Failed
 
-**解决方案:**
-1. 确认权重文件存在: `dir vendors\DeepfakeBench\training\weights\`
-2. 检查文件大小是否正常（不应该是 0 KB）
-3. 如有问题，重新下载对应权重
+**Solution:**
+1. Confirm weight file exists: `dir vendors\DeepfakeBench\training\weights\`
+2. Check if file size is normal (should not be 0 KB)
+3. If there's a problem, re-download the corresponding weight
 
-### 问题: PowerShell 显示异常
+### Issue: PowerShell Display Anomalies
 
-这是 PowerShell 控制台的已知问题，不影响实际运行。可以：
-1. 使用批处理脚本运行
-2. 直接检查输出目录查看结果
-3. 或使用标准 CMD 而非 PowerShell
+This is a known issue with PowerShell console and doesn't affect actual execution. You can:
+1. Use batch script to run
+2. Check output directory directly for results
+3. Or use standard CMD instead of PowerShell
 
-## 📚 更多信息
+## 📚 More Information
 
-- **详细使用文档**: `tools/README.md`
-- **DeepfakeBench 官方**: https://github.com/SCLBD/DeepfakeBench
-- **模型配置**: `vendors/DeepfakeBench/training/config/detector/`
+- **Detailed Usage Documentation**: `tools/README.md`
+- **DeepfakeBench Official**: https://github.com/SCLBD/DeepfakeBench
+- **Model Configuration**: `vendors/DeepfakeBench/training/config/detector/`
 
-## ✨ 后续扩展
+## ✨ Future Extensions
 
-可以进一步添加的功能：
+Functions that can be further added:
 
-1. **可视化输出**: 在视频上叠加分数曲线
-2. **集成检测**: 多个模型投票融合
-3. **Web API**: REST API 接口
-4. **实时推理**: 摄像头实时检测
-5. **报告生成**: 自动生成 PDF/HTML 报告
+1. **Visualization Output**: Overlay score curves on videos
+2. **Ensemble Detection**: Multi-model voting fusion
+3. **Web API**: REST API interface
+4. **Real-time Inference**: Real-time camera detection
+5. **Report Generation**: Auto-generate PDF/HTML reports
 
-## 📝 版本信息
+## 📝 Version Information
 
-- **创建日期**: 2025-10-12
-- **支持模型**: 13 个 DeepfakeBench 图像检测器
-- **Python 版本**: 3.8+
-- **PyTorch 版本**: 1.9+
+- **Creation Date**: 2025-10-12
+- **Supported Models**: 13 DeepfakeBench image detectors
+- **Python Version**: 3.8+
+- **PyTorch Version**: 1.9+
 
 ---
 
-## ⚡ 下一步操作
+## ⚡ Next Steps
 
-现在系统已完全配置好，您可以：
+Now that the system is fully configured, you can:
 
-1. **运行测试**: 执行 `test_inference.bat` 验证系统
-2. **处理视频**: 使用 `tools/predict_frames.py` 分析视频
-3. **查看结果**: 检查 `runs/test_infer/` 目录
-4. **阅读文档**: 查看 `tools/README.md` 了解更多功能
+1. **Run Tests**: Execute `test_inference.bat` to verify the system
+2. **Process Videos**: Use `tools/predict_frames.py` to analyze videos
+3. **View Results**: Check the `runs/test_infer/` directory
+4. **Read Documentation**: Check `tools/README.md` for more features
 
-祝您使用愉快！🎉
-
+Enjoy! 🎉

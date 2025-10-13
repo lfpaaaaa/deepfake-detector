@@ -1,25 +1,25 @@
 # DeepfakeBench Frame-Level Detection Tools
 
-这套工具允许你使用 DeepfakeBench 的多种模型对视频进行逐帧深度伪造检测。
+This toolset allows you to perform frame-by-frame deepfake detection on videos using multiple DeepfakeBench models.
 
-## 📁 文件说明
+## 📁 File Descriptions
 
-- **`weight_registry.py`**: 权重文件到模型配置的映射表
-- **`build_dfbench_model.py`**: 自动加载和构建模型的工厂类
-- **`predict_frames.py`**: 主推理脚本，对视频逐帧分析
-- **`fuse_scores.py`**: 融合单帧分数与 VideoMAE 分数的脚本
+- **`weight_registry.py`**: Maps weight files to model configurations
+- **`build_dfbench_model.py`**: Factory class for automatically loading and building models
+- **`predict_frames.py`**: Main inference script for frame-by-frame video analysis
+- **`fuse_scores.py`**: Script for fusing single-frame scores with VideoMAE scores
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 验证权重文件
+### 1. Verify Weight Files
 
-确认权重文件已放置在正确位置：
+Confirm that weight files are placed in the correct location:
 
 ```bash
 ls vendors/DeepfakeBench/training/weights/
 ```
 
-应该看到以下文件：
+You should see the following files:
 - `xception_best.pth`
 - `meso4_best.pth`
 - `meso4Incep_best.pth`
@@ -34,9 +34,9 @@ ls vendors/DeepfakeBench/training/weights/
 - `cnnaug_best.pth`
 - `core_best.pth`
 
-### 2. 运行单个视频推理
+### 2. Run Single Video Inference
 
-使用 Xception 模型分析视频：
+Analyze a video using the Xception model:
 
 ```bash
 python tools/predict_frames.py \
@@ -47,15 +47,15 @@ python tools/predict_frames.py \
   --device cuda
 ```
 
-**参数说明：**
-- `--input`: 视频文件路径或包含视频的目录
-- `--model`: 模型名称（如 `xception`）或权重文件名（如 `xception_best.pth`）
-- `--fps`: 提取帧率（默认 3fps）
-- `--threshold`: 可疑片段的阈值（默认 0.5）
-- `--device`: 使用的设备（`cuda` 或 `cpu`）
-- `--outdir`: 输出目录（默认 `runs/image_infer`）
+**Parameter Descriptions:**
+- `--input`: Path to video file or directory containing videos
+- `--model`: Model name (e.g., `xception`) or weight filename (e.g., `xception_best.pth`)
+- `--fps`: Frame extraction rate (default: 3fps)
+- `--threshold`: Threshold for suspicious segments (default: 0.5)
+- `--device`: Device to use (`cuda` or `cpu`)
+- `--outdir`: Output directory (default: `runs/image_infer`)
 
-### 3. 批量处理多个视频
+### 3. Batch Process Multiple Videos
 
 ```bash
 python tools/predict_frames.py \
@@ -65,34 +65,34 @@ python tools/predict_frames.py \
   --threshold 0.55
 ```
 
-### 4. 尝试不同模型
+### 4. Try Different Models
 
-#### Xception (高精度，较慢)
+#### Xception (High Accuracy, Slower)
 ```bash
 python tools/predict_frames.py --input video.mp4 --model xception
 ```
 
-#### MesoNet (快速，轻量)
+#### MesoNet (Fast, Lightweight)
 ```bash
 python tools/predict_frames.py --input video.mp4 --model meso4
 ```
 
-#### EfficientNet-B4 (平衡)
+#### EfficientNet-B4 (Balanced)
 ```bash
 python tools/predict_frames.py --input video.mp4 --model efficientnetb4
 ```
 
-#### F3Net (频域分析)
+#### F3Net (Frequency Domain Analysis)
 ```bash
 python tools/predict_frames.py --input video.mp4 --model f3net
 ```
 
-## 📊 输出文件
+## 📊 Output Files
 
-每个视频会生成两个文件：
+Two files are generated for each video:
 
 ### `scores.csv`
-逐帧的检测分数：
+Frame-by-frame detection scores:
 ```csv
 frame_idx,timestamp,prob_fake
 0,0.000,0.234567
@@ -102,7 +102,7 @@ frame_idx,timestamp,prob_fake
 ```
 
 ### `timeline.json`
-汇总信息和可疑片段：
+Summary information and suspicious segments:
 ```json
 {
   "video": "video_name",
@@ -119,9 +119,9 @@ frame_idx,timestamp,prob_fake
 }
 ```
 
-## 🔗 融合 VideoMAE 分数
+## 🔗 Fusing VideoMAE Scores
 
-如果你已经有 VideoMAE 的分析结果，可以将两者融合以提高准确率：
+If you already have VideoMAE analysis results, you can fuse them together to improve accuracy:
 
 ```bash
 python tools/fuse_scores.py \
@@ -132,38 +132,38 @@ python tools/fuse_scores.py \
   --out runs/fused/xception_videomae/video_name
 ```
 
-**参数说明：**
-- `--frame_csv`: 单帧模型的分数文件
-- `--videomae_csv`: VideoMAE 的分数文件
-- `--alpha`: VideoMAE 的权重（0.6 表示 60% VideoMAE + 40% 单帧）
-- `--threshold`: 融合后的阈值
-- `--out`: 输出目录
+**Parameter Descriptions:**
+- `--frame_csv`: Frame model scores file
+- `--videomae_csv`: VideoMAE scores file
+- `--alpha`: VideoMAE weight (0.6 means 60% VideoMAE + 40% frame model)
+- `--threshold`: Post-fusion threshold
+- `--out`: Output directory
 
-**输出文件：**
-- `scores_fused.csv`: 融合后的逐帧分数
-- `timeline_fused.json`: 融合后的可疑片段
+**Output Files:**
+- `scores_fused.csv`: Fused frame-by-frame scores
+- `timeline_fused.json`: Fused suspicious segments
 
-## 🎯 支持的模型
+## 🎯 Supported Models
 
-| 模型 | model_key | 输入尺寸 | 特点 |
+| Model | model_key | Input Size | Features |
 |------|-----------|----------|------|
-| Xception | `xception` | 299x299 | 高精度，深层网络 |
-| MesoNet-4 | `meso4` | 256x256 | 轻量快速 |
-| MesoNet-4 Inception | `meso4Inception` | 256x256 | MesoNet 改进版 |
-| F3Net | `f3net` | 224x224 | 频域分析 |
-| EfficientNet-B4 | `efficientnetb4` | 380x380 | 高效平衡 |
-| Capsule Net | `capsule_net` | 128x128 | 胶囊网络 |
-| SRM | `srm` | 299x299 | 空间富模型 |
-| RECCE | `recce` | 224x224 | 关系感知 |
-| SPSL | `spsl` | 224x224 | 自监督学习 |
-| FFD | `ffd` | 224x224 | 人脸伪造检测 |
-| UCF | `ucf` | 224x224 | 统一对比学习 |
-| CNN-AUG | `multi_attention` | 224x224 | 多注意力机制 |
-| CORE | `core` | 224x224 | 核心特征 |
+| Xception | `xception` | 299x299 | High accuracy, deep network |
+| MesoNet-4 | `meso4` | 256x256 | Lightweight and fast |
+| MesoNet-4 Inception | `meso4Inception` | 256x256 | Improved MesoNet |
+| F3Net | `f3net` | 224x224 | Frequency domain analysis |
+| EfficientNet-B4 | `efficientnetb4` | 380x380 | Efficient and balanced |
+| Capsule Net | `capsule_net` | 128x128 | Capsule network |
+| SRM | `srm` | 299x299 | Spatial Rich Model |
+| RECCE | `recce` | 224x224 | Relationship-aware |
+| SPSL | `spsl` | 224x224 | Self-supervised learning |
+| FFD | `ffd` | 224x224 | Face forgery detection |
+| UCF | `ucf` | 224x224 | Unified contrastive learning |
+| CNN-AUG | `multi_attention` | 224x224 | Multi-attention mechanism |
+| CORE | `core` | 224x224 | Core features |
 
-## 🔧 高级用法
+## 🔧 Advanced Usage
 
-### 指定自定义权重文件
+### Specify Custom Weight File
 
 ```bash
 python tools/predict_frames.py \
@@ -172,17 +172,17 @@ python tools/predict_frames.py \
   --ckpt /path/to/custom_weights.pth
 ```
 
-### 调整帧率和阈值
+### Adjust FPS and Threshold
 
 ```bash
-# 更高的帧率（更精细但更慢）
+# Higher FPS (more detailed but slower)
 python tools/predict_frames.py --input video.mp4 --model xception --fps 5
 
-# 更低的阈值（检测更敏感）
+# Lower threshold (more sensitive detection)
 python tools/predict_frames.py --input video.mp4 --model xception --threshold 0.4
 ```
 
-### CPU 模式（无 GPU 时）
+### CPU Mode (When No GPU Available)
 
 ```bash
 python tools/predict_frames.py \
@@ -191,77 +191,77 @@ python tools/predict_frames.py \
   --device cpu
 ```
 
-## 📈 性能建议
+## 📈 Performance Recommendations
 
-### 速度优化
-1. 使用较低的 FPS（如 2-3）进行初步筛查
-2. 选择轻量模型（MesoNet, Capsule）用于快速处理
-3. 批量处理时使用 GPU
+### Speed Optimization
+1. Use lower FPS (e.g., 2-3) for initial screening
+2. Choose lightweight models (MesoNet, Capsule) for fast processing
+3. Use GPU for batch processing
 
-### 精度优化
-1. 使用多个模型进行集成
-2. 提高 FPS 到 5-10 用于关键视频
-3. 融合 VideoMAE 分数
-4. 调整阈值根据具体场景
+### Accuracy Optimization
+1. Use multiple models for ensemble
+2. Increase FPS to 5-10 for critical videos
+3. Fuse with VideoMAE scores
+4. Adjust threshold based on specific scenarios
 
-### 推荐组合
-- **快速筛查**: MesoNet-4 @ 2fps
-- **标准检测**: F3Net @ 3fps
-- **高精度**: Xception + VideoMAE 融合 @ 5fps
-- **轻量部署**: Capsule Net @ 2fps
+### Recommended Combinations
+- **Quick Screening**: MesoNet-4 @ 2fps
+- **Standard Detection**: F3Net @ 3fps
+- **High Accuracy**: Xception + VideoMAE fusion @ 5fps
+- **Lightweight Deployment**: Capsule Net @ 2fps
 
-## 🐛 故障排查
+## 🐛 Troubleshooting
 
-### 问题：找不到模型
+### Issue: Model Not Found
 
 ```
 [ERROR] Cannot locate detector builder for model_key='xxx'
 ```
 
-**解决方案：**
-1. 检查模型名称是否正确（参考支持的模型表）
-2. 确认 DeepfakeBench 代码完整
-3. 查看 `vendors/DeepfakeBench/training/detectors/` 是否有对应的 `xxx_detector.py`
+**Solution:**
+1. Check if model name is correct (refer to supported models table)
+2. Confirm DeepfakeBench code is complete
+3. Check if `vendors/DeepfakeBench/training/detectors/` contains corresponding `xxx_detector.py`
 
-### 问题：权重加载失败
+### Issue: Weight Loading Failed
 
 ```
 [ERROR] Failed to load checkpoint
 ```
 
-**解决方案：**
-1. 确认权重文件存在且完整
-2. 检查权重文件是否对应正确的模型
-3. 尝试重新下载权重文件
+**Solution:**
+1. Confirm weight file exists and is complete
+2. Check if weight file corresponds to correct model
+3. Try re-downloading weight file
 
-### 问题：CUDA 内存不足
+### Issue: CUDA Out of Memory
 
 ```
 RuntimeError: CUDA out of memory
 ```
 
-**解决方案：**
-1. 降低 FPS
-2. 使用更小的模型（如 MesoNet, Capsule）
-3. 使用 CPU 模式：`--device cpu`
+**Solution:**
+1. Reduce FPS
+2. Use smaller model (e.g., MesoNet, Capsule)
+3. Use CPU mode: `--device cpu`
 
-### 问题：视频无法打开
+### Issue: Cannot Open Video
 
 ```
 [ERROR] Failed to open video
 ```
 
-**解决方案：**
-1. 确认视频文件完整且格式支持
-2. 尝试使用 ffmpeg 转换视频格式
-3. 检查文件路径是否正确
+**Solution:**
+1. Confirm video file is complete and format is supported
+2. Try converting video format using ffmpeg
+3. Check if file path is correct
 
-## 📝 示例工作流程
+## 📝 Example Workflow
 
-### 完整的检测流程
+### Complete Detection Workflow
 
 ```bash
-# 1. 使用快速模型初步筛查
+# 1. Initial screening with fast model
 python tools/predict_frames.py \
   --input data/jobs/ \
   --model meso4 \
@@ -269,7 +269,7 @@ python tools/predict_frames.py \
   --threshold 0.5 \
   --outdir runs/quick_scan
 
-# 2. 对可疑视频使用高精度模型
+# 2. Use high-accuracy model for suspicious videos
 python tools/predict_frames.py \
   --input suspicious_video.mp4 \
   --model xception \
@@ -277,7 +277,7 @@ python tools/predict_frames.py \
   --threshold 0.6 \
   --outdir runs/detailed_scan
 
-# 3. 如果有 VideoMAE 结果，进行融合
+# 3. If VideoMAE results available, perform fusion
 python tools/fuse_scores.py \
   --frame_csv runs/detailed_scan/xception/video/scores.csv \
   --videomae_csv runs/videomae/video/scores.csv \
@@ -286,13 +286,12 @@ python tools/fuse_scores.py \
   --out runs/final_result/video
 ```
 
-## 🔗 相关资源
+## 🔗 Related Resources
 
 - [DeepfakeBench GitHub](https://github.com/SCLBD/DeepfakeBench)
-- 项目文档: `docs/MODEL_SETUP.md`
-- 权重下载指南: `WEIGHTS_DOWNLOAD_GUIDE.md`
+- Project Documentation: `docs/MODEL_SETUP.md`
+- Weight Download Guide: `WEIGHTS_DOWNLOAD_GUIDE.md`
 
-## 📄 许可证
+## 📄 License
 
-遵循 DeepfakeBench 和本项目的许可证要求。
-
+Follows the license requirements of DeepfakeBench and this project.
