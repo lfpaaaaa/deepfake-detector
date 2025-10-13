@@ -16,7 +16,7 @@ This project develops a forensic tool to detect and analyse deepfake and synthet
 
 ## The Team
 
-Baojun Liu : frontend lead
+Baojun Liu : frontend
 
 Ruidong Zhang : scrum master
 
@@ -62,24 +62,24 @@ pip install -r requirements.txt
 2. **Download model files** (Required):
 ```bash
 # Automatic download (recommended)
-python download_models.py
+python models\download_models.py
 
 # Or get from team members (see MODEL_SETUP.md)
 ```
 
 3. Test your model:
 ```bash
-python test_model.py
+python scripts\test_model.py
 ```
 
 4. Start server with TruFor model (recommended):
 ```bash
-python start_trufor.py
+python scripts\start_trufor.py
 ```
 
 Or start with ResNet50 model:
 ```bash
-python start_local_model.py
+python scripts\start_local_model.py
 ```
 
 ### 📁 Model Files Required
