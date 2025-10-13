@@ -9,14 +9,17 @@ This project develops a forensic tool to detect and analyse deepfake and synthet
 ### Key Features
 
 - **TruFor Integration**: Advanced forensic framework with pixel-level localization
-- **Dual Model Support**: Both ResNet50 and TruFor models available
-- **Real-time Analysis**: Fast processing with confidence-weighted pooling
-- **Interactive UI**: Modern web interface with drag-and-drop support
+- **DeepfakeBench Integration**: 13 state-of-the-art frame-level detection models
+- **Interactive Timeline**: Real-time threshold adjustment with visual feedback
+- **Keyframe Screenshots**: Automatic extraction of suspicious frame segments
+- **Dynamic Analysis**: Adjust detection sensitivity on-the-fly
+- **Interactive UI**: Modern web interface with navigation system
 - **Offline Operation**: Complete local processing without internet dependency
+- **Batch Processing**: Multi-GPU parallel video processing
 
 ## The Team
 
-Baojun Liu : frontend
+Baojun Liu : frontend lead
 
 Ruidong Zhang : scrum master
 
@@ -29,12 +32,11 @@ Xiyu Guan : Product owner
 ## Technologies
 
 - **TruFor Model**: State-of-the-art forensic framework for image forgery detection
-- **ResNet50 Model**: Local deepfake detection for secure offline operation
+- **DeepfakeBench Framework**: 13 advanced frame-level detection models
 - **FastAPI**: Modern Python web framework for APIs
-- **PyTorch**: Deep learning framework
-- **OpenCV**: Computer vision library
-- **Tailwind CSS**: Utility-first CSS framework
-- **daisyUI**: Component library for Tailwind CSS
+- **PyTorch**: Deep learning framework for model inference
+- **OpenCV**: Computer vision library for video processing
+- **Tailwind CSS + daisyUI**: Modern UI framework
 
 ## Models
 
@@ -44,11 +46,12 @@ Xiyu Guan : Product owner
 - **Output**: Anomaly maps, confidence maps, integrity scores
 - **File**: `trufor.pth.tar`
 
-### ResNet50 Model
-- **Architecture**: ResNet50 with 2-class output (authentic/fake)
-- **Features**: Fast binary classification
-- **Output**: Detection confidence scores
-- **File**: `deepfake_resnet50.pth`
+### DeepfakeBench Models (13 Frame-Level Detectors)
+- **Models**: Xception, MesoNet-4, F3Net, EfficientNet-B4, Capsule Net, SRM, RECCE, SPSL, FFD, UCF, CNN-AUG, CORE
+- **Location**: `vendors/DeepfakeBench/training/weights/`
+- **Features**: Frame-by-frame analysis, suspicious segment detection, multi-model comparison
+- **Quick Start**: See [QUICK_START.md](QUICK_START.md) or [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)
+- **Usage**: `python tools/predict_frames.py --input video.mp4 --model xception`
 
 ## Quick Start
 
@@ -61,33 +64,54 @@ pip install -r requirements.txt
 
 2. **Download model files** (Required):
 ```bash
-# Automatic download (recommended)
-python models\download_models.py
+# Download TruFor model
+python models/download_models.py
 
 # Or get from team members (see MODEL_SETUP.md)
 ```
 
-3. Test your model:
+3. Start the server:
 ```bash
-python scripts\test_model.py
+# Start with TruFor model
+python scripts/start_trufor.py
+
+# Or start with all features
+python app/main.py
 ```
 
-4. Start server with TruFor model (recommended):
-```bash
-python scripts\start_trufor.py
-```
+4. Access the web interface:
+- Main page: `http://localhost:8000/web/index_main.html`
+- TruFor Detection: `http://localhost:8000/web/index.html`
+- DeepfakeBench: `http://localhost:8000/web/deepfakebench.html`
 
-Or start with ResNet50 model:
+5. **Frame-by-frame analysis** with DeepfakeBench models:
 ```bash
-python scripts\start_local_model.py
+# Single video analysis with visualization
+python tools/predict_frames.py --input video.mp4 --model xception --fps 10 --save-vis
+
+# Batch processing multiple videos
+python tools/batch_predict.py --input-dir data/videos --model xception --workers 4 --gpus 0,1
+
+# List available models
+python tools/list_models.py
+
+# Aggregate results
+python tools/aggregate_runs.py --root runs/image_infer --out summary.csv
 ```
 
 ### 📁 Model Files Required
-- `trufor.pth.tar` (~500MB) - Primary TruFor model
-- `deepfake_resnet50.pth` (~100MB) - ResNet50 alternative
-- `deepfake_resnet18.pth` (~50MB) - ResNet18 lightweight
+- `trufor.pth.tar` (~500MB) - Primary TruFor model for image/video forensics
+- DeepfakeBench weights (13 files, ~50-200MB each) - Frame-level detectors
+  - Location: `vendors/DeepfakeBench/training/weights/`
+  - Models: `xception_best.pth`, `meso4_best.pth`, `f3net_best.pth`, etc.
 
 See [MODEL_SETUP.md](MODEL_SETUP.md) for detailed setup instructions and [TRUFOR_TECHNICAL_GUIDE.md](TRUFOR_TECHNICAL_GUIDE.md) for technical implementation details.
+
+For DeepfakeBench frame-level detection:
+- **Quick Start**: [QUICK_START.md](QUICK_START.md)
+- **Full Documentation**: [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)
+- **Batch Processing**: [BATCH_PROCESSING_GUIDE.md](BATCH_PROCESSING_GUIDE.md) 🆕
+- **Tool Documentation**: [tools/README.md](tools/README.md)
 
 ### UI Development
 
@@ -97,25 +121,96 @@ npm run build
 ``` 
 to compile the latest `app-compiled.css`
 
-## Model Configuration
+## Detection Methods
 
-The system supports two models for deepfake detection:
-
-### TruFor Model (Default)
-- **Model File**: `trufor.pth.tar`
+### 1. TruFor Detection (Image & Video Forensics)
+- **Model**: `trufor.pth.tar`
 - **Architecture**: Transformer-based fusion with dual encoders
-- **Features**: Pixel-level localization, confidence mapping, Noiseprint++ analysis
-- **Operation**: Completely offline, no internet connection required
+- **Features**: 
+  - Pixel-level localization with heatmaps
+  - Confidence mapping
+  - Noiseprint++ analysis
+  - Both image and video support
+- **Use Case**: Detailed forensic analysis with visual evidence
 
-### ResNet50 Model (Alternative)
-- **Model File**: `deepfake_resnet50.pth`
-- **Architecture**: ResNet50 with 2-class output (authentic/fake)
-- **Features**: Fast binary classification
-- **Operation**: Completely offline, no internet connection required
+### 2. DeepfakeBench Detection (Video Frame Analysis)
+- **Models**: 13 specialized detectors (Xception, F3Net, EfficientNet-B4, etc.)
+- **Features**:
+  - Frame-by-frame deepfake detection
+  - Interactive timeline with threshold slider
+  - Automatic keyframe extraction
+  - Suspicious segment identification
+  - Real-time threshold adjustment
+  - Dynamic keyframe generation
+- **Use Case**: Video-specific deepfake detection with detailed temporal analysis
+
+Both methods operate completely offline with no internet connection required.
+
+## Web Interface Navigation
+
+The system provides three main interfaces accessible through a unified navigation bar:
+
+1. **Home** (`/web/index_main.html`) - Landing page with method selection
+2. **TruFor Detection** (`/web/index.html`) - Image and video forensic analysis
+3. **DeepfakeBench** (`/web/deepfakebench.html`) - Frame-level video analysis
+
+### Key Features
+- **Unified Navigation**: Easy switching between detection methods
+- **Drag & Drop Upload**: Intuitive file upload interface
+- **Real-time Progress**: Live analysis progress indicators
+- **Interactive Results**: 
+  - Timeline visualization with adjustable threshold
+  - Keyframe screenshots of suspicious segments
+  - Detailed segment analysis
+  - Downloadable results
 
 ## API Endpoints
 
-- `GET /` - Web interface
-- `POST /detect` - Upload and detect deepfakes
+### TruFor API
+- `POST /detect` - Upload and analyze media
 - `GET /health` - Health check
-- `GET /docs` - API documentation
+
+### DeepfakeBench API
+- `GET /api/deepfakebench/models` - List available models
+- `POST /api/deepfakebench/analyze` - Start video analysis
+- `GET /api/deepfakebench/jobs/{job_id}` - Get analysis status
+- `POST /api/deepfakebench/jobs/{job_id}/extract-keyframe` - Extract frame at timestamp
+- `GET /video/jobs/{job_id}/keyframes/{filename}` - Serve keyframe images
+
+## Project Structure
+
+```
+deepfake-detector/
+├── app/
+│   ├── adapters/           # Model adapters
+│   │   ├── trufor_adapter.py
+│   │   └── deepfakebench_adapter.py
+│   ├── web/                # Web interfaces
+│   │   ├── index_main.html      # Landing page
+│   │   ├── index.html           # TruFor interface
+│   │   └── deepfakebench.html   # DeepfakeBench interface
+│   └── main.py             # FastAPI application
+├── tools/                  # CLI tools
+│   ├── predict_frames.py   # Frame-level inference
+│   ├── batch_predict.py    # Batch processing
+│   └── aggregate_runs.py   # Result aggregation
+├── models/                 # Model weights
+│   └── trufor.pth.tar
+├── vendors/DeepfakeBench/  # DeepfakeBench framework
+│   └── training/weights/   # DeepfakeBench model weights
+├── data/jobs/              # Analysis results
+└── docs/                   # Documentation
+```
+
+## Documentation
+
+- **[QUICK_START.md](QUICK_START.md)** - Quick start guide
+- **[FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)** - Frame-level detection setup
+- **[BATCH_PROCESSING_GUIDE.md](BATCH_PROCESSING_GUIDE.md)** - Batch processing guide
+- **[UPGRADE_SUMMARY_V2.md](UPGRADE_SUMMARY_V2.md)** - V2.0 upgrade summary
+- **[MODEL_SETUP.md](docs/MODEL_SETUP.md)** - Model setup instructions
+- **[TRUFOR_TECHNICAL_GUIDE.md](docs/TRUFOR_TECHNICAL_GUIDE.md)** - TruFor technical details
+
+## License
+
+This project is for educational and research purposes.

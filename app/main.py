@@ -14,12 +14,12 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 try:
     # Try relative imports first (when run from app directory)
-    from adapters.local_resnet_adapter import LocalResNetAdapter
     from adapters.trufor_adapter import TruForAdapter
+    from adapters.deepfakebench_adapter import DeepfakeBenchAdapter
 except ImportError:
     # Fallback to absolute imports (when run from project root)
-    from app.adapters.local_resnet_adapter import LocalResNetAdapter
     from app.adapters.trufor_adapter import TruForAdapter
+    from app.adapters.deepfakebench_adapter import DeepfakeBenchAdapter
 import uvicorn
 
 # Load environment variables
@@ -48,23 +48,19 @@ async def lifespan(app: FastAPI):
     """Initialize resources on startup"""
     global detection_adapter
     try:
-        # Get model type from environment variable
-        model_type = os.getenv("MODEL_TYPE", "resnet50").lower()
-        
-        if model_type == "trufor":
-            # Initialize TruFor model
-            model_path = os.getenv("MODEL_PATH", "trufor.pth.tar")
+        # Initialize TruFor model
+        model_path = os.getenv("MODEL_PATH", "trufor.pth.tar")
+        if os.path.exists(model_path):
             detection_adapter = TruForAdapter(model_path=model_path)
             logger.info("TruFor adapter initialized successfully")
         else:
-            # Initialize local ResNet50 model (default)
-            model_path = os.getenv("MODEL_PATH", "deepfake_resnet50.pth")
-            detection_adapter = LocalResNetAdapter(model_path=model_path)
-            logger.info("Local ResNet50 adapter initialized successfully")
+            logger.warning(f"TruFor model not found at {model_path}, adapter not initialized")
+            detection_adapter = None
             
     except Exception as e:
         logger.error(f"Failed to initialize detection adapter: {e}")
-        raise
+        logger.warning("Server will start without TruFor model loaded")
+        detection_adapter = None
     yield
     logger.info("Shutting down application")
 
@@ -72,7 +68,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Deepfake Detection API",
     version="1.0.0",
-    description="Local deepfake detection service supporting ResNet50 and TruFor models",
+    description="Deepfake detection service supporting TruFor and DeepfakeBench models",
     lifespan=lifespan
 )
 
@@ -370,6 +366,207 @@ async def get_keyframe(job_id: str, filename: str):
         raise HTTPException(status_code=404, detail="Keyframe not found")
     
     return FileResponse(keyframe_path)
+
+
+# =============================================================================
+# DeepfakeBench API Endpoints
+# =============================================================================
+
+@app.get("/api/deepfakebench/models")
+async def get_deepfakebench_models():
+    """Get list of available DeepfakeBench models"""
+    try:
+        models = DeepfakeBenchAdapter.get_available_models()
+        return JSONResponse(content={"models": models})
+    except Exception as e:
+        logger.error(f"Failed to get models: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/deepfakebench/analyze")
+async def analyze_with_deepfakebench(
+    file: UploadFile = File(...),
+    model: str = "xception",
+    fps: float = 3.0,
+    threshold: float = 0.5
+):
+    """
+    Analyze video using DeepfakeBench models
+    
+    Parameters:
+    - file: Video file
+    - model: Model key (e.g., 'xception', 'meso4', 'f3net')
+    - fps: Frame sampling rate (default: 3.0)
+    - threshold: Detection threshold (default: 0.5)
+    """
+    # Validate file type
+    if file.content_type not in ALLOWED_VIDEO_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type: {file.content_type}. Allowed: {', '.join(ALLOWED_VIDEO_TYPES)}"
+        )
+    
+    # Read file content
+    content = await file.read()
+    file_size_mb = len(content) / (1024 * 1024)
+    logger.info(f"DeepfakeBench analysis request - File: {file.filename}, Size: {file_size_mb:.2f}MB, Model: {model}")
+    
+    # Validate size
+    if len(content) > MAX_VIDEO_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large: {file_size_mb:.1f}MB. Maximum size: 500MB"
+        )
+    
+    # Generate job ID
+    timestamp = int(time.time())
+    file_hash = hashlib.sha256(content).hexdigest()[:12]
+    job_id = f"dfb_{file_hash}_{timestamp}"
+    
+    # Create job directory
+    job_dir = DATA_DIR / job_id
+    job_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save input video
+    input_path = job_dir / "input.mp4"
+    with open(input_path, "wb") as f:
+        f.write(content)
+    
+    logger.info(f"Created DeepfakeBench job {job_id} for video {file.filename}")
+    
+    # Initialize job status
+    jobs[job_id] = {
+        "status": "processing",
+        "job_id": job_id,
+        "filename": file.filename,
+        "model": model,
+        "created_at": timestamp,
+        "progress": 0,
+        "message": f"Analyzing with {model}..."
+    }
+    
+    # Start analysis in background
+    asyncio.create_task(run_deepfakebench_analysis(
+        job_id, str(input_path), model, fps, threshold
+    ))
+    
+    return JSONResponse(content={"job_id": job_id, "model": model})
+
+
+async def run_deepfakebench_analysis(job_id: str, video_path: str, model: str, fps: float, threshold: float):
+    """Run DeepfakeBench analysis in background"""
+    try:
+        logger.info(f"Starting DeepfakeBench analysis for job {job_id} with model {model}")
+        
+        jobs[job_id].update({
+            "progress": 10,
+            "message": f"Loading {model} model..."
+        })
+        
+        # Initialize adapter
+        adapter = DeepfakeBenchAdapter(model_key=model, device="cuda")
+        
+        jobs[job_id].update({
+            "progress": 30,
+            "message": "Analyzing video..."
+        })
+        
+        # Run analysis
+        result = adapter.analyze_video(video_path, fps=fps, threshold=threshold)
+        
+        if result["success"]:
+            jobs[job_id].update({
+                "status": "completed",
+                "progress": 100,
+                "message": "Analysis complete",
+                "result": result
+            })
+            logger.info(f"Job {job_id} completed successfully")
+        else:
+            jobs[job_id].update({
+                "status": "error",
+                "message": result.get("error", "Analysis failed")
+            })
+            
+    except Exception as e:
+        logger.error(f"DeepfakeBench analysis failed for job {job_id}: {e}")
+        import traceback
+        traceback.print_exc()
+        jobs[job_id].update({
+            "status": "error",
+            "message": f"Analysis failed: {str(e)}"
+        })
+
+
+@app.get("/api/deepfakebench/jobs/{job_id}")
+async def get_deepfakebench_job(job_id: str):
+    """Get DeepfakeBench job status"""
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    return JSONResponse(content=jobs[job_id])
+
+
+@app.post("/api/deepfakebench/jobs/{job_id}/extract-keyframe")
+async def extract_keyframe(job_id: str, timestamp: float = 0.0):
+    """Extract a keyframe at the specified timestamp"""
+    import cv2
+    
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Get video path
+    job_dir = DATA_DIR / job_id
+    video_path = job_dir / "input.mp4"
+    
+    if not video_path.exists():
+        raise HTTPException(status_code=404, detail="Video file not found")
+    
+    try:
+        # Open video
+        cap = cv2.VideoCapture(str(video_path))
+        
+        if not cap.isOpened():
+            raise HTTPException(status_code=500, detail="Failed to open video")
+        
+        # Get FPS
+        video_fps = cap.get(cv2.CAP_PROP_FPS)
+        
+        # Calculate frame number
+        frame_number = int(timestamp * video_fps)
+        
+        # Seek to frame
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+        
+        # Read frame
+        ret, frame = cap.read()
+        cap.release()
+        
+        if not ret:
+            raise HTTPException(status_code=500, detail="Failed to extract frame")
+        
+        # Create keyframes directory
+        keyframes_dir = job_dir / "keyframes"
+        keyframes_dir.mkdir(exist_ok=True)
+        
+        # Generate filename based on timestamp
+        keyframe_filename = f"keyframe_{timestamp:.2f}s.jpg"
+        keyframe_path = keyframes_dir / keyframe_filename
+        
+        # Save keyframe
+        cv2.imwrite(str(keyframe_path), frame)
+        
+        logger.info(f"Extracted keyframe for job {job_id} at {timestamp:.2f}s -> {keyframe_filename}")
+        
+        return JSONResponse(content={
+            "success": True,
+            "keyframe_path": f"keyframes/{keyframe_filename}",
+            "timestamp": timestamp
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to extract keyframe: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to extract keyframe: {str(e)}")
 
 
 if __name__ == "__main__":

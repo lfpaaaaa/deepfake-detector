@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .page-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 60px);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        
+        .detection-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .option-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        
+        .option-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .option-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .option-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .option-features {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .option-features li {
+            padding: 8px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        .option-features li:before {
+            content: "✓";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .badge.new {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .badge.classic {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .info-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .info-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table th {
+            background: #f5f5f5;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .comparison-table td {
+            color: #666;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status.available {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.unavailable {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/web/index_main.html" class="nav-brand">🎭 Deepfake Detector</a>
+            <div class="nav-links">
+                <a href="/web/index_main.html" class="nav-link active">
+                    <span>🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/web/index.html" class="nav-link">
+                    <span>🎯</span>
+                    <span>TruFor Detection</span>
+                </a>
+                <a href="/web/deepfakebench.html" class="nav-link">
+                    <span>🔬</span>
+                    <span>DeepfakeBench</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="page-content">
+        <div class="container">
+            <div class="header">
+                <h1>🎭 Deepfake Detection System</h1>
+            <p class="subtitle">Choose your detection method to start analysis</p>
+        </div>
+        
+        <div class="detection-options">
+            <!-- DeepfakeBench Option -->
+            <a href="/web/deepfakebench.html" class="option-card">
+                <div class="option-icon">🎬</div>
+                <div class="option-title">DeepfakeBench</div>
+                <span class="badge new">✨ New Feature</span>
+                <div class="option-description">
+                    13 advanced models, frame-by-frame analysis, suspicious segment detection
+                </div>
+                <ul class="option-features">
+                    <li>13 models available (Xception, F3Net, etc.)</li>
+                    <li>Frame-by-frame precision analysis</li>
+                    <li>Suspicious time segment localization</li>
+                    <li>Real-time progress tracking</li>
+                    <li>Flexible parameter adjustment</li>
+                </ul>
+            </a>
+            
+            <!-- Classic TruFor Option -->
+            <a href="/web/index.html" class="option-card">
+                <div class="option-icon">🔍</div>
+                <div class="option-title">TruFor</div>
+                <span class="badge classic">Forensic Analysis</span>
+                <div class="option-description">
+                    Advanced image forensic analysis with pixel-level deepfake detection
+                </div>
+                <ul class="option-features">
+                    <li>TruFor forensic model</li>
+                    <li>Noiseprint++ analysis</li>
+                    <li>Pixel-level anomaly localization</li>
+                    <li>Image and video support</li>
+                    <li>Heatmap visualization</li>
+                </ul>
+            </a>
+        </div>
+        
+        <!-- Comparison Section -->
+        <div class="info-section">
+            <h2>📊 Feature Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>DeepfakeBench</th>
+                        <th>TruFor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Number of Models</strong></td>
+                        <td>13 models available</td>
+                        <td>1 forensic model</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Detection Target</strong></td>
+                        <td>Video (frame-level)</td>
+                        <td>Image + Video</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Analysis Method</strong></td>
+                        <td>Frame-by-frame + Segment detection</td>
+                        <td>Forensic analysis + Pixel-level localization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Suspicious Segments</strong></td>
+                        <td>✅ Precise time localization</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Forensic Heatmap</strong></td>
+                        <td>❌</td>
+                        <td>✅ Pixel-level anomaly map</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Noiseprint Analysis</strong></td>
+                        <td>❌</td>
+                        <td>✅ Noiseprint++</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Processing Speed</strong></td>
+                        <td>Adjustable (FPS parameter)</td>
+                        <td>Moderate (forensic analysis)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use Case</strong></td>
+                        <td>In-depth video analysis</td>
+                        <td>Forensic image verification</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Model Status -->
+        <div class="info-section">
+            <h2>🔧 Model Status</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 10px;">DeepfakeBench Models</h3>
+                    <div id="dfbStatus">Checking...</div>
+                </div>
+                <div>
+                    <h3 style="color: #4facfe; margin-bottom: 10px;">TruFor Model</h3>
+                    <div id="truforStatus">Checking...</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Choose the detection method that fits your needs</p>
+            <p style="margin-top: 10px; font-size: 14px;">
+                💡 Tip: For first-time users, try DeepfakeBench's MesoNet-4 model (fastest)
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Check model status
+        async function checkModels() {
+            // Check DeepfakeBench models
+            try {
+                const response = await fetch('/api/deepfakebench/models');
+                const data = await response.json();
+                const available = data.models.filter(m => m.available).length;
+                const total = data.models.length;
+                
+                document.getElementById('dfbStatus').innerHTML = `
+                    <span class="status available">✅ ${available}/${total} models available</span>
+                    <div style="font-size: 12px; color: #666; margin-top: 8px;">
+                        ${data.models.filter(m => m.available).map(m => m.name).join(', ')}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('dfbStatus').innerHTML = 
+                    '<span class="status unavailable">❌ Cannot connect</span>';
+            }
+            
+            // Check TruFor model
+            try {
+                const response = await fetch('/health');
+                if (response.ok) {
+                    document.getElementById('truforStatus').innerHTML = `
+                        <span class="status available">✅ TruFor available</span>
+                        <div style="font-size: 12px; color: #666; margin-top: 8px;">
+                            Forensic analysis with Noiseprint++
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('truforStatus').innerHTML = `
+                        <span class="status unavailable">⚠️ TruFor not found</span>
+                        <div style="font-size: 12px; color: #666; margin-top: 8px;">
+                            Requires trufor.pth.tar
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('truforStatus').innerHTML = 
+                    '<span class="status unavailable">❌ Cannot connect</span>';
+            }
+        }
+        
+        checkModels();
+    </script>
+        </div> <!-- /container -->
+    </div> <!-- /page-content -->
+</body>
+</html>

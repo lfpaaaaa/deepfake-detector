@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .timeline-chart {
+            position: relative;
+            height: 100px;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #ffffff 100%);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .timeline-segment {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.6);
+            border: 1px solid rgb(220, 38, 38);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .timeline-segment:hover {
+            background: rgba(239, 68, 68, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        .timeline-time-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: #666;
+            transform: translateX(-50%);
+        }
+        
+        .keyframe-card {
+            transition: transform 0.2s;
+        }
+        
+        .keyframe-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .heatmap-canvas {
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-base-200">
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <!-- Title -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">🔍 Deepfake Detection System</h1>
+            <p class="text-base-content/60">AI-powered image and video authenticity detection</p>
+        </div>
+        
+        <!-- Media Type Selector -->
+        <div class="flex justify-center mb-6">
+            <div class="btn-group">
+                <button id="btnImage" class="btn btn-primary" onclick="switchMode('image')">
+                    📷 Image Detection
+                </button>
+                <button id="btnVideo" class="btn" onclick="switchMode('video')">
+                    🎥 Video Analysis
+                </button>
+            </div>
+        </div>
+        
+        <!-- Image Detection Mode -->
+        <div id="imageMode" class="space-y-6">
+            <!-- Upload Card -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div id="imageUploadZone" 
+                         class="border-2 border-dashed border-base-300 rounded-lg p-8 md:p-12 text-center hover:border-primary transition-colors cursor-pointer"
+                         ondrop="handleImageDrop(event)" 
+                         ondragover="event.preventDefault()" 
+                         ondragenter="event.target.classList.add('border-primary')"
+                         ondragleave="event.target.classList.remove('border-primary')">
+                        
+                        <svg class="w-16 h-16 mx-auto mb-4 text-base-content opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        
+                        <p class="text-lg font-medium mb-2">Drag and drop image here</p>
+                        <p class="text-sm text-base-content/60 mb-4">or</p>
+                        
+                        <input type="file" 
+                               id="imageFileInput" 
+                               accept="image/*" 
+                               class="hidden" 
+                               onchange="handleImageSelect(event)">
+                        <button class="btn btn-primary" onclick="document.getElementById('imageFileInput').click()">
+                            Choose Image
+                        </button>
+                        
+                        <p class="text-xs text-base-content/40 mt-4">Supported: JPG, PNG (max 10MB)</p>
+                    </div>
+                    
+                    <!-- Image Analysis Progress -->
+                    <div id="imageProgress" class="mt-4 hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium">Analyzing image...</span>
+                            <span id="imageProgressPercent" class="text-sm">0%</span>
+                        </div>
+                        <progress id="imageProgressBar" class="progress progress-primary w-full" value="0" max="100"></progress>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Results -->
+            <div id="imageResults" class="space-y-6 hidden">
+                <!-- Summary Card -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">📊 Detection Results</h2>
+                        
+                        <!-- Verdict Banner -->
+                        <div class="alert mb-4" id="imageVerdict">
+                            <div class="flex-1">
+                                <span id="imageVerdictText" class="font-bold text-lg"></span>
+                                <p id="imageConfidence" class="text-sm mt-1"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Authenticity</div>
+                                <div class="stat-value text-lg" id="imageScore">--</div>
+                                <div class="stat-desc text-xs">0 = fake, 1 = real</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Confidence</div>
+                                <div class="stat-value text-lg" id="imageConf">--</div>
+                                <div class="stat-desc text-xs">prediction strength</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Integrity</div>
+                                <div class="stat-value text-lg" id="imageIntegrity">--</div>
+                                <div class="stat-desc text-xs">overall score</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Model</div>
+                                <div class="stat-value text-lg">TruFor</div>
+                                <div class="stat-desc text-xs">with Noiseprint++</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visualization Card -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">🎨 Visualization Analysis</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Original Image -->
+                            <div>
+                                <h3 class="font-semibold mb-2">Original Image</h3>
+                                <img id="imagePreview" class="w-full rounded-lg border" alt="Original">
+                            </div>
+                            
+                            <!-- Anomaly Heatmap -->
+                            <div>
+                                <h3 class="font-semibold mb-2">Anomaly Heatmap</h3>
+                                <canvas id="predictionCanvas" class="heatmap-canvas border rounded-lg w-full"></canvas>
+                                <p class="text-xs text-base-content/60 mt-1">Red = manipulated areas</p>
+                            </div>
+                            
+                            <!-- Confidence Map -->
+                            <div>
+                                <h3 class="font-semibold mb-2">Confidence Map</h3>
+                                <canvas id="confidenceCanvas" class="heatmap-canvas border rounded-lg w-full"></canvas>
+                                <p class="text-xs text-base-content/60 mt-1">Brighter = higher confidence</p>
+                            </div>
+                            
+                            <!-- Noiseprint++ Map -->
+                            <div id="noiseprintContainer" class="hidden">
+                                <h3 class="font-semibold mb-2">Noiseprint++ Analysis</h3>
+                                <canvas id="noiseprintCanvas" class="heatmap-canvas border rounded-lg w-full"></canvas>
+                                <p class="text-xs text-base-content/60 mt-1">Noise pattern analysis</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Portrait Note -->
+                        <div id="portraitNote" class="alert alert-info mt-4 hidden">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span id="portraitNoteText"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button class="btn btn-ghost" onclick="resetImage()">Analyze Another</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Video Analysis Mode -->
+        <div id="videoMode" class="space-y-6 hidden">
+            <!-- Upload Card -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div id="videoUploadZone" 
+                         class="border-2 border-dashed border-base-300 rounded-lg p-8 md:p-12 text-center hover:border-primary transition-colors cursor-pointer"
+                         ondrop="handleVideoDrop(event)" 
+                         ondragover="event.preventDefault()" 
+                         ondragenter="event.target.classList.add('border-primary')"
+                         ondragleave="event.target.classList.remove('border-primary')">
+                        
+                        <svg class="w-16 h-16 mx-auto mb-4 text-base-content opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        
+                        <p class="text-lg font-medium mb-2">Drag and drop video here</p>
+                        <p class="text-sm text-base-content/60 mb-4">or</p>
+                        
+                        <input type="file" 
+                               id="videoFileInput" 
+                               accept="video/*" 
+                               class="hidden" 
+                               onchange="handleVideoSelect(event)">
+                        <button class="btn btn-primary" onclick="document.getElementById('videoFileInput').click()">
+                            Choose Video
+                        </button>
+                        
+                        <p class="text-xs text-base-content/40 mt-4">Supported: MP4, MOV (max 50MB)</p>
+                    </div>
+                    
+                    <!-- Video Analysis Progress -->
+                    <div id="videoProgress" class="mt-4 hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium" id="videoStage">Uploading video...</span>
+                            <span id="videoProgressPercent" class="text-sm">0%</span>
+                        </div>
+                        <progress id="videoProgressBar" class="progress progress-primary w-full" value="0" max="100"></progress>
+                        <p id="videoMessage" class="text-xs text-base-content/60 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Results -->
+            <div id="videoResults" class="space-y-6 hidden">
+                <!-- Summary Card -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">📊 Analysis Summary</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Duration</div>
+                                <div class="stat-value text-lg" id="videoDuration">--</div>
+                                <div class="stat-desc text-xs">seconds</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Clips Analyzed</div>
+                                <div class="stat-value text-lg" id="videoClips">--</div>
+                                <div class="stat-desc text-xs">total frames</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Threshold</div>
+                                <div class="stat-value text-lg" id="videoThreshold">--</div>
+                                <div class="stat-desc text-xs">detection level</div>
+                            </div>
+                            <div class="stat bg-base-200 rounded-lg p-4">
+                                <div class="stat-title text-xs">Suspicious</div>
+                                <div class="stat-value text-lg text-error" id="videoSegments">--</div>
+                                <div class="stat-desc text-xs">segments found</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline Chart -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">⏱️ Detection Timeline</h2>
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium">Adjust Threshold: <span id="thresholdValue">50</span>%</label>
+                                <span class="text-xs text-base-content/60">Higher = fewer detections</span>
+                            </div>
+                            <input type="range" 
+                                   id="thresholdSlider" 
+                                   min="0" 
+                                   max="100" 
+                                   value="50" 
+                                   class="range range-primary range-sm"
+                                   oninput="updateThreshold(this.value)">
+                        </div>
+                        <div id="timelineChart" class="timeline-chart relative">
+                            <!-- Timeline segments will be drawn here -->
+                        </div>
+                        <div class="flex justify-between text-xs text-base-content/60 mt-2">
+                            <span>0:00</span>
+                            <span id="timelineEnd">--:--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Segments List -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">🚨 Suspicious Segments</h2>
+                        <div id="segmentsList" class="space-y-3">
+                            <!-- Segments will be listed here -->
+                        </div>
+                        <div id="noSegments" class="text-center py-8 text-base-content/60 hidden">
+                            <svg class="w-16 h-16 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p>No suspicious segments detected</p>
+                            <p class="text-sm">Try lowering the threshold to see more detections</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Keyframes -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">🖼️ Key Frames</h2>
+                        <div id="keyframesList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <!-- Keyframes will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button class="btn btn-ghost" onclick="resetVideo()">Analyze Another Video</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentMode = 'image';
+        let currentJobId = null;
+        let timelineData = null;
+        let pollInterval = null;
+        
+        // Switch between image and video modes
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'image') {
+                document.getElementById('btnImage').classList.add('btn-primary');
+                document.getElementById('btnVideo').classList.remove('btn-primary');
+                document.getElementById('imageMode').classList.remove('hidden');
+                document.getElementById('videoMode').classList.add('hidden');
+            } else {
+                document.getElementById('btnVideo').classList.add('btn-primary');
+                document.getElementById('btnImage').classList.remove('btn-primary');
+                document.getElementById('videoMode').classList.remove('hidden');
+                document.getElementById('imageMode').classList.add('hidden');
+            }
+        }
+        
+        // ============ IMAGE DETECTION ============
+        
+        function handleImageDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('border-primary');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                analyzeImage(file);
+            }
+        }
+        
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                analyzeImage(file);
+            }
+        }
+        
+        async function analyzeImage(file) {
+            // Show progress
+            document.getElementById('imageProgress').classList.remove('hidden');
+            document.getElementById('imageResults').classList.add('hidden');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 90) {
+                        document.getElementById('imageProgressBar').value = progress;
+                        document.getElementById('imageProgressPercent').textContent = progress + '%';
+                    }
+                }, 200);
+                
+                const response = await fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                clearInterval(progressInterval);
+                document.getElementById('imageProgressBar').value = 100;
+                document.getElementById('imageProgressPercent').textContent = '100%';
+                
+                if (!response.ok) {
+                    throw new Error('Detection failed');
+                }
+                
+                const result = await response.json();
+                displayImageResults(file, result);
+                
+            } catch (error) {
+                alert('Error analyzing image: ' + error.message);
+                document.getElementById('imageProgress').classList.add('hidden');
+            }
+        }
+        
+        function displayImageResults(file, result) {
+            document.getElementById('imageProgress').classList.add('hidden');
+            document.getElementById('imageResults').classList.remove('hidden');
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('imagePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            
+            // Show results
+            const isFake = result.decision === 'fake' || result.is_fake;
+            const verdict = document.getElementById('imageVerdict');
+            verdict.className = 'alert mb-4 ' + (isFake ? 'alert-error' : 'alert-success');
+            
+            document.getElementById('imageVerdictText').textContent = 
+                isFake ? '⚠️ Likely Manipulated' : '✅ Likely Authentic';
+            document.getElementById('imageConfidence').textContent = 
+                `Confidence: ${(result.confidence * 100).toFixed(1)}%`;
+            document.getElementById('imageScore').textContent = 
+                result.score ? result.score.toFixed(3) : '--';
+            document.getElementById('imageConf').textContent = 
+                `${(result.confidence * 100).toFixed(1)}%`;
+            document.getElementById('imageIntegrity').textContent = 
+                result.integrity ? result.integrity.toFixed(3) : '--';
+            
+            // Draw heatmaps
+            if (result.prediction_map && result.image_size) {
+                drawHeatmap(result.prediction_map, result.image_size, 'predictionCanvas', 'hot');
+            }
+            
+            if (result.confidence_map && result.image_size) {
+                drawHeatmap(result.confidence_map, result.image_size, 'confidenceCanvas', 'gray');
+            }
+            
+            if (result.noiseprint_map && result.image_size) {
+                document.getElementById('noiseprintContainer').classList.remove('hidden');
+                drawHeatmap(result.noiseprint_map, result.image_size, 'noiseprintCanvas', 'viridis');
+            }
+            
+            // Show portrait note if available
+            if (result.portrait_note && result.portrait_note.trim()) {
+                document.getElementById('portraitNote').classList.remove('hidden');
+                document.getElementById('portraitNoteText').textContent = result.portrait_note;
+            }
+        }
+        
+        function drawHeatmap(data, size, canvasId, colormap) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            const [height, width] = size;
+            canvas.width = width;
+            canvas.height = height;
+            
+            const imageData = ctx.createImageData(width, height);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const value = data[y][x];
+                    const idx = (y * width + x) * 4;
+                    
+                    let r, g, b;
+                    if (colormap === 'hot') {
+                        // Red-yellow colormap for anomalies
+                        r = Math.floor(255 * value);
+                        g = Math.floor(255 * Math.max(0, value - 0.5) * 2);
+                        b = 0;
+                    } else if (colormap === 'gray') {
+                        // Grayscale
+                        r = g = b = Math.floor(255 * value);
+                    } else {
+                        // Viridis-like colormap
+                        r = Math.floor(255 * (0.267 + 0.004 * value));
+                        g = Math.floor(255 * (0.005 + 0.556 * value));
+                        b = Math.floor(255 * (0.329 + 0.458 * value));
+                    }
+                    
+                    imageData.data[idx] = r;
+                    imageData.data[idx + 1] = g;
+                    imageData.data[idx + 2] = b;
+                    imageData.data[idx + 3] = 255;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        function resetImage() {
+            document.getElementById('imageResults').classList.add('hidden');
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('noiseprintContainer').classList.add('hidden');
+            document.getElementById('portraitNote').classList.add('hidden');
+        }
+        
+        // ============ VIDEO ANALYSIS ============
+        
+        function handleVideoDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('border-primary');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('video/')) {
+                analyzeVideo(file);
+            }
+        }
+        
+        function handleVideoSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                analyzeVideo(file);
+            }
+        }
+        
+        async function analyzeVideo(file) {
+            // Show progress
+            document.getElementById('videoProgress').classList.remove('hidden');
+            document.getElementById('videoResults').classList.add('hidden');
+            document.getElementById('videoStage').textContent = 'Uploading video...';
+            document.getElementById('videoProgressBar').value = 10;
+            document.getElementById('videoProgressPercent').textContent = '10%';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/video/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+                
+                const result = await response.json();
+                currentJobId = result.job_id;
+                
+                // Start polling for progress
+                pollJobStatus();
+                
+            } catch (error) {
+                alert('Error uploading video: ' + error.message);
+                document.getElementById('videoProgress').classList.add('hidden');
+            }
+        }
+        
+        async function pollJobStatus() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+            
+            pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/video/jobs/${currentJobId}/status`);
+                    const status = await response.json();
+                    
+                    updateVideoProgress(status);
+                    
+                    if (status.status === 'completed') {
+                        clearInterval(pollInterval);
+                        await loadVideoResults();
+                    } else if (status.status === 'error') {
+                        clearInterval(pollInterval);
+                        alert('Analysis failed: ' + status.message);
+                        document.getElementById('videoProgress').classList.add('hidden');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                }
+            }, 1000);
+        }
+        
+        function updateVideoProgress(status) {
+            const progress = status.progress || 0;
+            document.getElementById('videoProgressBar').value = progress;
+            document.getElementById('videoProgressPercent').textContent = progress + '%';
+            document.getElementById('videoStage').textContent = status.stage || 'Processing...';
+            document.getElementById('videoMessage').textContent = status.message || '';
+        }
+        
+        async function loadVideoResults() {
+            try {
+                const response = await fetch(`/video/jobs/${currentJobId}/result`);
+                const result = await response.json();
+                
+                timelineData = result;
+                displayVideoResults(result);
+                
+            } catch (error) {
+                alert('Error loading results: ' + error.message);
+            }
+        }
+        
+        function displayVideoResults(data) {
+            document.getElementById('videoProgress').classList.add('hidden');
+            document.getElementById('videoResults').classList.remove('hidden');
+            
+            // Update summary stats
+            document.getElementById('videoDuration').textContent = data.video_duration.toFixed(1);
+            document.getElementById('videoClips').textContent = data.total_clips;
+            document.getElementById('videoThreshold').textContent = data.threshold.toFixed(3);
+            document.getElementById('videoSegments').textContent = data.segments.length;
+            
+            // Update timeline end time
+            const minutes = Math.floor(data.video_duration / 60);
+            const seconds = Math.floor(data.video_duration % 60);
+            document.getElementById('timelineEnd').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Draw timeline
+            drawTimeline(data);
+            
+            // Display segments
+            displaySegments(data.segments);
+            
+            // Display keyframes
+            displayKeyframes(data.segments);
+        }
+        
+        function drawTimeline(data) {
+            const chart = document.getElementById('timelineChart');
+            chart.innerHTML = '';
+            
+            const duration = data.video_duration;
+            const segments = data.segments;
+            
+            segments.forEach((seg, index) => {
+                const startPercent = (seg.start_time / duration) * 100;
+                const widthPercent = ((seg.end_time - seg.start_time) / duration) * 100;
+                
+                const segDiv = document.createElement('div');
+                segDiv.className = 'timeline-segment';
+                segDiv.style.left = startPercent + '%';
+                segDiv.style.width = Math.max(widthPercent, 0.5) + '%';
+                segDiv.style.height = '80%';
+                segDiv.style.top = '10%';
+                segDiv.title = `Segment ${seg.segment_id}: ${seg.start_time.toFixed(1)}s - ${seg.end_time.toFixed(1)}s (score: ${seg.peak_score.toFixed(3)})`;
+                
+                // Add time label
+                const label = document.createElement('div');
+                label.className = 'timeline-time-label';
+                label.style.left = (startPercent + widthPercent / 2) + '%';
+                const mins = Math.floor(seg.peak_time / 60);
+                const secs = Math.floor(seg.peak_time % 60);
+                label.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                segDiv.appendChild(label);
+                chart.appendChild(segDiv);
+            });
+        }
+        
+        function displaySegments(segments) {
+            const list = document.getElementById('segmentsList');
+            const noSegments = document.getElementById('noSegments');
+            
+            list.innerHTML = '';
+            
+            if (segments.length === 0) {
+                list.classList.add('hidden');
+                noSegments.classList.remove('hidden');
+                return;
+            }
+            
+            list.classList.remove('hidden');
+            noSegments.classList.add('hidden');
+            
+            segments.forEach(seg => {
+                const div = document.createElement('div');
+                div.className = 'alert alert-error shadow-sm';
+                div.innerHTML = `
+                    <div class="flex-1">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="font-bold">Segment ${seg.segment_id}</h3>
+                            <div class="text-sm">
+                                Time: ${formatTime(seg.start_time)} - ${formatTime(seg.end_time)} 
+                                (${seg.duration.toFixed(1)}s)
+                            </div>
+                            <div class="text-sm">
+                                Peak Score: ${seg.peak_score.toFixed(3)} at ${formatTime(seg.peak_time)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        function displayKeyframes(segments) {
+            const list = document.getElementById('keyframesList');
+            list.innerHTML = '';
+            
+            segments.forEach(seg => {
+                if (seg.keyframe_path) {
+                    const div = document.createElement('div');
+                    div.className = 'keyframe-card';
+                    div.innerHTML = `
+                        <div class="card bg-base-100 shadow">
+                            <figure class="px-2 pt-2">
+                                <img src="/video/jobs/${currentJobId}/${seg.keyframe_path}" 
+                                     alt="Segment ${seg.segment_id}" 
+                                     class="rounded-lg w-full h-32 object-cover">
+                            </figure>
+                            <div class="card-body p-3">
+                                <h3 class="card-title text-sm">Segment ${seg.segment_id}</h3>
+                                <p class="text-xs text-base-content/60">${formatTime(seg.peak_time)}</p>
+                                <p class="text-xs font-semibold text-error">Score: ${seg.peak_score.toFixed(3)}</p>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                }
+            });
+        }
+        
+        function updateThreshold(value) {
+            document.getElementById('thresholdValue').textContent = value;
+            
+            if (!timelineData) return;
+            
+            // Calculate new threshold from percentile
+            const scores = timelineData.scores.map(s => s.score);
+            scores.sort((a, b) => a - b);
+            const index = Math.floor(scores.length * value / 100);
+            const threshold = scores[index] || 0;
+            
+            // Filter segments
+            const filteredSegments = timelineData.segments.filter(s => s.peak_score >= threshold);
+            
+            // Update display
+            document.getElementById('videoSegments').textContent = filteredSegments.length;
+            displaySegments(filteredSegments);
+            displayKeyframes(filteredSegments);
+            
+            // Redraw timeline
+            const filteredData = { ...timelineData, segments: filteredSegments };
+            drawTimeline(filteredData);
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function resetVideo() {
+            document.getElementById('videoResults').classList.add('hidden');
+            document.getElementById('videoFileInput').value = '';
+            currentJobId = null;
+            timelineData = null;
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+        }
+    </script>
+</body>
+</html>
+
