@@ -19,7 +19,7 @@ This project develops a forensic tool to detect and analyse deepfake and synthet
 
 ## The Team
 
-Baojun Liu : frontend lead
+Baojun Liu : frontend
 
 Ruidong Zhang : scrum master
 
@@ -110,7 +110,7 @@ See [MODEL_SETUP.md](MODEL_SETUP.md) for detailed setup instructions and [TRUFOR
 For DeepfakeBench frame-level detection:
 - **Quick Start**: [QUICK_START.md](QUICK_START.md)
 - **Full Documentation**: [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)
-- **Batch Processing**: [BATCH_PROCESSING_GUIDE.md](BATCH_PROCESSING_GUIDE.md) 🆕
+- **Batch Processing**: [BATCH_PROCESSING_GUIDE.md](BATCH_PROCESSING_GUIDE.md) 
 - **Tool Documentation**: [tools/README.md](tools/README.md)
 
 ### UI Development
