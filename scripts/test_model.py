@@ -7,7 +7,9 @@ import os
 import sys
 import torch
 import torchvision.models as models
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from app.adapters.local_resnet_adapter import LocalResNetAdapter
+
 
 def test_model_loading():
     """Test model loading"""
