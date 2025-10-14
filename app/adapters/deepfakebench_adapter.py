@@ -36,7 +36,6 @@ class DeepfakeBenchAdapter:
         "capsule_net": {"name": "Capsule Net", "speed": "Very Fast", "accuracy": "Medium"},
         "recce": {"name": "RECCE", "speed": "Medium", "accuracy": "High"},
         "spsl": {"name": "SPSL", "speed": "Medium", "accuracy": "High"},
-        "ffd": {"name": "FFD", "speed": "Medium", "accuracy": "High"},
         "ucf": {"name": "UCF", "speed": "Medium", "accuracy": "High"},
         "multi_attention": {"name": "CNN-AUG", "speed": "Medium", "accuracy": "High"},
         "core": {"name": "CORE", "speed": "Medium", "accuracy": "High"},
@@ -82,11 +81,11 @@ class DeepfakeBenchAdapter:
                 raise FileNotFoundError(f"Model weights not found: {weight_path}")
             
             # Build model
-            logger.info(f"Building model: {self.model_key}")
+            logger.warning(f"🏗️ Building model: {self.model_key} (from weight file: {weight_filename})")
             self.model, self.transform_fn = build_model_and_transforms(self.model_key)
             
             # Load weights
-            logger.info(f"Loading weights from: {weight_path}")
+            logger.warning(f"📦 Loading weights from: {weight_path}")
             checkpoint = torch.load(weight_path, map_location="cpu")
             
             if isinstance(checkpoint, dict):
@@ -106,6 +105,26 @@ class DeepfakeBenchAdapter:
             logger.error(f"Failed to load model: {e}")
             raise
     
+    def _is_black_or_low_contrast(self, frame: np.ndarray) -> bool:
+        """
+        Detect if a frame is black or has very low contrast.
+        These frames often cause false positives in deepfake detection.
+        """
+        # Convert to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Check mean brightness (black screen check)
+        mean_brightness = np.mean(gray)
+        if mean_brightness < 15:  # Very dark frame
+            return True
+        
+        # Check contrast (std deviation of pixel values)
+        contrast = np.std(gray)
+        if contrast < 10:  # Very low contrast (uniform color)
+            return True
+        
+        return False
+    
     def _preprocess_frame(self, frame: np.ndarray) -> torch.Tensor:
         """Preprocess a single frame for inference."""
         if self.transform_fn is not None:
@@ -124,12 +143,20 @@ class DeepfakeBenchAdapter:
         tensor = transform(frame)
         return tensor.unsqueeze(0)
     
+    # Add frame counter for debugging
+    _frame_count = 0
+    
     def _run_inference(self, frame_tensor: torch.Tensor) -> float:
         """Run inference on a single frame."""
         frame_tensor = frame_tensor.to(self.device)
         
         with torch.no_grad():
-            data_dict = {"image": frame_tensor}
+            # Some models (like UCF) require a label field during inference
+            # Provide a dummy label (0 = real) for inference
+            data_dict = {
+                "image": frame_tensor,
+                "label": torch.tensor([0], dtype=torch.long).to(self.device)
+            }
             
             try:
                 output = self.model(data_dict, inference=True)
@@ -141,7 +168,21 @@ class DeepfakeBenchAdapter:
             
             # Handle different output formats
             if isinstance(output, dict):
-                logits = output.get("prob") or output.get("cls") or output.get("logits") or output.get("pred")
+                # DEBUG: Print first frame output structure
+                if DeepfakeBenchAdapter._frame_count == 0:
+                    logger.warning(f"🔍 Model output keys: {output.keys()}")
+                    for k, v in output.items():
+                        if isinstance(v, torch.Tensor):
+                            logger.warning(f"🔍   {k}: shape={v.shape}, value={v.cpu().numpy()}")
+                
+                # Try to get logits from known output keys (avoid using 'or' with tensors)
+                logits = None
+                for key in ["prob", "cls", "logits", "pred"]:
+                    if key in output:
+                        logits = output[key]
+                        break
+                
+                # If still None, take the first tensor found
                 if logits is None:
                     for key, value in output.items():
                         if isinstance(value, torch.Tensor):
@@ -150,14 +191,36 @@ class DeepfakeBenchAdapter:
             else:
                 logits = output
             
+            # Increment frame count
+            DeepfakeBenchAdapter._frame_count += 1
+            
             # Convert to probability
-            if logits.dim() == 1:
+            # Check if logits is already a probability (from xception's 'prob' output)
+            if isinstance(output, dict) and 'prob' in output and 'cls' in output:
+                # xception model returns: {'cls': logits, 'prob': fake_prob, 'feat': features}
+                # where prob is already softmax(cls, dim=1)[:, 1] (i.e., Fake probability)
+                prob = logits.item() if logits.dim() == 0 or (logits.dim() == 1 and len(logits) == 1) else logits[0].item()
+                
+                # DEBUG: Print first 10 frames with raw cls logits, and any frame > 80%
+                if DeepfakeBenchAdapter._frame_count <= 10 or prob > 0.8:
+                    raw_logits = output['cls'][0].cpu().numpy()
+                    probs = torch.softmax(output['cls'], dim=1)[0]
+                    logger.warning(f"🔍 Frame {DeepfakeBenchAdapter._frame_count} - Raw logits: {raw_logits}, Probs: [Real={probs[0]:.4f}, Fake={probs[1]:.4f}], Final prob={prob:.4f}")
+            elif logits.dim() == 1:
                 if len(logits) == 2:
-                    prob = torch.softmax(logits, dim=0)[1].item()
+                    probs = torch.softmax(logits, dim=0)
+                    prob = probs[1].item()  # Probability of class 1 (fake)
+                    # DEBUG: Print first 10 frames
+                    if DeepfakeBenchAdapter._frame_count <= 10:
+                        logger.warning(f"🔍 Frame {DeepfakeBenchAdapter._frame_count} - Logits: {logits.cpu().numpy()}, Probs: [Real={probs[0]:.4f}, Fake={probs[1]:.4f}]")
                 else:
                     prob = torch.sigmoid(logits[0]).item()
             elif logits.shape[-1] == 2:
-                prob = torch.softmax(logits, dim=1)[0, 1].item()
+                probs = torch.softmax(logits, dim=1)[0]
+                prob = probs[1].item()  # Probability of class 1 (fake)
+                # DEBUG: Print first 10 frames
+                if DeepfakeBenchAdapter._frame_count <= 10:
+                    logger.warning(f"🔍 Frame {DeepfakeBenchAdapter._frame_count} - Raw logits: {logits[0].cpu().numpy()}, Probs: [Real={probs[0]:.4f}, Fake={probs[1]:.4f}]")
             elif logits.shape[-1] == 1:
                 prob = torch.sigmoid(logits[0, 0]).item()
             else:
@@ -165,7 +228,7 @@ class DeepfakeBenchAdapter:
             
             return prob
     
-    def analyze_video(self, video_path: str, fps: float = 3.0, threshold: float = 0.5) -> Dict:
+    def analyze_video(self, video_path: str, fps: float = 3.0, threshold: float = 0.5, progress_callback=None) -> Dict:
         """
         Analyze a video and return detection results.
         
@@ -173,17 +236,23 @@ class DeepfakeBenchAdapter:
             video_path: Path to video file
             fps: Frame sampling rate
             threshold: Detection threshold
+            progress_callback: Optional callback function(progress, stage, message) for progress updates
         
         Returns:
             Dictionary with analysis results
         """
+        logger.warning(f"🎬 STARTING VIDEO ANALYSIS WITH MODEL: {self.model_key.upper()}")
         logger.info(f"Analyzing video: {video_path}")
+        
+        # Reset frame counter for debugging
+        DeepfakeBenchAdapter._frame_count = 0
         
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             raise RuntimeError(f"Failed to open video: {video_path}")
         
         source_fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_step = max(int(round(source_fps / fps)), 1)
         
         scores = []
@@ -200,14 +269,22 @@ class DeepfakeBenchAdapter:
                 timestamp = output_idx / fps
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
+                # Check if frame is black or low contrast (common false positive trigger)
+                is_anomalous = self._is_black_or_low_contrast(frame)
+                
                 # Preprocess and run inference
                 frame_tensor = self._preprocess_frame(rgb_frame)
                 prob = self._run_inference(frame_tensor)
                 
+                # Log if high-score frame is actually a black/low-contrast frame
+                if is_anomalous and prob > 0.7:
+                    logger.warning(f"🚫 Frame {output_idx} at {timestamp:.2f}s: Black/low-contrast frame with high score {prob:.4f} - will be excluded from overall score")
+                
                 scores.append({
                     "frame": output_idx,
                     "timestamp": timestamp,
-                    "probability": prob
+                    "probability": prob,
+                    "is_anomalous": is_anomalous  # Mark anomalous frames
                 })
                 
                 # Store frame data for keyframe extraction
@@ -219,10 +296,22 @@ class DeepfakeBenchAdapter:
                 })
                 
                 output_idx += 1
+                
+                # Update progress every frame for short videos, every 3 frames for longer ones
+                update_frequency = 1 if output_idx < 30 else 3
+                if progress_callback and output_idx % update_frequency == 0:
+                    # Progress from 30% to 80% during frame analysis
+                    progress = 30 + int((frame_idx / total_frames) * 50)
+                    progress_callback(progress, "Analyzing video...", f"Processed {output_idx} frames")
+                    logger.debug(f"Progress update: {progress}% - Frame {output_idx}/{total_frames}")
             
             frame_idx += 1
         
         cap.release()
+        
+        # Update progress - frame analysis complete
+        if progress_callback:
+            progress_callback(80, "Analyzing results...", "Processing detection scores")
         
         # Analyze results
         if not scores:
@@ -231,17 +320,44 @@ class DeepfakeBenchAdapter:
                 "error": "No frames processed"
             }
         
-        # Calculate metrics
-        probs = [s["probability"] for s in scores]
-        overall_score = float(np.max(probs))
-        average_score = float(np.mean(probs))
+        # Calculate metrics - exclude anomalous frames (black/low-contrast)
+        valid_scores = [s for s in scores if not s.get("is_anomalous", False)]
+        all_probs = [s["probability"] for s in scores]
         
-        # Smooth scores
-        window = 5
-        if len(probs) >= window:
-            smoothed = np.convolve(probs, np.ones(window)/window, mode='same')
+        if len(valid_scores) > 0:
+            valid_probs = [s["probability"] for s in valid_scores]
+            overall_score = float(np.mean(valid_probs))  # Use average of valid frames only
+            average_score = float(np.mean(valid_probs))
         else:
-            smoothed = np.array(probs)
+            # If all frames are anomalous (unlikely), fall back to all frames
+            valid_probs = all_probs
+            overall_score = float(np.mean(all_probs))
+            average_score = float(np.mean(all_probs))
+        
+        max_score = float(np.max(all_probs))  # Keep max for debugging
+        anomalous_count = len(scores) - len(valid_scores)
+        
+        # DEBUG: Print score statistics
+        logger.warning(f"🔍 SCORE STATS - Total frames: {len(scores)}, Valid frames: {len(valid_scores)}, Anomalous: {anomalous_count}")
+        logger.warning(f"🔍 SCORE STATS - Min: {np.min(all_probs):.4f}, Max: {max_score:.4f}, Mean (all): {np.mean(all_probs):.4f}")
+        logger.warning(f"🔍 Overall Score (Valid frames avg): {overall_score:.4f} ({overall_score*100:.2f}%)")
+        logger.warning(f"🔍 Max Score (single frame): {max_score:.4f} ({max_score*100:.2f}%)")
+        
+        # Find the frame with max score (for debugging)
+        max_idx = np.argmax(all_probs)
+        max_frame_info = scores[max_idx]
+        logger.warning(f"🔍 MAX SCORE FRAME: Frame #{max_frame_info['frame']} at {max_frame_info['timestamp']:.2f}s = {max_frame_info['probability']:.4f} (Anomalous: {max_frame_info.get('is_anomalous', False)})")
+        
+        # Smooth scores (use all probabilities for timeline display)
+        window = 5
+        if len(all_probs) >= window:
+            smoothed = np.convolve(all_probs, np.ones(window)/window, mode='same')
+        else:
+            smoothed = np.array(all_probs)
+        
+        # Update progress - finding segments
+        if progress_callback:
+            progress_callback(85, "Finding suspicious segments...", "Detecting anomalies")
         
         # Find suspicious segments
         segments = []
@@ -285,6 +401,10 @@ class DeepfakeBenchAdapter:
                     "peak_time": scores[peak_idx]["timestamp"],
                     "keyframe_idx": peak_idx
                 })
+        
+        # Update progress - extracting keyframes
+        if progress_callback:
+            progress_callback(90, "Extracting keyframes...", f"Found {len(segments)} suspicious segments")
         
         # Save keyframes for suspicious segments
         keyframe_dir = os.path.join(os.path.dirname(video_path), "keyframes")

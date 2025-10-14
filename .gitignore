@@ -45,14 +45,17 @@ env/
 *.weights
 *.pt
 models/*.pth
-!models/download_models.py
-!models/share_models.py
+vendors/DeepfakeBench/training/weights/*.pth
+vendors/DeepfakeBench/training/pretrained/*.pth
 
 # Data directories
 data/jobs/*
 !data/jobs/.gitkeep
-runs/*
-!runs/.gitkeep
+runs/
+*.csv
+*.json
+!configs/*.json
+!package.json
 
 # Log files
 *.log
@@ -79,6 +82,11 @@ package-lock.json
 test_*.py
 *_test.py
 *.test.py
+
+# Temporary documentation files
+*_COMPLETE.md
+*_PREPARATION.md
+*TRANSLATION_COMPLETE*
 
 # Compiled CSS
 *.css.map

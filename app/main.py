@@ -7,7 +7,8 @@ import hashlib
 import time
 from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from concurrent.futures import ThreadPoolExecutor
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -34,6 +35,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize adapter as global variable
 detection_adapter = None
+
+# Thread pool for CPU-intensive tasks
+executor = ThreadPoolExecutor(max_workers=2)
 
 # Job storage
 jobs = {}
@@ -386,9 +390,9 @@ async def get_deepfakebench_models():
 @app.post("/api/deepfakebench/analyze")
 async def analyze_with_deepfakebench(
     file: UploadFile = File(...),
-    model: str = "xception",
-    fps: float = 3.0,
-    threshold: float = 0.5
+    model: str = Form("xception"),
+    fps: float = Form(3.0),
+    threshold: float = Form(0.5)
 ):
     """
     Analyze video using DeepfakeBench models
@@ -423,18 +427,9 @@ async def analyze_with_deepfakebench(
     file_hash = hashlib.sha256(content).hexdigest()[:12]
     job_id = f"dfb_{file_hash}_{timestamp}"
     
-    # Create job directory
-    job_dir = DATA_DIR / job_id
-    job_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Save input video
-    input_path = job_dir / "input.mp4"
-    with open(input_path, "wb") as f:
-        f.write(content)
-    
     logger.info(f"Created DeepfakeBench job {job_id} for video {file.filename}")
     
-    # Initialize job status
+    # Initialize job status FIRST (before saving file)
     jobs[job_id] = {
         "status": "processing",
         "job_id": job_id,
@@ -442,45 +437,108 @@ async def analyze_with_deepfakebench(
         "model": model,
         "created_at": timestamp,
         "progress": 0,
-        "message": f"Analyzing with {model}..."
+        "stage": "Uploading...",
+        "message": f"Preparing to analyze with {model}"
     }
     
-    # Start analysis in background
-    asyncio.create_task(run_deepfakebench_analysis(
-        job_id, str(input_path), model, fps, threshold
-    ))
+    # Start analysis in background thread (to avoid blocking event loop)
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(
+        executor,
+        run_deepfakebench_analysis_sync,
+        job_id, content, model, fps, threshold
+    )
     
+    # Return job_id IMMEDIATELY (before file is saved)
     return JSONResponse(content={"job_id": job_id, "model": model})
 
 
-async def run_deepfakebench_analysis(job_id: str, video_path: str, model: str, fps: float, threshold: float):
-    """Run DeepfakeBench analysis in background"""
+def run_deepfakebench_analysis_sync(job_id: str, content: bytes, model: str, fps: float, threshold: float):
+    """Save video file and run DeepfakeBench analysis in background thread (synchronous for ThreadPoolExecutor)"""
+    try:
+        # Create job directory
+        job_dir = DATA_DIR / job_id
+        job_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Update progress - saving file
+        jobs[job_id].update({
+            "progress": 5,
+            "stage": "Saving file...",
+            "message": "Writing video to disk"
+        })
+        
+        # Save input video
+        input_path = job_dir / "input.mp4"
+        with open(input_path, "wb") as f:
+            f.write(content)
+        
+        logger.info(f"Saved video file for job {job_id}, starting analysis")
+        
+        # Now run the analysis (synchronous call since we're already in a thread)
+        run_deepfakebench_analysis(job_id, str(input_path), model, fps, threshold)
+        
+    except Exception as e:
+        logger.error(f"Failed to save/analyze video for job {job_id}: {e}")
+        jobs[job_id].update({
+            "status": "error",
+            "message": f"Failed to save video: {str(e)}"
+        })
+
+
+def run_deepfakebench_analysis(job_id: str, video_path: str, model: str, fps: float, threshold: float):
+    """Run DeepfakeBench analysis in background (synchronous for ThreadPoolExecutor)"""
     try:
         logger.info(f"Starting DeepfakeBench analysis for job {job_id} with model {model}")
         
+        # Get job directory for progress file
+        job_dir = DATA_DIR / job_id
+        
         jobs[job_id].update({
             "progress": 10,
-            "message": f"Loading {model} model..."
+            "stage": "Loading model...",
+            "message": f"Initializing {model}"
         })
         
         # Initialize adapter
         adapter = DeepfakeBenchAdapter(model_key=model, device="cuda")
         
-        jobs[job_id].update({
-            "progress": 30,
-            "message": "Analyzing video..."
-        })
+        # Progress callback - write to file like TruFor does
+        def update_progress(progress, stage, message):
+            jobs[job_id].update({
+                "progress": progress,
+                "stage": stage,
+                "message": message
+            })
+            # Write to progress.json file for polling
+            progress_file = job_dir / "progress.json"
+            try:
+                with open(progress_file, 'w') as f:
+                    json.dump({
+                        "progress": progress,
+                        "stage": stage,
+                        "message": message
+                    }, f)
+                logger.info(f"📊 Progress updated: {progress}% - {stage} - {message}")
+            except Exception as e:
+                logger.warning(f"Failed to write progress file: {e}")
         
-        # Run analysis
-        result = adapter.analyze_video(video_path, fps=fps, threshold=threshold)
+        # Initial progress update
+        update_progress(30, "Analyzing video...", "Starting frame analysis")
+        
+        # Run analysis with progress callback
+        result = adapter.analyze_video(video_path, fps=fps, threshold=threshold, progress_callback=update_progress)
         
         if result["success"]:
+            update_progress(95, "Generating report...", "Finalizing results")
+            
             jobs[job_id].update({
                 "status": "completed",
                 "progress": 100,
-                "message": "Analysis complete",
+                "stage": "Complete",
+                "message": "Analysis finished",
                 "result": result
             })
+            update_progress(100, "Complete", "Analysis finished")
             logger.info(f"Job {job_id} completed successfully")
         else:
             jobs[job_id].update({
@@ -504,7 +562,28 @@ async def get_deepfakebench_job(job_id: str):
     if job_id not in jobs:
         raise HTTPException(status_code=404, detail="Job not found")
     
-    return JSONResponse(content=jobs[job_id])
+    job = jobs[job_id]
+    
+    # Check for progress updates from progress.json file (like TruFor does)
+    job_dir = DATA_DIR / job_id
+    progress_file = job_dir / "progress.json"
+    
+    if progress_file.exists():
+        try:
+            with open(progress_file, 'r') as f:
+                progress_data = json.load(f)
+                job.update({
+                    "progress": progress_data.get("progress", job.get("progress", 0)),
+                    "message": progress_data.get("message", job.get("message", "")),
+                    "stage": progress_data.get("stage", job.get("stage", "processing"))
+                })
+                logger.info(f"📨 Sending progress to frontend: {job.get('progress')}% - {job.get('stage')} - {job.get('message')}")
+        except Exception as e:
+            logger.warning(f"Failed to read progress file: {e}")
+    else:
+        logger.debug(f"Progress file not found for job {job_id}")
+    
+    return JSONResponse(content=job)
 
 
 @app.post("/api/deepfakebench/jobs/{job_id}/extract-keyframe")
@@ -529,21 +608,50 @@ async def extract_keyframe(job_id: str, timestamp: float = 0.0):
         if not cap.isOpened():
             raise HTTPException(status_code=500, detail="Failed to open video")
         
-        # Get FPS
+        # Get video properties
         video_fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        video_duration = total_frames / video_fps if video_fps > 0 else 0
+        
+        # AGGRESSIVE boundary handling: if timestamp is in last 40% of video, use middle region instead
+        # This is because many videos have corrupted frames near the end
+        if timestamp > video_duration * 0.6:
+            # Map to safe middle region (30% of video duration)
+            fallback_timestamp = video_duration * 0.35
+            logger.warning(f"⚠️ Timestamp {timestamp:.2f}s is in potentially corrupted end region (>{video_duration*0.6:.2f}s), using fallback at {fallback_timestamp:.2f}s")
+            timestamp = fallback_timestamp
         
         # Calculate frame number
         frame_number = int(timestamp * video_fps)
         
+        # Ensure frame_number is within safe range (use only first 70% of frames to avoid corruption)
+        safe_max_frame = max(0, int(total_frames * 0.7))
+        if frame_number > safe_max_frame:
+            frame_number = safe_max_frame
+            logger.warning(f"⚠️ Frame {int(timestamp * video_fps)} exceeds safe range, capped to frame {safe_max_frame} (70% of video)")
+        
+        frame_number = max(0, frame_number)
+        
         # Seek to frame
         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
         
-        # Read frame
+        # Read frame with multiple retries
         ret, frame = cap.read()
+        
+        # If failed, try multiple previous frames (important for video end)
+        retry_attempts = 15  # Try up to 15 frames back
+        attempt = 0
+        while not ret and attempt < retry_attempts and frame_number - attempt > 0:
+            attempt += 1
+            retry_frame = frame_number - attempt
+            logger.warning(f"Failed to read frame {frame_number - attempt + 1}, trying frame {retry_frame}")
+            cap.set(cv2.CAP_PROP_POS_FRAMES, retry_frame)
+            ret, frame = cap.read()
+        
         cap.release()
         
         if not ret:
-            raise HTTPException(status_code=500, detail="Failed to extract frame")
+            raise HTTPException(status_code=500, detail=f"Failed to extract frame at {timestamp:.2f}s (tried frames {frame_number} to {max(0, frame_number - retry_attempts)})")
         
         # Create keyframes directory
         keyframes_dir = job_dir / "keyframes"

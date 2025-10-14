@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Version: 2.1.0 - Real-time progress updates -->
     <title>DeepfakeBench Video Analysis</title>
     <link rel="stylesheet" href="/web/css/app.css">
     <style>
@@ -214,37 +218,58 @@
             transform: none;
         }
         
-        .progress {
+        .progress-container {
             margin-top: 20px;
             padding: 20px;
-            background: #f9f9ff;
-            border-radius: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: none;
         }
         
-        .progress.show {
+        .progress-container.show {
             display: block;
         }
         
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: #e0e0e0;
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 10px 0;
+        /* Custom progress bar to match TruFor style */
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
         
-        .progress-fill {
+        .progress-stage {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .progress-percent {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .progress-bar-custom {
+            width: 100%;
+            height: 12px;
+            background-color: #E5E7EB;
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            width: 0%;
-            transition: width 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            transition: width 0.3s ease;
+            border-radius: 9999px;
+        }
+        
+        .progress-message {
+            font-size: 12px;
+            color: #9CA3AF;
+            margin-top: 4px;
         }
         
         .result {
@@ -455,6 +480,177 @@
             height: 16px;
             border-radius: 3px;
         }
+        
+        /* Model Detail Info Icon */
+        .model-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .model-info-icon {
+            background: #667eea;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .model-info-icon:hover {
+            background: #764ba2;
+            transform: scale(1.1);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .modal-close {
+            background: #f0f0f0;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            padding: 0;
+        }
+        
+        .modal-close:hover {
+            background: #e0e0e0;
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            color: #333;
+        }
+        
+        .modal-section {
+            margin-bottom: 20px;
+        }
+        
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-section-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+        }
+        
+        .modal-section-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .modal-section-content li {
+            margin: 5px 0;
+        }
+        
+        .pros-icon {
+            color: #27ae60;
+        }
+        
+        .cons-icon {
+            color: #e74c3c;
+        }
+        
+        .info-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        .badge-speed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .badge-accuracy {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .badge-complexity {
+            background: #fff3e0;
+            color: #e65100;
+        }
     </style>
 </head>
 <body>
@@ -516,11 +712,15 @@
         <button id="analyzeBtn" disabled>Select file and model to start analysis</button>
         
         <!-- Progress -->
-        <div class="progress" id="progress">
-            <div id="progressMessage">Preparing...</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill">0%</div>
+        <div class="progress-container" id="progress">
+            <div class="progress-header">
+                <span class="progress-stage" id="progressStage">Preparing...</span>
+                <span class="progress-percent" id="progressPercent">0%</span>
             </div>
+            <div class="progress-bar-custom">
+                <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <p class="progress-message" id="progressMessage"></p>
         </div>
         
         <!-- Results -->
@@ -602,6 +802,202 @@
         let originalSegments = [];  // Store original segments with keyframes
         let originalThreshold = 0.5;  // Store original threshold from server
         
+        // Model detailed information
+        const modelDetails = {
+            'xception': {
+                description: 'Xception is a deep learning architecture based on depthwise separable convolutions. It excels at detecting face manipulation artifacts.',
+                pros: [
+                    'High detection accuracy across various deepfake types',
+                    'Robust to compression and quality degradation',
+                    'Well-established architecture with proven performance',
+                    'Balanced speed and accuracy'
+                ],
+                cons: [
+                    'Medium processing speed compared to lightweight models',
+                    'May struggle with very high-quality deepfakes',
+                    'Requires significant GPU memory'
+                ],
+                useCases: 'General-purpose deepfake detection, suitable for most scenarios',
+                complexity: 'Medium'
+            },
+            'meso4': {
+                description: 'MesoNet-4 is a lightweight CNN specifically designed for deepfake detection, focusing on mesoscopic features.',
+                pros: [
+                    'Very fast inference speed',
+                    'Low computational requirements',
+                    'Good for real-time applications',
+                    'Compact model size'
+                ],
+                cons: [
+                    'Medium accuracy compared to deeper models',
+                    'May miss subtle manipulations',
+                    'Less robust to variations'
+                ],
+                useCases: 'Real-time detection, resource-constrained environments',
+                complexity: 'Low'
+            },
+            'meso4Inception': {
+                description: 'Enhanced version of MesoNet-4 with Inception modules for multi-scale feature extraction.',
+                pros: [
+                    'Fast processing speed',
+                    'Better multi-scale feature detection than MesoNet-4',
+                    'Good balance of speed and accuracy',
+                    'Relatively lightweight'
+                ],
+                cons: [
+                    'Still medium accuracy level',
+                    'Not as robust as heavier models',
+                    'May require fine-tuning for specific datasets'
+                ],
+                useCases: 'Scenarios requiring fast processing with moderate accuracy',
+                complexity: 'Low-Medium'
+            },
+            'f3net': {
+                description: 'F3-Net focuses on frequency domain analysis to detect deepfake artifacts invisible in spatial domain.',
+                pros: [
+                    'Excellent at detecting frequency-domain artifacts',
+                    'Robust to spatial manipulations',
+                    'High accuracy on generated faces',
+                    'Complementary to spatial-domain methods'
+                ],
+                cons: [
+                    'Medium processing speed',
+                    'May require specific preprocessing',
+                    'Less effective on heavily compressed videos'
+                ],
+                useCases: 'Detecting high-quality deepfakes, frequency analysis scenarios',
+                complexity: 'Medium'
+            },
+            'efficientnetb4': {
+                description: 'EfficientNet-B4 uses compound scaling to balance network depth, width, and resolution for optimal performance.',
+                pros: [
+                    'State-of-the-art accuracy',
+                    'Efficient parameter utilization',
+                    'Strong generalization capability',
+                    'Excellent feature extraction'
+                ],
+                cons: [
+                    'Slower inference than lightweight models',
+                    'Higher memory requirements',
+                    'May be overkill for simple cases'
+                ],
+                useCases: 'High-accuracy requirements, final verification stage',
+                complexity: 'High'
+            },
+            'capsule_net': {
+                description: 'Capsule Network uses capsule structures to better model spatial hierarchies and part-whole relationships.',
+                pros: [
+                    'Very fast inference',
+                    'Novel architecture for deepfake detection',
+                    'Good at capturing facial structure inconsistencies',
+                    'Low resource consumption'
+                ],
+                cons: [
+                    'Medium accuracy',
+                    'May struggle with subtle manipulations',
+                    'Less proven track record'
+                ],
+                useCases: 'Quick preliminary screening, mobile applications',
+                complexity: 'Medium'
+            },
+            'srm': {
+                description: 'Spatial Rich Model focuses on steganalysis features to detect manipulation traces at pixel level.',
+                pros: [
+                    'Excellent at detecting low-level artifacts',
+                    'High sensitivity to pixel-level manipulations',
+                    'Robust detection capability',
+                    'Good for forensic analysis'
+                ],
+                cons: [
+                    'Medium processing speed',
+                    'May produce false positives on compressed images',
+                    'Requires careful threshold tuning'
+                ],
+                useCases: 'Forensic investigation, detailed pixel-level analysis',
+                complexity: 'Medium-High'
+            },
+            'recce': {
+                description: 'RECCE (Recurrent Convolutional Network) leverages temporal information for video-based deepfake detection.',
+                pros: [
+                    'Good temporal consistency detection',
+                    'High accuracy on video sequences',
+                    'Captures inter-frame relationships',
+                    'Effective on deepfake videos'
+                ],
+                cons: [
+                    'Medium processing speed',
+                    'Requires sequential frame processing',
+                    'Higher memory usage'
+                ],
+                useCases: 'Video-focused detection, temporal analysis',
+                complexity: 'Medium-High'
+            },
+            'spsl': {
+                description: 'SPSL (Spatial-Phase Shallow Learning) combines spatial and frequency domain features for robust detection.',
+                pros: [
+                    'Hybrid spatial-frequency analysis',
+                    'High detection accuracy',
+                    'Robust to various manipulation types',
+                    'Good generalization'
+                ],
+                cons: [
+                    'Medium processing speed',
+                    'Moderate computational requirements',
+                    'Complex feature engineering'
+                ],
+                useCases: 'Comprehensive detection requiring multi-domain analysis',
+                complexity: 'Medium'
+            },
+            'ucf': {
+                description: 'UCF model specializes in detecting facial reenactment and expression manipulation.',
+                pros: [
+                    'Excellent for facial expression manipulation',
+                    'High accuracy on reenactment attacks',
+                    'Good at detecting subtle facial changes',
+                    'Specialized for facial manipulation'
+                ],
+                cons: [
+                    'Medium processing speed',
+                    'Focused on facial region only',
+                    'May miss non-facial manipulations'
+                ],
+                useCases: 'Face swap detection, expression manipulation identification',
+                complexity: 'Medium'
+            },
+            'cnn_aug': {
+                description: 'CNN with augmentation techniques to improve robustness and generalization across different deepfake types.',
+                pros: [
+                    'Good generalization due to augmentation',
+                    'High robustness to variations',
+                    'Balanced performance',
+                    'Moderate speed'
+                ],
+                cons: [
+                    'Medium accuracy ceiling',
+                    'Requires more training data',
+                    'Medium computational cost'
+                ],
+                useCases: 'General detection with emphasis on robustness',
+                complexity: 'Medium'
+            },
+            'core': {
+                description: 'CORE focuses on identifying core manipulation patterns through attention mechanisms.',
+                pros: [
+                    'Attention-based feature selection',
+                    'High accuracy on key manipulation areas',
+                    'Good interpretability',
+                    'Effective artifact localization'
+                ],
+                cons: [
+                    'Medium processing speed',
+                    'Requires more computational resources',
+                    'Complex attention mechanism'
+                ],
+                useCases: 'Detailed analysis requiring manipulation localization',
+                complexity: 'Medium-High'
+            }
+        };
+        
         // Load available models
         async function loadModels() {
             try {
@@ -624,7 +1020,10 @@
                 const card = document.createElement('div');
                 card.className = `model-card ${model.available ? '' : 'unavailable'} ${model.key === selectedModel ? 'selected' : ''}`;
                 card.innerHTML = `
-                    <div class="model-name">${model.name}</div>
+                    <div class="model-card-header">
+                        <div class="model-name">${model.name}</div>
+                        <div class="model-info-icon" onclick="event.stopPropagation(); showModelDetail('${model.key}')" title="View detailed information">ℹ</div>
+                    </div>
                     <div class="model-info">
                         Speed: ${model.speed}<br>
                         Accuracy: ${model.accuracy}<br>
@@ -645,6 +1044,78 @@
             renderModels();
             updateAnalyzeButton();
         }
+        
+        // Show model detail modal
+        function showModelDetail(modelKey) {
+            const detail = modelDetails[modelKey];
+            if (!detail) {
+                console.error('No details found for model:', modelKey);
+                return;
+            }
+            
+            const modelName = availableModels.find(m => m.key === modelKey)?.name || modelKey;
+            
+            document.getElementById('modalModelName').textContent = modelName;
+            document.getElementById('modalBody').innerHTML = `
+                <div class="modal-section">
+                    <div style="margin-bottom: 15px;">
+                        <span class="info-badge badge-speed">Speed: ${availableModels.find(m => m.key === modelKey)?.speed || 'N/A'}</span>
+                        <span class="info-badge badge-accuracy">Accuracy: ${availableModels.find(m => m.key === modelKey)?.accuracy || 'N/A'}</span>
+                        <span class="info-badge badge-complexity">Complexity: ${detail.complexity}</span>
+                    </div>
+                    <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 20px;">${detail.description}</p>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title"><span class="pros-icon">✓</span> Advantages</div>
+                    <div class="modal-section-content">
+                        <ul>
+                            ${detail.pros.map(pro => `<li>${pro}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title"><span class="cons-icon">✗</span> Limitations</div>
+                    <div class="modal-section-content">
+                        <ul>
+                            ${detail.cons.map(con => `<li>${con}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">💡 Best Use Cases</div>
+                    <div class="modal-section-content">
+                        ${detail.useCases}
+                    </div>
+                </div>
+            `;
+            
+            const modal = document.getElementById('modelDetailModal');
+            modal.classList.add('show');
+            
+            // Close modal when clicking outside
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    closeModelDetail();
+                }
+            };
+        }
+        
+        // Close model detail modal
+        function closeModelDetail() {
+            const modal = document.getElementById('modelDetailModal');
+            modal.classList.remove('show');
+            modal.onclick = null;
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModelDetail();
+            }
+        });
         
         // Upload area handlers
         const uploadArea = document.getElementById('uploadArea');
@@ -713,7 +1184,7 @@
                 formData.append('fps', fps);
                 formData.append('threshold', threshold);
                 
-                updateProgress(10, 'Uploading video...');
+                updateProgress(10, 'Uploading video...', 'Sending file to server');
                 
                 const response = await fetch('/api/deepfakebench/analyze', {
                     method: 'POST',
@@ -740,34 +1211,58 @@
         };
         
         async function pollJobStatus(jobId) {
-            const interval = setInterval(async () => {
+            console.log(`🔄 Starting polling for job ${jobId}`);
+            let pollCount = 0;
+            
+            // Polling function
+            const doPoll = async () => {
+                pollCount++;
+                console.log(`🔄 Poll #${pollCount} for job ${jobId}`);
                 try {
                     const response = await fetch(`/api/deepfakebench/jobs/${jobId}`);
                     const job = await response.json();
                     
-                    updateProgress(job.progress, job.message);
+                    console.log(`📊 Progress: ${job.progress}% - ${job.stage} - ${job.message}`);
+                    updateProgress(job.progress || 0, job.stage || 'Processing...', job.message || '');
                     
                     if (job.status === 'completed') {
-                        clearInterval(interval);
+                        console.log(`✅ Job completed after ${pollCount} polls`);
+                        if (interval) clearInterval(interval);
                         displayResults(job.result);
                         document.getElementById('progress').classList.remove('show');
                         document.getElementById('analyzeBtn').disabled = false;
+                        return true; // Done
                     } else if (job.status === 'error') {
-                        clearInterval(interval);
+                        console.log(`❌ Job failed after ${pollCount} polls`);
+                        if (interval) clearInterval(interval);
                         document.getElementById('error').textContent = `Analysis failed: ${job.message}`;
                         document.getElementById('error').style.display = 'block';
                         document.getElementById('progress').classList.remove('show');
                         document.getElementById('analyzeBtn').disabled = false;
+                        return true; // Done
                     }
+                    return false; // Continue polling
                 } catch (error) {
                     console.error('Failed to poll status:', error);
+                    return false;
                 }
-            }, 1000);
+            };
+            
+            // Poll immediately first, then set interval
+            const done = await doPoll();
+            if (done) return; // Already completed
+            
+            // Continue polling every 500ms for smooth updates
+            const interval = setInterval(async () => {
+                const done = await doPoll();
+                if (done && interval) clearInterval(interval);
+            }, 500);
         }
         
-        function updateProgress(percent, message) {
-            document.getElementById('progressFill').style.width = `${percent}%`;
-            document.getElementById('progressFill').textContent = `${percent}%`;
+        function updateProgress(percent, stage, message = '') {
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressStage').textContent = stage;
             document.getElementById('progressMessage').textContent = message;
         }
         
@@ -907,12 +1402,23 @@
             
             console.log(`\n🎚️ === THRESHOLD CHANGED TO ${(threshold*100).toFixed(0)}% ===`);
             
+            // DEBUG: Show score distribution
+            const probs = currentResult.frame_scores.map(f => f.probability);
+            const aboveThreshold = probs.filter(p => p >= threshold).length;
+            const belowThreshold = probs.filter(p => p < threshold).length;
+            console.log(`📊 Score Distribution:`);
+            console.log(`  - Frames >= ${(threshold*100).toFixed(0)}%: ${aboveThreshold} frames`);
+            console.log(`  - Frames < ${(threshold*100).toFixed(0)}%: ${belowThreshold} frames`);
+            console.log(`  - Min score: ${(Math.min(...probs)*100).toFixed(2)}%`);
+            console.log(`  - Max score: ${(Math.max(...probs)*100).toFixed(2)}%`);
+            console.log(`  - Avg score: ${(probs.reduce((a,b)=>a+b,0)/probs.length*100).toFixed(2)}%`);
+            
             // Recalculate segments based on new threshold
             const newSegments = findSuspiciousSegments(currentResult.frame_scores, threshold, currentResult.fps);
             
-            console.log(`Found ${newSegments.length} new segments:`);
+            console.log(`\n✅ Found ${newSegments.length} segments (threshold=${(threshold*100).toFixed(0)}%):`);
             newSegments.forEach((seg, i) => {
-                console.log(`  New Segment ${i+1}: ${seg.start.toFixed(2)}-${seg.end.toFixed(2)}s, peak at ${seg.peak_time.toFixed(2)}s`);
+                console.log(`  Segment ${i+1}: ${seg.start.toFixed(2)}-${seg.end.toFixed(2)}s (${seg.duration.toFixed(2)}s), peak=${(seg.peak_score*100).toFixed(2)}% at ${seg.peak_time.toFixed(2)}s`);
             });
             
             // Match keyframes for new segments with UNIQUE assignment
@@ -928,53 +1434,90 @@
         function findSuspiciousSegments(frameScores, threshold, fps) {
             const segments = [];
             let inSegment = false;
-            let segmentStart = 0;
-            let maxScore = 0;
-            let maxScoreTime = 0;
+            let segmentStartIdx = 0;
             
-            frameScores.forEach((frame, idx) => {
-                const score = frame.probability;
-                const time = frame.timestamp;
+            // Step 1: Smooth scores (same as backend: 5-frame moving average)
+            const rawProbs = frameScores.map(f => f.probability);
+            const smoothed = smoothScores(rawProbs, 5);
+            
+            // Step 2: Find segments using smoothed scores (same as backend)
+            for (let i = 0; i < smoothed.length; i++) {
+                const prob = smoothed[i];
                 
-                if (score >= threshold) {
-                    if (!inSegment) {
-                        inSegment = true;
-                        segmentStart = time;
-                        maxScore = score;
-                        maxScoreTime = time;
-                    } else {
-                        if (score > maxScore) {
-                            maxScore = score;
-                            maxScoreTime = time;
-                        }
-                    }
-                } else {
-                    if (inSegment) {
+                if (!inSegment && prob >= threshold) {
+                    inSegment = true;
+                    segmentStartIdx = i;
+                } else if (inSegment && prob < threshold) {
+                    inSegment = false;
+                    const startTime = frameScores[segmentStartIdx].timestamp;
+                    const endTime = frameScores[i - 1].timestamp;
+                    const duration = endTime - startTime;
+                    
+                    // Only keep segments >= 1 second (same as backend)
+                    if (duration >= 1.0) {
+                        // Find peak in this segment
+                        const segmentProbs = smoothed.slice(segmentStartIdx, i);
+                        const peakIdx = segmentStartIdx + segmentProbs.indexOf(Math.max(...segmentProbs));
+                        
                         segments.push({
-                            start: segmentStart,
-                            end: time,
-                            duration: time - segmentStart,
-                            peak_score: maxScore,
-                            peak_time: maxScoreTime
+                            start: startTime,
+                            end: endTime,
+                            duration: duration,
+                            peak_score: smoothed[peakIdx],
+                            peak_time: frameScores[peakIdx].timestamp
                         });
-                        inSegment = false;
                     }
                 }
-            });
+            }
             
             // Close last segment if still open
             if (inSegment && frameScores.length > 0) {
-                const lastTime = frameScores[frameScores.length - 1].timestamp;
-                segments.push({
-                    start: segmentStart,
-                    end: lastTime,
-                    duration: lastTime - segmentStart,
-                    peak_score: maxScore,
-                    peak_time: maxScoreTime
-                });
+                const startTime = frameScores[segmentStartIdx].timestamp;
+                const endTime = frameScores[frameScores.length - 1].timestamp;
+                const duration = endTime - startTime;
+                
+                if (duration >= 1.0) {
+                    const segmentProbs = smoothed.slice(segmentStartIdx);
+                    const peakIdx = segmentStartIdx + segmentProbs.indexOf(Math.max(...segmentProbs));
+                    
+                    segments.push({
+                        start: startTime,
+                        end: endTime,
+                        duration: duration,
+                        peak_score: smoothed[peakIdx],
+                        peak_time: frameScores[peakIdx].timestamp
+                    });
+                }
             }
             
             return segments;
+        }
+        
+        // Smooth scores using moving average (same as backend's np.convolve)
+        function smoothScores(scores, windowSize) {
+            if (scores.length < windowSize) {
+                return scores;
+            }
+            
+            const smoothed = [];
+            for (let i = 0; i < scores.length; i++) {
+                let sum = 0;
+                let count = 0;
+                
+                // Calculate window boundaries (same as numpy's 'same' mode)
+                const halfWindow = Math.floor(windowSize / 2);
+                const start = Math.max(0, i - halfWindow);
+                const end = Math.min(scores.length, i + halfWindow + 1);
+                
+                for (let j = start; j < end; j++) {
+                    sum += scores[j];
+                    count++;
+                }
+                
+                smoothed.push(sum / count);
+            }
+            
+            return smoothed;
         }
         
         async function matchKeyframesUnique(newSegments) {
@@ -1095,6 +1638,19 @@
         loadModels();
     </script>
     </div> <!-- /main-content -->
+    
+    <!-- Model Detail Modal -->
+    <div id="modelDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalModelName">Model Details</h2>
+                <button class="modal-close" onclick="closeModelDetail()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be dynamically inserted -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

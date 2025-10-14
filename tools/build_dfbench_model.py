@@ -8,6 +8,7 @@ import sys
 import os
 import glob
 import importlib
+import inspect
 import torch
 import yaml
 from typing import Tuple, Optional, Callable
@@ -49,7 +50,8 @@ def _auto_import_detector(model_key: str):
             for attr_name in dir(mod):
                 if attr_name.lower() == expected_class_name:
                     attr = getattr(mod, attr_name)
-                    if callable(attr):
+                    # Skip abstract base classes
+                    if callable(attr) and inspect.isclass(attr) and not inspect.isabstract(attr):
                         print(f"[INFO] Found detector class (exact match): {module_path}.{attr_name}")
                         return attr
         except Exception as e:
@@ -75,10 +77,32 @@ def _auto_import_detector(model_key: str):
                         print(f"[INFO] Found builder: {module_path}.{attr_name}")
                         return attr
                 
-                # Check for XXXDetector class (partial match)
-                if attr_name.lower().endswith("detector") and callable(attr):
-                    if model_key.lower() in attr_name.lower():
+                # Check for XXXDetector class (skip abstract classes)
+                if attr_name.lower().endswith("detector") and callable(attr) and inspect.isclass(attr):
+                    # Skip abstract base classes
+                    if inspect.isabstract(attr):
+                        continue
+                    
+                    # Try exact match first (e.g., xception -> XceptionDetector)
+                    if model_key.lower() == attr_name.lower().replace("detector", ""):
+                        print(f"[INFO] Found detector class (exact match): {module_path}.{attr_name}")
+                        return attr
+                    # Then try partial match (e.g., efficientnetb4 contains efficient)
+                    elif model_key.lower() in attr_name.lower():
                         print(f"[INFO] Found detector class (partial match): {module_path}.{attr_name}")
+                        return attr
+            
+            # If no class found, check if filename matches (e.g., efficientnetb4_detector.py contains efficientnetb4)
+            filename = os.path.basename(py_file).replace("_detector.py", "")
+            if filename.lower() == model_key.lower():
+                # Re-import and get the main detector class
+                for attr_name in dir(mod):
+                    attr = getattr(mod, attr_name)
+                    if attr_name.lower().endswith("detector") and callable(attr) and inspect.isclass(attr):
+                        # Skip abstract base classes
+                        if inspect.isabstract(attr):
+                            continue
+                        print(f"[INFO] Found detector class (filename match): {module_path}.{attr_name}")
                         return attr
                         
         except Exception as e:
@@ -92,6 +116,9 @@ def _load_config(model_key: str) -> dict:
     """Load configuration from YAML file for the model."""
     config_path = os.path.join(DFB_ROOT, "training", "config", "detector", f"{model_key}.yaml")
     
+    # Models that require ImageNet pretrained weights (will fail without them)
+    REQUIRES_IMAGENET_PRETRAIN = {"f3net", "core", "spsl", "ucf", "srm", "capsule_net"}
+    
     if not os.path.exists(config_path):
         print(f"[WARN] Config file not found: {config_path}, using minimal config")
         # Return minimal config
@@ -99,7 +126,7 @@ def _load_config(model_key: str) -> dict:
             "backbone_name": model_key,
             "backbone_config": {"num_classes": 2, "inc": 3},
             "loss_func": "cross_entropy",
-            "pretrained": "None"
+            "pretrained": None  # Use None object, not string
         }
     
     try:
@@ -114,19 +141,47 @@ def _load_config(model_key: str) -> dict:
         if "loss_func" not in config:
             config["loss_func"] = "cross_entropy"
         
-        # Force disable pretraining - we will load full trained weights later
-        # This avoids the error when backbone pretrained weights are missing
-        print(f"[INFO] Skipping backbone pretraining for {model_key} (will load full trained weights later)")
-        config["pretrained"] = "None"
+        # Handle pretrained weights based on model requirements
+        if model_key.lower() in REQUIRES_IMAGENET_PRETRAIN:
+            # These models REQUIRE ImageNet pretrained weights for good performance
+            pretrained_path = config.get("pretrained", "")
+            if pretrained_path and pretrained_path != "None":
+                # Convert relative path to absolute
+                if not os.path.isabs(pretrained_path):
+                    pretrained_path = os.path.join(DFB_ROOT, pretrained_path)
+                
+                # Check if file exists
+                if os.path.exists(pretrained_path):
+                    print(f"[INFO] Using ImageNet pretrained weights: {pretrained_path}")
+                    config["pretrained"] = pretrained_path
+                else:
+                    raise FileNotFoundError(
+                        f"Model '{model_key}' requires ImageNet pretrained weights, but file not found: {pretrained_path}\n"
+                        f"Please download 'xception-b5690688.pth' from:\n"
+                        f"https://download.pytorch.org/models/xception-b5690688.pth\n"
+                        f"And place it in: vendors/DeepfakeBench/training/pretrained/"
+                    )
+            else:
+                raise ValueError(
+                    f"Model '{model_key}' requires ImageNet pretrained weights, but none specified in config.\n"
+                    f"Please download 'xception-b5690688.pth' and update the config."
+                )
+        else:
+            # For other models, disable pretraining - we will load full trained weights later
+            print(f"[INFO] Skipping backbone pretraining for {model_key} (will load full trained weights later)")
+            config["pretrained"] = None  # Use None object, not string "None"
         
         return config
+    except FileNotFoundError:
+        # Re-raise FileNotFoundError for missing pretrained weights
+        raise
     except Exception as e:
         print(f"[WARN] Failed to load config: {e}, using minimal config")
         return {
             "backbone_name": model_key,
             "backbone_config": {"num_classes": 2, "inc": 3},
             "loss_func": "cross_entropy",
-            "pretrained": "None"
+            "pretrained": None  # Use None object, not string
         }
 
 
