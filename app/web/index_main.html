@@ -279,9 +279,9 @@
         
         @media (min-width: 769px) {
             .detection-options {
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-                gap: 30px;
-                margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
             }
         }
         
@@ -397,12 +397,12 @@
         
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
-            .badge.new {
+        .badge.new {
                 background: #4A1520 !important;
                 color: #FFB3C1 !important;
-            }
-            
-            .badge.classic {
+        }
+        
+        .badge.classic {
                 background: #003D5C !important;
                 color: #81D4FA !important;
             }
@@ -419,8 +419,8 @@
         
         @media (min-width: 769px) {
             .info-section {
-                padding: 30px;
-                margin-top: 30px;
+            padding: 30px;
+            margin-top: 30px;
             }
         }
         
@@ -794,143 +794,143 @@
         <nav class="drawer-nav" aria-label="Mobile navigation">
             <a href="/web/index_main.html" class="nav-link active" aria-current="page">
                 <span aria-hidden="true">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/web/index.html" class="nav-link">
+                    <span>Home</span>
+                </a>
+                <a href="/web/index.html" class="nav-link">
                 <span aria-hidden="true">🖼️</span>
                 <span>Images (TruFor)</span>
-            </a>
-            <a href="/web/deepfakebench.html" class="nav-link">
+                </a>
+                <a href="/web/deepfakebench.html" class="nav-link">
                 <span aria-hidden="true">🎬</span>
                 <span>Video (DeepfakeBench)</span>
-            </a>
-        </nav>
+                </a>
+    </nav>
     </aside>
     
     <div class="page-content">
         <div class="container">
             <div class="header">
                 <h1>🎭 Deepfake Detection System</h1>
-                <p class="subtitle">Choose your detection method to start analysis</p>
-            </div>
+            <p class="subtitle">Choose your detection method to start analysis</p>
+        </div>
         
-            <div class="detection-options">
-                <!-- DeepfakeBench Option -->
+        <div class="detection-options">
+            <!-- DeepfakeBench Option -->
                 <a href="/web/deepfakebench.html" class="option-card" tabindex="0">
                     <div class="option-icon" aria-hidden="true">🎬</div>
                     <div class="option-title">
                         DeepfakeBench
                         <span class="badge new"><span aria-hidden="true">✨</span>New</span>
                     </div>
-                    <div class="option-description">
-                        12 advanced models, frame-by-frame analysis, suspicious segment detection
-                    </div>
-                    <ul class="option-features">
-                        <li>12 models available (Xception, F3Net, etc.)</li>
-                        <li>Frame-by-frame precision analysis</li>
-                        <li>Suspicious time segment localization</li>
-                        <li>Real-time progress tracking</li>
-                        <li>Flexible parameter adjustment</li>
-                    </ul>
-                </a>
-                
-                <!-- Classic TruFor Option -->
+                <div class="option-description">
+                    12 advanced models, frame-by-frame analysis, suspicious segment detection
+                </div>
+                <ul class="option-features">
+                    <li>12 models available (Xception, F3Net, etc.)</li>
+                    <li>Frame-by-frame precision analysis</li>
+                    <li>Suspicious time segment localization</li>
+                    <li>Real-time progress tracking</li>
+                    <li>Flexible parameter adjustment</li>
+                </ul>
+            </a>
+            
+            <!-- Classic TruFor Option -->
                 <a href="/web/index.html" class="option-card" tabindex="0">
                     <div class="option-icon" aria-hidden="true">🔍</div>
                     <div class="option-title">
                         TruFor
                         <span class="badge classic"><span aria-hidden="true">🔬</span>Forensic</span>
                     </div>
-                    <div class="option-description">
-                        Advanced image forensic analysis with pixel-level deepfake detection
-                    </div>
-                    <ul class="option-features">
-                        <li>TruFor forensic model</li>
-                        <li>Noiseprint++ analysis</li>
-                        <li>Pixel-level anomaly localization</li>
-                        <li>Image and video support</li>
-                        <li>Heatmap visualization</li>
-                    </ul>
-                </a>
-            </div>
+                <div class="option-description">
+                    Advanced image forensic analysis with pixel-level deepfake detection
+                </div>
+                <ul class="option-features">
+                    <li>TruFor forensic model</li>
+                    <li>Noiseprint++ analysis</li>
+                    <li>Pixel-level anomaly localization</li>
+                    <li>Image and video support</li>
+                    <li>Heatmap visualization</li>
+                </ul>
+            </a>
+        </div>
         
-            <!-- Comparison Section -->
-            <div class="info-section">
-                <h2>📊 Feature Comparison</h2>
+        <!-- Comparison Section -->
+        <div class="info-section">
+            <h2>📊 Feature Comparison</h2>
                 <div class="table-wrapper">
-                    <table class="comparison-table">
-                        <thead>
-                            <tr>
-                                <th>Feature</th>
-                                <th>DeepfakeBench</th>
-                                <th>TruFor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Number of Models</strong></td>
-                                <td>12 models available</td>
-                                <td>1 forensic model</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Detection Target</strong></td>
-                                <td>Video (frame-level)</td>
-                                <td>Image + Video</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Analysis Method</strong></td>
-                                <td>Frame-by-frame + Segment detection</td>
-                                <td>Forensic analysis + Pixel-level localization</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Suspicious Segments</strong></td>
-                                <td>✅ Precise time localization</td>
-                                <td>❌</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Forensic Heatmap</strong></td>
-                                <td>❌</td>
-                                <td>✅ Pixel-level anomaly map</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Noiseprint Analysis</strong></td>
-                                <td>❌</td>
-                                <td>✅ Noiseprint++</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Processing Speed</strong></td>
-                                <td>Adjustable (FPS parameter)</td>
-                                <td>Moderate (forensic analysis)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Use Case</strong></td>
-                                <td>In-depth video analysis</td>
-                                <td>Forensic image verification</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>DeepfakeBench</th>
+                        <th>TruFor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Number of Models</strong></td>
+                        <td>12 models available</td>
+                        <td>1 forensic model</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Detection Target</strong></td>
+                        <td>Video (frame-level)</td>
+                        <td>Image + Video</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Analysis Method</strong></td>
+                        <td>Frame-by-frame + Segment detection</td>
+                        <td>Forensic analysis + Pixel-level localization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Suspicious Segments</strong></td>
+                        <td>✅ Precise time localization</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Forensic Heatmap</strong></td>
+                        <td>❌</td>
+                        <td>✅ Pixel-level anomaly map</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Noiseprint Analysis</strong></td>
+                        <td>❌</td>
+                        <td>✅ Noiseprint++</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Processing Speed</strong></td>
+                        <td>Adjustable (FPS parameter)</td>
+                        <td>Moderate (forensic analysis)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use Case</strong></td>
+                        <td>In-depth video analysis</td>
+                        <td>Forensic image verification</td>
+                    </tr>
+                </tbody>
+            </table>
                 </div>
-            </div>
+        </div>
         
-            <!-- Model Status -->
-            <div class="info-section">
-                <h2>🔧 Model Status</h2>
+        <!-- Model Status -->
+        <div class="info-section">
+            <h2>🔧 Model Status</h2>
                 <div class="model-status-grid">
-                    <div>
+                <div>
                         <h3>DeepfakeBench Models</h3>
-                        <div id="dfbStatus">Checking...</div>
-                    </div>
-                    <div>
+                    <div id="dfbStatus">Checking...</div>
+                </div>
+                <div>
                         <h3 style="color: #4facfe;">TruFor Model</h3>
-                        <div id="truforStatus">Checking...</div>
-                    </div>
+                    <div id="truforStatus">Checking...</div>
                 </div>
             </div>
+        </div>
         
-            <footer>
-                <p>Choose the detection method that fits your needs</p>
+        <footer>
+            <p>Choose the detection method that fits your needs</p>
                 <p class="tip">💡 Tip: For first-time users, try DeepfakeBench's MesoNet-4 model (fastest)</p>
-            </footer>
+        </footer>
         </div>
     </div>
 
@@ -1140,7 +1140,7 @@
         
         // Initialize feather icons after DOM loads
         document.addEventListener('DOMContentLoaded', function() {
-            checkModels();
+        checkModels();
         });
     </script>
 </body>
