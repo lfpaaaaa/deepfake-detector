@@ -54,43 +54,29 @@ function determineDecision(integrity, evidenceReliability) {
     const reliabilityPercent = Math.round(evidenceReliability * 100);
     
     // Decision thresholds based on your requirements
-    console.log(`Decision logic: integrity=${integrityPercent}%, reliability=${reliabilityPercent}%`);
-    
     if (integrityPercent >= 70 && reliabilityPercent >= 40) {
-        console.log('Decision: AUTHENTIC');
         return 'AUTHENTIC';
     } else if (integrityPercent >= 55 && integrityPercent < 70) {
-        console.log('Decision: LIKELY_AUTHENTIC');
         return 'LIKELY_AUTHENTIC';
     } else if (integrityPercent >= 45 && integrityPercent < 55) {
-        console.log('Decision: INCONCLUSIVE');
         return 'INCONCLUSIVE';
     } else if (integrityPercent >= 30 && integrityPercent < 45 && reliabilityPercent >= 40) {
-        console.log('Decision: LIKELY_FORGED');
         return 'LIKELY_FORGED';
     } else if (integrityPercent < 30 && reliabilityPercent >= 50) {
-        console.log('Decision: FORGED');
         return 'FORGED';
     } else {
-        console.log('Decision: INCONCLUSIVE (default)');
         return 'INCONCLUSIVE'; // Default for edge cases
     }
 }
 
 // 🎨 UPDATED VERSION WITH SMOOTH COLORMAP - NO BLACK REGIONS! 🎨
-console.log('🎨 JavaScript loaded: UI IMPROVEMENTS VERSION 2.0 - FIVE-TIER DECISION SYSTEM!');
-console.log('🔧 DEBUG: New decision logic is active!');
-console.log('🔧 DEBUG: Evidence Reliability calculation is active!');
 
 // DOM elements are defined in HTML - using global elements object
 
 // Check for missing elements
-console.log('Checking DOM elements...');
 for (const [name, element] of Object.entries(elements)) {
     if (!element) {
         console.error(`Missing DOM element: ${name}`);
-    } else {
-        console.log(`Found element: ${name}`);
     }
 }
 
@@ -128,14 +114,9 @@ function showError(message) {
 
 // Handle file
 async function handleFile(file) {
-    console.log('File selected:', file.name, file.type, file.size);
-    
     if (!validateFile(file)) {
-        console.log('File validation failed');
         return;
     }
-    
-    console.log('File validation passed, starting detection...');
     
     // Hide errors and results
     elements.errorAlert.classList.add('hidden');
@@ -150,13 +131,10 @@ async function handleFile(file) {
     formData.append('file', file);
     
     try {
-        console.log('Sending request to /detect...');
         const response = await fetch('/detect', {
             method: 'POST',
             body: formData
         });
-        
-        console.log('Response status:', response.status);
         
         if (!response.ok) {
             const error = await response.json();
@@ -165,7 +143,6 @@ async function handleFile(file) {
         }
         
         const result = await response.json();
-        console.log('Detection result:', result);
         displayResult(result);
         
     } catch (error) {
@@ -177,10 +154,8 @@ async function handleFile(file) {
 
 // Display results
 function displayResult(data) {
-    console.log('🔧 DEBUG: displayResult called with data:', data);
     // Determine if this is TruFor response
     const isTruFor = data.model === 'TruFor';
-    console.log('🔧 DEBUG: isTruFor:', isTruFor);
     
     // Update status based on TruFor response format
     let status, config;
@@ -191,13 +166,11 @@ function displayResult(data) {
             const confData = data.confidence_map.flat();
             const avgConfidence = confData.reduce((sum, val) => sum + val, 0) / confData.length;
             evidenceReliability = avgConfidence;
-            console.log(`Evidence Reliability calculated: ${avgConfidence} (${Math.round(avgConfidence * 100)}%)`);
         }
         
         // Determine decision using new five-tier system
         status = determineDecision(data.integrity, evidenceReliability);
         config = DECISION_CONFIG[status];
-        console.log(`Decision: integrity=${data.integrity} (${Math.round(data.integrity * 100)}%), reliability=${evidenceReliability} (${Math.round(evidenceReliability * 100)}%) -> ${status}`);
         
         // Update status alert
         elements.statusAlert.className = `alert ${config.alertClass} shadow-lg`;
@@ -215,12 +188,10 @@ function displayResult(data) {
             const confData = data.confidence_map.flat();
             const avgConfidence = confData.reduce((sum, val) => sum + val, 0) / confData.length;
             const reliabilityPercent = Math.round(avgConfidence * 100);
-            console.log(`Evidence Reliability display: ${avgConfidence} -> ${reliabilityPercent}%`);
             elements.confidenceText.textContent = `${reliabilityPercent}%`;
             elements.confidenceBar.value = reliabilityPercent;
         } else {
             const confidence = Math.round(data.confidence * 100);
-            console.log(`Using fallback confidence: ${confidence}%`);
             elements.confidenceBar.value = confidence;
             elements.confidenceText.textContent = `${confidence}%`;
         }
@@ -242,7 +213,6 @@ function displayResult(data) {
             
             // Display portrait mode detection note
             if (data.portrait_note) {
-                console.log('Portrait mode detected:', data.portrait_note);
                 // Create or update portrait note element
                 let portraitNoteElement = document.getElementById('portraitNote');
                 if (!portraitNoteElement) {
@@ -324,8 +294,6 @@ function displayTruForVisualization(data) {
         const imgWidth = elements.originalImage.naturalWidth;
         const imgHeight = elements.originalImage.naturalHeight;
         
-        console.log(`🖼️ Image loaded: ${imgWidth}x${imgHeight}`);
-        
         // Calculate aspect ratio preserving dimensions with max size 300px
         const maxSize = 300;
         let canvasWidth, canvasHeight;
@@ -340,7 +308,6 @@ function displayTruForVisualization(data) {
             canvasWidth = Math.round(maxSize * (imgWidth / imgHeight));
         }
         
-        console.log(`📐 Calculated canvas size: ${canvasWidth}x${canvasHeight}`);
         
         // Set canvas size to match aspect ratio (both element properties and CSS style)
         elements.predictionOverlay.width = canvasWidth;
@@ -363,7 +330,6 @@ function displayTruForVisualization(data) {
         elements.noiseprintMap.style.width = canvasWidth + 'px';
         elements.noiseprintMap.style.height = canvasHeight + 'px';
         
-        console.log(`✅ Canvas sizes set: ${canvasWidth}x${canvasHeight}`);
         
         // Redraw all visualizations with correct aspect ratio
         if (data.prediction_map) {
@@ -387,7 +353,6 @@ function displayTruForVisualization(data) {
         
         // Handle case where image is already cached and loaded
         if (elements.originalImage.complete && elements.originalImage.naturalWidth > 0) {
-            console.log('🔄 Image already loaded from cache, calling setup immediately');
             setupVisualizationsWithAspectRatio();
         }
     } else {
@@ -425,8 +390,6 @@ function displayTruForVisualization(data) {
             elements.fakeLikelihoodBar.style.width = `${fakeLikelihoodPercent}%`;
         }
         
-        console.log(`Integrity Score updated: ${integrityPercent}% (${elements.integrityLabel.textContent})`);
-        console.log(`Fake Likelihood: ${fakeLikelihoodPercent}%`);
     }
 }
 
@@ -483,13 +446,9 @@ function smoothColormap(value) {
 
 // Draw heatmap on canvas - UPDATED VERSION WITH SMOOTH COLORMAP
 function drawHeatmap(canvas, data, type) {
-    console.log(`🎨 NEW VERSION: Drawing ${type} heatmap with SMOOTH COLORMAP...`);
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    
-    console.log(`Canvas size: ${width}x${height}`);
-    console.log(`Data size: ${data.length}x${data[0].length}`);
     
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
@@ -497,29 +456,6 @@ function drawHeatmap(canvas, data, type) {
     // Create image data
     const imageData = ctx.createImageData(width, height);
     const pixels = imageData.data;
-    
-    // Debug data range
-    let minVal = Infinity;
-    let maxVal = -Infinity;
-    for (let y = 0; y < data.length; y++) {
-        for (let x = 0; x < data[y].length; x++) {
-            const value = data[y][x];
-            if (value < minVal) minVal = value;
-            if (value > maxVal) maxVal = value;
-        }
-    }
-    console.log(`${type} data range:`, minVal, 'to', maxVal);
-    console.log(`🎨 USING SMOOTH COLORMAP for type: ${type}`);
-    
-    // Test smoothColormap function
-    if (type === 'forgery') {
-        console.log('🧪 Testing smoothColormap:');
-        console.log('Value 0.0:', smoothColormap(0.0));
-        console.log('Value 0.25:', smoothColormap(0.25));
-        console.log('Value 0.5:', smoothColormap(0.5));
-        console.log('Value 0.75:', smoothColormap(0.75));
-        console.log('Value 1.0:', smoothColormap(1.0));
-    }
     
     // Draw heatmap based on type
     for (let y = 0; y < height; y++) {
@@ -535,11 +471,6 @@ function drawHeatmap(canvas, data, type) {
                     // Anomaly map: Smooth colormap (blue to red) - no black regions
                     const normalizedValue = Math.max(0, Math.min(1, value));
                     const [r, g, b] = smoothColormap(normalizedValue);
-                    
-                    // Debug: Check for black regions
-                    if (r === 0 && g === 0 && b === 0) {
-                        console.log(`Black pixel detected at (${x}, ${y}), value: ${value}, normalized: ${normalizedValue}`);
-                    }
                     
                     pixels[pixelIndex] = Math.round(255 * r);     // Red
                     pixels[pixelIndex + 1] = Math.round(255 * g); // Green
@@ -579,7 +510,6 @@ function drawHeatmap(canvas, data, type) {
     }
     
     ctx.putImageData(imageData, 0, 0);
-    console.log(`✅ NEW VERSION: ${type} heatmap drawn successfully with SMOOTH COLORMAP!`);
 }
 
 // Draw prediction overlay on original image
@@ -664,12 +594,8 @@ if (elements.uploadZone) {
     elements.uploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
         elements.uploadZone.classList.remove('border-primary', 'bg-base-200');
-        
-        console.log('File dropped');
         const files = e.dataTransfer.files;
-        console.log('Files dropped:', files.length);
         if (files.length > 0) {
-            console.log('Processing dropped file:', files[0].name);
             handleFile(files[0]);
         }
     });
@@ -680,11 +606,8 @@ if (elements.uploadZone) {
 // File selection event
 if (elements.fileInput) {
     elements.fileInput.addEventListener('change', (e) => {
-        console.log('File input changed');
         const files = e.target.files;
-        console.log('Files selected:', files.length);
         if (files.length > 0) {
-            console.log('Processing file:', files[0].name);
             handleFile(files[0]);
         }
     });

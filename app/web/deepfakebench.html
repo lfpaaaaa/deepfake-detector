@@ -1211,29 +1211,29 @@
         };
         
         async function pollJobStatus(jobId) {
-            console.log(`🔄 Starting polling for job ${jobId}`);
+            
             let pollCount = 0;
             
             // Polling function
             const doPoll = async () => {
                 pollCount++;
-                console.log(`🔄 Poll #${pollCount} for job ${jobId}`);
+                
                 try {
                     const response = await fetch(`/api/deepfakebench/jobs/${jobId}`);
                     const job = await response.json();
                     
-                    console.log(`📊 Progress: ${job.progress}% - ${job.stage} - ${job.message}`);
+                    
                     updateProgress(job.progress || 0, job.stage || 'Processing...', job.message || '');
                     
                     if (job.status === 'completed') {
-                        console.log(`✅ Job completed after ${pollCount} polls`);
+                        
                         if (interval) clearInterval(interval);
                         displayResults(job.result);
                         document.getElementById('progress').classList.remove('show');
                         document.getElementById('analyzeBtn').disabled = false;
                         return true; // Done
                     } else if (job.status === 'error') {
-                        console.log(`❌ Job failed after ${pollCount} polls`);
+                        
                         if (interval) clearInterval(interval);
                         document.getElementById('error').textContent = `Analysis failed: ${job.message}`;
                         document.getElementById('error').style.display = 'block';
@@ -1272,12 +1272,7 @@
             // Store original segments with keyframe information
             originalSegments = result.suspicious_segments.map(seg => ({...seg}));
             originalThreshold = result.threshold;
-            console.log('📊 === ANALYSIS RESULTS ===');
-            console.log('Original threshold:', originalThreshold);
-            console.log('Original segments:', originalSegments);
-            originalSegments.forEach((seg, i) => {
-                console.log(`  Segment ${i+1}: ${seg.start.toFixed(2)}-${seg.end.toFixed(2)}s, peak at ${seg.peak_time?.toFixed(2)}s, keyframe: ${seg.keyframe_path || 'NONE'}`);
-            });
+            
             
             // Calculate video duration from frame_scores
             if (result.frame_scores && result.frame_scores.length > 0) {
@@ -1400,29 +1395,15 @@
                 return;
             }
             
-            console.log(`\n🎚️ === THRESHOLD CHANGED TO ${(threshold*100).toFixed(0)}% ===`);
             
-            // DEBUG: Show score distribution
-            const probs = currentResult.frame_scores.map(f => f.probability);
-            const aboveThreshold = probs.filter(p => p >= threshold).length;
-            const belowThreshold = probs.filter(p => p < threshold).length;
-            console.log(`📊 Score Distribution:`);
-            console.log(`  - Frames >= ${(threshold*100).toFixed(0)}%: ${aboveThreshold} frames`);
-            console.log(`  - Frames < ${(threshold*100).toFixed(0)}%: ${belowThreshold} frames`);
-            console.log(`  - Min score: ${(Math.min(...probs)*100).toFixed(2)}%`);
-            console.log(`  - Max score: ${(Math.max(...probs)*100).toFixed(2)}%`);
-            console.log(`  - Avg score: ${(probs.reduce((a,b)=>a+b,0)/probs.length*100).toFixed(2)}%`);
             
             // Recalculate segments based on new threshold
             const newSegments = findSuspiciousSegments(currentResult.frame_scores, threshold, currentResult.fps);
             
-            console.log(`\n✅ Found ${newSegments.length} segments (threshold=${(threshold*100).toFixed(0)}%):`);
-            newSegments.forEach((seg, i) => {
-                console.log(`  Segment ${i+1}: ${seg.start.toFixed(2)}-${seg.end.toFixed(2)}s (${seg.duration.toFixed(2)}s), peak=${(seg.peak_score*100).toFixed(2)}% at ${seg.peak_time.toFixed(2)}s`);
-            });
+            
             
             // Match keyframes for new segments with UNIQUE assignment
-            console.log('\n🔗 Attempting to match keyframes (each keyframe used once)...');
+            
             await matchKeyframesUnique(newSegments);
             
             // Update displays
@@ -1525,22 +1506,19 @@
             const matches = [];
             
             newSegments.forEach((newSeg, newIdx) => {
-                console.log(`\n  🔍 Segment ${newIdx+1}: ${newSeg.start.toFixed(2)}-${newSeg.end.toFixed(2)}s`);
+                
                 
                 originalSegments.forEach((origSeg, origIdx) => {
                     if (!origSeg.keyframe_path || !origSeg.peak_time) return;
                     
-                    console.log(`    - Original Segment ${origIdx+1}: ${origSeg.start.toFixed(2)}-${origSeg.end.toFixed(2)}s, peak at ${origSeg.peak_time.toFixed(2)}s`);
+                    
                     
                     // CRITICAL CHECK: The keyframe's peak_time MUST be within the new segment's time range
                     const isPeakWithinNewSeg = origSeg.peak_time >= newSeg.start && origSeg.peak_time <= newSeg.end;
                     
                     if (!isPeakWithinNewSeg) {
-                        console.log(`      ❌ Peak ${origSeg.peak_time.toFixed(2)}s is OUTSIDE new segment [${newSeg.start.toFixed(2)}-${newSeg.end.toFixed(2)}]`);
                         return;
                     }
-                    
-                    console.log(`      ✅ Peak ${origSeg.peak_time.toFixed(2)}s is WITHIN new segment [${newSeg.start.toFixed(2)}-${newSeg.end.toFixed(2)}]`);
                     
                     // Calculate time overlap for scoring
                     const overlapStart = Math.max(newSeg.start, origSeg.start);
@@ -1548,7 +1526,7 @@
                     const overlapDuration = Math.max(0, overlapEnd - overlapStart);
                     const overlapRatio = overlapDuration / newSeg.duration;
                     
-                    console.log(`      Overlap: ${overlapDuration.toFixed(2)}s / ${newSeg.duration.toFixed(2)}s = ${(overlapRatio * 100).toFixed(1)}%`);
+                    
                     
                     // Add to candidates
                     matches.push({
@@ -1567,7 +1545,7 @@
             const usedOriginals = new Set();
             const usedNews = new Set();
             
-            console.log(`\n🎯 Assigning keyframes (greedy, peak_time must be within segment):`);
+            
             
             for (const match of matches) {
                 // Skip if either segment already used
@@ -1584,11 +1562,11 @@
                 usedOriginals.add(match.origIdx);
                 usedNews.add(match.newIdx);
                 
-                console.log(`  ✅ Segment ${match.newIdx+1} ← Original Segment ${match.origIdx+1} (${(match.overlapRatio * 100).toFixed(1)}% overlap, peak at ${match.origSeg.peak_time.toFixed(2)}s)`);
+                        
             }
             
             // Generate keyframes for unmatched segments
-            console.log(`\n🎬 Generating keyframes for unmatched segments...`);
+            
             const unmatchedSegments = [];
             newSegments.forEach((seg, idx) => {
                 if (!usedNews.has(idx)) {
@@ -1597,12 +1575,12 @@
             });
             
             if (unmatchedSegments.length > 0) {
-                console.log(`  Found ${unmatchedSegments.length} segments without keyframes`);
+                
                 
                 // Generate keyframes in parallel
                 const keyframePromises = unmatchedSegments.map(async ({ seg, idx }) => {
                     try {
-                        console.log(`  🔄 Generating keyframe for Segment ${idx+1} at ${seg.peak_time.toFixed(2)}s...`);
+                        
                         
                         const response = await fetch(`/api/deepfakebench/jobs/${currentJobId}/extract-keyframe?timestamp=${seg.peak_time}`, {
                             method: 'POST'
@@ -1611,20 +1589,20 @@
                         if (response.ok) {
                             const data = await response.json();
                             seg.keyframe_path = data.keyframe_path;
-                            console.log(`  ✅ Segment ${idx+1}: Generated keyframe at ${data.keyframe_path}`);
+                            
                         } else {
-                            console.log(`  ❌ Segment ${idx+1}: Failed to generate keyframe (${response.status})`);
+                            
                         }
                     } catch (error) {
-                        console.log(`  ❌ Segment ${idx+1}: Error generating keyframe:`, error);
+                        
                     }
                 });
                 
                 // Wait for all keyframes to be generated
                 await Promise.all(keyframePromises);
-                console.log(`  ✅ Keyframe generation complete`);
+                
             } else {
-                console.log(`  No segments need keyframe generation`);
+                
             }
         }
         

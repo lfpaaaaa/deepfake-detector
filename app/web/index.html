@@ -207,6 +207,10 @@
                             <div>
                                 <h3 class="font-semibold mb-2">Anomaly Heatmap</h3>
                                 <canvas id="predictionCanvas" class="heatmap-canvas border rounded-lg w-full"></canvas>
+                                <div class="mt-2 flex gap-2">
+                                    <button id="toggleConfidenceBtn" class="btn btn-sm btn-outline" onclick="toggleConfidenceCorrection()" title="Toggle confidence correction">Confidence-corrected</button>
+                                    <button id="downloadPngBtn" class="btn btn-sm btn-ghost" onclick="downloadCanvas('predictionCanvas','anomaly-heatmap.png')" title="Save heatmap as PNG">Download PNG</button>
+                                </div>
                                 <p class="text-xs text-base-content/60 mt-1">Red = manipulated areas</p>
             </div>
             
@@ -464,6 +468,7 @@
                 displayImageResults(file, result);
                 
             } catch (error) {
+                // Note: Keep minimal user-facing error
                 alert('Error analyzing image: ' + error.message);
                 document.getElementById('imageProgress').classList.add('hidden');
             }
@@ -498,7 +503,17 @@
             
             // Draw heatmaps
             if (result.prediction_map && result.image_size) {
+                // Cache for toggles
+                window.currentHeatmapData = result.prediction_map;
+                window.currentWeightedHeatmapData = result.weighted_prediction_map || null;
+                window.currentImageSize = result.image_size;
+                window.useConfidenceCorrected = false;
                 drawHeatmap(result.prediction_map, result.image_size, 'predictionCanvas', 'hot');
+                // Reset buttons state
+                const confBtn = document.getElementById('toggleConfidenceBtn');
+                if (confBtn) { confBtn.setAttribute('data-on','0'); confBtn.textContent = 'Confidence-corrected'; }
+                const ovBtn = document.getElementById('toggleOverlayBtn');
+                if (ovBtn) { ovBtn.setAttribute('data-on','0'); ovBtn.textContent = 'Overlay on Original'; }
             }
             
             if (result.confidence_map && result.image_size) {
@@ -557,6 +572,48 @@
             
             ctx.putImageData(imageData, 0, 0);
         }
+
+        // Removed overlay feature per latest UI requirements
+
+        // Toggle confidence correction (use weighted anomaly map)
+        function toggleConfidenceCorrection() {
+            const btn = document.getElementById('toggleConfidenceBtn');
+            const on = btn.getAttribute('data-on') === '1';
+            if (!on) {
+                // Turn ON: use weighted map if available
+                if (window.currentWeightedHeatmapData && window.currentImageSize) {
+                    window.useConfidenceCorrected = true;
+                    drawHeatmap(window.currentWeightedHeatmapData, window.currentImageSize, 'predictionCanvas', 'hot');
+                    btn.textContent = 'Raw anomaly map';
+                    btn.setAttribute('data-on', '1');
+                    // Reset overlay state when switching source
+                    const ovBtn = document.getElementById('toggleOverlayBtn');
+                    if (ovBtn) { ovBtn.setAttribute('data-on','0'); ovBtn.textContent = 'Overlay on Original'; }
+                } else {
+                    // Note: Keep user-facing alert for unavailable feature
+                    alert('Confidence-corrected map is unavailable for this image.');
+                }
+            } else {
+                // Turn OFF: use raw anomaly map
+                if (window.currentHeatmapData && window.currentImageSize) {
+                    window.useConfidenceCorrected = false;
+                    drawHeatmap(window.currentHeatmapData, window.currentImageSize, 'predictionCanvas', 'hot');
+                    btn.textContent = 'Confidence-corrected';
+                    btn.setAttribute('data-on', '0');
+                    const ovBtn = document.getElementById('toggleOverlayBtn');
+                    if (ovBtn) { ovBtn.setAttribute('data-on','0'); ovBtn.textContent = 'Overlay on Original'; }
+                }
+            }
+        }
+
+        // Download any canvas as PNG
+        function downloadCanvas(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
         
         function resetImage() {
             document.getElementById('imageResults').classList.add('hidden');
@@ -590,11 +647,12 @@
             const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
             
             if (file.size > maxSize) {
+                // Note: Keep file size alert for UX clarity
                 alert(`File too large!\nFile size: ${fileSizeMB}MB\nMaximum size: 500MB`);
                 return;
             }
             
-            console.log(`Uploading video: ${file.name}, size: ${fileSizeMB}MB`);
+                
             
             // Show progress
             document.getElementById('videoProgress').classList.remove('hidden');
@@ -620,13 +678,14 @@
                 const result = await response.json();
                 currentJobId = result.job_id;
                 
-                console.log(`Video uploaded successfully, job_id: ${currentJobId}`);
+                
                 
                 // Start polling for progress
                 pollJobStatus();
                 
             } catch (error) {
                 console.error('Upload error:', error);
+                // Note: Keep minimal user-facing error
                 alert('Error uploading video: ' + error.message);
                 // Reset progress
                 document.getElementById('videoProgressBar').value = 0;
@@ -652,6 +711,7 @@
                         await loadVideoResults();
                     } else if (status.status === 'error') {
                         clearInterval(pollInterval);
+                        // Note: Keep minimal user-facing error
                         alert('Analysis failed: ' + status.message);
                         document.getElementById('videoProgress').classList.add('hidden');
                     }
@@ -679,6 +739,7 @@
                 displayVideoResults(result);
                 
             } catch (error) {
+                // Note: Keep minimal user-facing error
                 alert('Error loading results: ' + error.message);
             }
         }
@@ -813,15 +874,15 @@
         }
         
         function updateThreshold(value) {
-            console.log('updateThreshold called with value:', value);
+            
             document.getElementById('thresholdValue').textContent = value;
             
             if (!timelineData) {
-                console.log('No timeline data available');
+                
                 return;
             }
             
-            console.log('Timeline data:', timelineData);
+            
             
             // Get all segment scores (not all scores, just segments)
             const segmentScores = timelineData.segments.map(s => s.peak_score);
@@ -839,13 +900,12 @@
                 threshold = segmentScores[index] || 0;
             }
             
-            console.log(`Threshold at ${value}%: ${threshold.toFixed(3)}`);
-            console.log(`Segment scores range: ${Math.min(...segmentScores).toFixed(3)} - ${Math.max(...segmentScores).toFixed(3)}`);
+            
             
             // Filter segments by threshold
             const filteredSegments = timelineData.segments.filter(s => s.peak_score >= threshold);
             
-            console.log(`Filtered segments: ${filteredSegments.length} of ${timelineData.segments.length}`);
+            
             
             // Update display
             document.getElementById('videoSegments').textContent = filteredSegments.length;
