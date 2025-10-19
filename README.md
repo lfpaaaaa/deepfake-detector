@@ -202,6 +202,73 @@ deepfake-detector/
 └── docs/                   # Documentation
 ```
 
+## LAN Access Guide
+
+To access the web interface from other devices on your local network (e.g., mobile phones, tablets):
+
+### 1. Find Your Computer's IPv4 Address
+
+**Windows (PowerShell):**
+```powershell
+ipconfig
+# Look for "IPv4 Address" under your active network adapter (e.g., 192.168.1.100)
+```
+
+**macOS/Linux:**
+```bash
+ifconfig
+# Look for "inet" address under your active network interface (e.g., en0 or wlan0)
+```
+
+### 2. Configure Firewall
+
+**Windows:**
+```powershell
+# Allow inbound connections on port 8000
+New-NetFirewallRule -DisplayName "Deepfake Detector" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
+```
+
+**macOS:**
+- System Preferences → Security & Privacy → Firewall → Firewall Options
+- Add Python and allow incoming connections
+
+**Linux (ufw):**
+```bash
+sudo ufw allow 8000/tcp
+```
+
+### 3. Start the Server
+
+The server is already configured to accept LAN connections (`host="0.0.0.0"`):
+
+```bash
+python scripts/start_trufor.py
+```
+
+### 4. Access from Other Devices
+
+On your mobile phone or other device **connected to the same Wi-Fi network**, open your browser and navigate to:
+
+```
+http://YOUR_IPV4_ADDRESS:8000/web/index_main.html
+```
+
+For example, if your IPv4 is `192.168.1.100`:
+```
+http://192.168.1.100:8000/web/index_main.html
+```
+
+### Available Pages:
+- Main page: `http://YOUR_IP:8000/web/index_main.html`
+- TruFor Detection: `http://YOUR_IP:8000/web/index.html`
+- DeepfakeBench: `http://YOUR_IP:8000/web/deepfakebench.html`
+
+### Troubleshooting:
+- ✅ Ensure both devices are on the **same Wi-Fi network**
+- ✅ Verify firewall rules allow port 8000
+- ✅ Check if the server is running: `http://YOUR_IP:8000/health`
+- ✅ Try disabling VPN if enabled
+
 ## Documentation
 
 - **[QUICK_START.md](QUICK_START.md)** - Quick start guide

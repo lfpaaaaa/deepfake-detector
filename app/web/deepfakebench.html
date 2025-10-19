@@ -2,31 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <!-- Version: 2.1.0 - Real-time progress updates -->
+    <!-- Version: 3.0.0 - Mobile-first UI Refresh -->
     <title>DeepfakeBench Video Analysis</title>
     <link rel="stylesheet" href="/web/css/app.css">
     <style>
+        /* ========== CSS Reset & Base ========== */
+        * { box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            /* iOS safe-area support */
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
-        /* Navigation Bar */
+        /* ========== Navigation with Drawer ========== */
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border-radius: 12px 12px 0 0;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            /* Safe-area for notch */
+            padding-top: env(safe-area-inset-top);
         }
         
         .nav-container {
@@ -35,43 +41,190 @@
             align-items: center;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 12px 16px;
+            position: relative;
         }
         
         .nav-brand {
             font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
+            font-weight: 700;
+            color: #111827;
             text-decoration: none;
+            z-index: 1;
         }
         
+        /* Desktop nav links */
         .nav-links {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         
         .nav-link {
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 10px;
             text-decoration: none;
-            color: #333;
-            transition: all 0.3s;
-            font-weight: 500;
+            color: #111827;
+            transition: all 0.2s;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            /* Minimum touch target */
+            min-height: 44px;
         }
         
         .nav-link:hover {
-            background: #f0f0f0;
-            color: #667eea;
+            background: #f3f4f6;
         }
         
         .nav-link.active {
-            background: #667eea;
-            color: white;
+            background: #1f2937;
+            color: #fff;
         }
         
+        .nav-link:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* Hamburger menu button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            min-width: 44px;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-toggle:hover {
+            background: #f3f4f6;
+        }
+        
+        .menu-toggle:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* Mobile drawer overlay */
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+        
+        .drawer-overlay.show {
+            display: block;
+        }
+        
+        /* Mobile drawer panel */
+        .drawer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            max-width: 85%;
+            background: #ffffff;
+            z-index: 250;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .drawer.show {
+            display: block;
+            transform: translateX(0);
+        }
+        
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 24px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .drawer-close {
+            background: #f3f4f6;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .drawer-close:hover {
+            background: #e5e7eb;
+        }
+        
+        .drawer-close:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        .drawer-nav {
+            padding: 16px 0;
+        }
+        
+        .drawer-nav .nav-link {
+            display: flex;
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .main-content {
+                padding: 16px !important;
+            }
+            
+            .container {
+                padding: 20px !important;
+            }
+            
+            /* Prevent scroll when drawer open */
+            body.drawer-open {
+                overflow: hidden;
+            }
+        }
+        
+        /* ========== Hero Section ========== */
         .main-content {
             padding: 20px;
         }
@@ -84,25 +237,45 @@
         }
         
         h1 {
-            color: #333;
+            color: #1f2937;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
         }
         
         .subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            font-size: 15px;
+            font-weight: 500;
         }
         
+        /* Mobile: compress hero */
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 24px;
+                margin-bottom: 6px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+        }
+        
+        /* ========== Upload Area ========== */
         .upload-area {
             border: 3px dashed #667eea;
             border-radius: 12px;
-            padding: 40px;
+            padding: 32px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 20px;
+            position: relative;
         }
         
         .upload-area:hover {
@@ -115,86 +288,369 @@
             background: #f0f0ff;
         }
         
-        #fileInput {
-            display: none;
+        .upload-area:focus-within {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
         }
         
-        .model-selector {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f9f9ff;
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .upload-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        
+        .upload-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+        
+        .upload-specs {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .upload-primary-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
             border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .upload-primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Hide default file input */
+        #fileInput {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+        }
+        
+        .file-selected {
+            margin: 16px 0;
+            padding: 12px 16px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #0c4a6e;
+            font-size: 14px;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #075985;
+        }
+        
+        .file-remove {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .file-remove:hover {
+            background: #fecaca;
+        }
+        
+        /* Mobile: different copy */
+        @media (max-width: 640px) {
+            .upload-area {
+                padding: 24px 16px;
+            }
+            
+            .upload-desktop-copy {
+                display: none;
+            }
+        }
+        
+        @media (min-width: 641px) {
+            .upload-mobile-copy {
+                display: none;
+            }
+        }
+        
+        /* ========== Model Selector ========== */
+        .model-selector {
+            margin: 24px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+        
+        .model-selector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .model-selector-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+        
+        .filter-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
         
         .model-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 16px;
         }
         
+        /* Radio card style */
         .model-card {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 44px;
         }
         
-        .model-card:hover {
+        .model-card:hover:not(.unavailable) {
             border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
         }
         
         .model-card.selected {
             border-color: #667eea;
-            background: #f0f0ff;
+            background: #f0f4ff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
         
         .model-card.unavailable {
             opacity: 0.5;
             cursor: not-allowed;
+            background: #f9fafb;
         }
         
-        .model-name {
-            font-weight: bold;
-            color: #333;
+        .model-card:focus-within {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        .model-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 8px;
         }
         
-        .model-info {
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .parameters {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .param-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        label {
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        input[type="number"] {
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+        .model-name {
+            font-weight: 700;
+            color: #1f2937;
             font-size: 14px;
+            margin-bottom: 4px;
+            flex: 1;
         }
         
-        button {
+        .model-badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+        
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge-speed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-accuracy {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .model-info-icon {
+            background: #667eea;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            border: none;
+            margin-left: 8px;
+        }
+        
+        .model-info-icon:hover {
+            background: #764ba2;
+            transform: scale(1.1);
+        }
+        
+        .model-info-icon:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* Radio input (hidden but accessible) */
+        .model-radio {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+        }
+        
+        /* ========== Bottom Action Bar (Mobile) ========== */
+        .bottom-action-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 12px 16px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            z-index: 90;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .bottom-action-bar {
+                display: block;
+            }
+            
+            /* Add padding to container to prevent content being hidden */
+            .main-content {
+                padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+            }
+        }
+        
+        .bottom-action-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .bottom-analyze-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 48px;
+        }
+        
+        .bottom-analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .bottom-analyze-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .bottom-analyze-btn:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* Desktop: hide bottom bar, use inline button */
+        @media (min-width: 769px) {
+            .desktop-analyze-btn {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-analyze-btn {
+                display: none;
+            }
+        }
+        
+        /* ========== Regular Button (Desktop) ========== */
+        button.desktop-analyze-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -207,17 +663,23 @@
             transition: all 0.3s;
         }
         
-        button:hover {
+        button.desktop-analyze-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
         
-        button:disabled {
+        button.desktop-analyze-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
         }
         
+        button.desktop-analyze-btn:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* ========== Progress & Results (unchanged from original) ========== */
         .progress-container {
             margin-top: 20px;
             padding: 20px;
@@ -231,7 +693,6 @@
             display: block;
         }
         
-        /* Custom progress bar to match TruFor style */
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -342,11 +803,12 @@
         }
         
         .error {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fee2e2;
+            color: #991b1b;
             padding: 15px;
             border-radius: 8px;
             margin-top: 20px;
+            border: 1px solid #fecaca;
         }
         
         /* Timeline Chart Styles */
@@ -481,36 +943,7 @@
             border-radius: 3px;
         }
         
-        /* Model Detail Info Icon */
-        .model-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .model-info-icon {
-            background: #667eea;
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-        
-        .model-info-icon:hover {
-            background: #764ba2;
-            transform: scale(1.1);
-        }
-        
-        /* Modal Styles */
+        /* ========== Modal Styles ========== */
         .modal {
             display: none;
             position: fixed;
@@ -587,6 +1020,11 @@
             transform: rotate(90deg);
         }
         
+        .modal-close:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
         .modal-body {
             color: #333;
         }
@@ -637,170 +1075,359 @@
             margin-right: 8px;
         }
         
-        .badge-speed {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        .badge-accuracy {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-        
         .badge-complexity {
             background: #fff3e0;
             color: #e65100;
         }
+        
+        /* ========== Utility Classes ========== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
+    <!-- Navigation Bar with Drawer -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="/web/index_main.html" class="nav-brand">🎭 Deepfake Detector</a>
-            <div class="nav-links">
+            <a href="/web/index_main.html" class="nav-brand" aria-label="Deepfake Detector Home">🎭 Deepfake Detector</a>
+            
+            <!-- Hamburger menu button (mobile only) -->
+            <button 
+                id="menuBtn" 
+                class="menu-toggle" 
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="drawer">
+                ☰
+            </button>
+            
+            <!-- Desktop nav links -->
+            <div class="nav-links" aria-label="Desktop navigation">
                 <a href="/web/index_main.html" class="nav-link">
-                    <span>🏠</span>
+                    <span aria-hidden="true">🏠</span>
                     <span>Home</span>
                 </a>
                 <a href="/web/index.html" class="nav-link">
-                    <span>🎯</span>
-                    <span>TruFor Detection</span>
+                    <span aria-hidden="true">🖼️</span>
+                    <span>Images (TruFor)</span>
                 </a>
-                <a href="/web/deepfakebench.html" class="nav-link active">
-                    <span>🔬</span>
-                    <span>DeepfakeBench</span>
+                <a href="/web/deepfakebench.html" class="nav-link active" aria-current="page">
+                    <span aria-hidden="true">🎬</span>
+                    <span>Video (DeepfakeBench)</span>
                 </a>
             </div>
         </div>
     </nav>
     
+    <!-- Mobile Drawer Overlay -->
+    <div id="drawerOverlay" class="drawer-overlay" aria-hidden="true"></div>
+    
+    <!-- Mobile Drawer -->
+    <aside id="drawer" class="drawer" role="dialog" aria-labelledby="drawerTitle" aria-modal="true">
+        <div class="drawer-header">
+            <h2 id="drawerTitle" class="drawer-title">Navigation</h2>
+            <button 
+                id="drawerCloseBtn" 
+                class="drawer-close" 
+                aria-label="Close navigation menu">
+                ×
+            </button>
+        </div>
+        <nav class="drawer-nav" aria-label="Mobile navigation">
+            <a href="/web/index_main.html" class="nav-link">
+                <span aria-hidden="true">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="/web/index.html" class="nav-link">
+                <span aria-hidden="true">🖼️</span>
+                <span>Images (TruFor)</span>
+            </a>
+            <a href="/web/deepfakebench.html" class="nav-link active" aria-current="page">
+                <span aria-hidden="true">🎬</span>
+                <span>Video (DeepfakeBench)</span>
+            </a>
+        </nav>
+    </aside>
+    
     <div class="main-content">
         <div class="container">
-            <h1>🎬 DeepfakeBench Video Analysis</h1>
-            <p class="subtitle">Detect deepfake videos using 13 advanced deep learning models</p>
+            <!-- Hero Section -->
+            <h1>Deepfake Detector</h1>
+            <p class="subtitle">Pick a method to start analysis</p>
         
-        <!-- Upload Area -->
-        <div class="upload-area" id="uploadArea">
-            <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
-            <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
-                Click or drag & drop video file here
-            </div>
-            <div style="color: #666;">
-                Supports MP4, MOV, AVI, WebM formats, max 500MB
-            </div>
-            <input type="file" id="fileInput" accept="video/*">
-        </div>
-        
-        <div id="fileName" style="text-align: center; color: #667eea; font-weight: bold; margin: 10px 0;"></div>
-        
-        <!-- Model Selector -->
-        <div class="model-selector">
-            <h3>Select Detection Model</h3>
-            <div class="model-grid" id="modelGrid">
-                <div style="grid-column: 1/-1; text-align: center; color: #666;">
-                    Loading models...
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea" tabindex="0" role="button" aria-label="Upload video file">
+                <div class="upload-icon" aria-hidden="true">🎬</div>
+                
+                <!-- Mobile copy -->
+                <div class="upload-mobile-copy">
+                    <div class="upload-title">Tap to choose or record a video</div>
+                    <div class="upload-specs">MP4, MOV, AVI, WebM • Max 500MB</div>
                 </div>
+                
+                <!-- Desktop copy -->
+                <div class="upload-desktop-copy">
+                    <div class="upload-title">Click or drag & drop a video</div>
+                    <div class="upload-specs">Supports MP4, MOV, AVI, WebM • Max 500MB</div>
+                </div>
+                
+                <input 
+                    type="file" 
+                    id="fileInput" 
+                    accept="video/*"
+                    aria-label="Choose video file">
             </div>
-        </div>
-        
-        <!-- Hidden Parameters (using defaults) -->
-        <input type="hidden" id="fps" value="10">
-        <input type="hidden" id="threshold" value="0.5">
-        
-        <!-- Analyze Button -->
-        <button id="analyzeBtn" disabled>Select file and model to start analysis</button>
-        
-        <!-- Progress -->
-        <div class="progress-container" id="progress">
-            <div class="progress-header">
-                <span class="progress-stage" id="progressStage">Preparing...</span>
-                <span class="progress-percent" id="progressPercent">0%</span>
-            </div>
-            <div class="progress-bar-custom">
-                <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-            </div>
-            <p class="progress-message" id="progressMessage"></p>
-        </div>
-        
-        <!-- Results -->
-        <div class="result" id="result">
-            <h2>Analysis Results</h2>
-            <div class="verdict" id="verdict"></div>
             
-            <div class="metrics">
-                <div class="metric">
-                    <div class="metric-value" id="overallScore">--</div>
-                    <div class="metric-label">Overall Score</div>
+            <!-- Selected file display -->
+            <div id="fileSelected" class="file-selected" style="display: none;">
+                <div class="file-info">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
                 </div>
-                <div class="metric">
-                    <div class="metric-value" id="averageScore">--</div>
-                    <div class="metric-label">Average Score</div>
+                <button 
+                    class="file-remove" 
+                    id="fileRemoveBtn"
+                    aria-label="Remove selected file">
+                    Remove
+                </button>
+            </div>
+            
+            <!-- Model Selector -->
+            <div class="model-selector">
+                <div class="model-selector-header">
+                    <h3 class="model-selector-title">Select Detection Model</h3>
+                    <label class="filter-toggle">
+                        <input 
+                            type="checkbox" 
+                            id="filterAvailable"
+                            aria-label="Show only available models">
+                        <span>Only available</span>
+                    </label>
                 </div>
-                <div class="metric">
-                    <div class="metric-value" id="totalFrames">--</div>
-                    <div class="metric-label">Frames Analyzed</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" id="segmentCount">--</div>
-                    <div class="metric-label">Suspicious Segments</div>
+                <div class="model-grid" id="modelGrid" role="radiogroup" aria-label="Detection models">
+                    <div style="grid-column: 1/-1; text-align: center; color: #666;">
+                        Loading models...
+                    </div>
                 </div>
             </div>
             
-            <!-- Timeline Section -->
-            <div class="timeline-section" id="timelineSection" style="display: none;">
-                <h3 style="margin-bottom: 15px;">⏱️ Detection Timeline</h3>
-                
-                <!-- Legend -->
-                <div class="timeline-legend">
-                    <div class="legend-item">
-                        <div class="legend-box" style="background: rgba(244, 67, 54, 0.6); border: 1px solid rgb(198, 40, 40);"></div>
-                        <span>Suspicious Segments</span>
-                    </div>
+            <!-- Hidden Parameters (using defaults) -->
+            <input type="hidden" id="fps" value="10">
+            <input type="hidden" id="threshold" value="0.5">
+            
+            <!-- Desktop Analyze Button -->
+            <button 
+                id="analyzeBtn" 
+                class="desktop-analyze-btn" 
+                disabled
+                aria-live="polite">
+                Select file and model to start analysis
+            </button>
+            
+            <!-- Progress -->
+            <div class="progress-container" id="progress" role="status" aria-live="polite">
+                <div class="progress-header">
+                    <span class="progress-stage" id="progressStage">Preparing...</span>
+                    <span class="progress-percent" id="progressPercent">0%</span>
                 </div>
-                
-                <!-- Threshold Control -->
-                <div class="threshold-control">
-                    <div class="threshold-label">
-                        <span>Adjust Detection Threshold</span>
-                        <span class="threshold-value" id="currentThreshold">50%</span>
-                    </div>
-                    <div class="slider-container">
-                        <span style="font-size: 12px; color: #666;">0%</span>
-                        <input type="range" id="thresholdSlider" min="0" max="100" value="50" 
-                               oninput="updateThreshold(this.value)">
-                        <span style="font-size: 12px; color: #666;">100%</span>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 12px; color: #666; text-align: center;">
-                        Higher = stricter detection (fewer segments)
-                    </div>
+                <div class="progress-bar-custom">
+                    <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
                 </div>
-                
-                <!-- Timeline Chart -->
-                <div id="timelineChart" class="timeline-chart">
-                    <!-- Segments will be rendered here -->
-                </div>
-                <div class="timeline-time-labels">
-                    <span>0:00</span>
-                    <span id="timelineEnd">--:--</span>
-                </div>
+                <p class="progress-message" id="progressMessage"></p>
             </div>
             
-            <div id="segmentsContainer"></div>
+            <!-- Results -->
+            <div class="result" id="result" role="region" aria-label="Analysis results">
+                <h2>Analysis Results</h2>
+                <div class="verdict" id="verdict" role="status"></div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="overallScore">--</div>
+                        <div class="metric-label">Overall Score</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="averageScore">--</div>
+                        <div class="metric-label">Average Score</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="totalFrames">--</div>
+                        <div class="metric-label">Frames Analyzed</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="segmentCount">--</div>
+                        <div class="metric-label">Suspicious Segments</div>
+                    </div>
+                </div>
+                
+                <!-- Timeline Section -->
+                <div class="timeline-section" id="timelineSection" style="display: none;">
+                    <h3 style="margin-bottom: 15px;">⏱️ Detection Timeline</h3>
+                    
+                    <!-- Legend -->
+                    <div class="timeline-legend">
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: rgba(244, 67, 54, 0.6); border: 1px solid rgb(198, 40, 40);"></div>
+                            <span>Suspicious Segments</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Threshold Control -->
+                    <div class="threshold-control">
+                        <div class="threshold-label">
+                            <span>Adjust Detection Threshold</span>
+                            <span class="threshold-value" id="currentThreshold">50%</span>
+                        </div>
+                        <div class="slider-container">
+                            <span style="font-size: 12px; color: #666;">0%</span>
+                            <input 
+                                type="range" 
+                                id="thresholdSlider" 
+                                min="0" 
+                                max="100" 
+                                value="50"
+                                aria-label="Detection threshold"
+                                oninput="updateThreshold(this.value)">
+                            <span style="font-size: 12px; color: #666;">100%</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #666; text-align: center;">
+                            Higher = stricter detection (fewer segments)
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline Chart -->
+                    <div id="timelineChart" class="timeline-chart">
+                        <!-- Segments will be rendered here -->
+                    </div>
+                    <div class="timeline-time-labels">
+                        <span>0:00</span>
+                        <span id="timelineEnd">--:--</span>
+                    </div>
+                </div>
+                
+                <div id="segmentsContainer"></div>
+            </div>
+            
+            <div class="error" id="error" style="display: none;" role="alert"></div>
         </div>
-        
-        <div class="error" id="error" style="display: none;"></div>
+    </div>
+    
+    <!-- Bottom Action Bar (Mobile only) -->
+    <div class="bottom-action-bar" role="region" aria-label="Action controls">
+        <div class="bottom-action-content">
+            <button 
+                id="bottomAnalyzeBtn" 
+                class="bottom-analyze-btn" 
+                disabled
+                aria-live="polite">
+                Select file and model
+            </button>
+        </div>
     </div>
 
     <script>
+        // ========== Navigation Drawer Logic ==========
+        (function() {
+            const menuBtn = document.getElementById('menuBtn');
+            const drawer = document.getElementById('drawer');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+            const body = document.body;
+            
+            let focusableElements = [];
+            let firstFocusable = null;
+            let lastFocusable = null;
+            
+            function openDrawer() {
+                drawer.classList.add('show');
+                drawerOverlay.classList.add('show');
+                body.classList.add('drawer-open');
+                menuBtn.setAttribute('aria-expanded', 'true');
+                drawer.setAttribute('aria-hidden', 'false');
+                drawerOverlay.setAttribute('aria-hidden', 'false');
+                
+                // Set up focus trap
+                focusableElements = drawer.querySelectorAll(
+                    'a[href], button:not([disabled]), input:not([disabled])'
+                );
+                firstFocusable = focusableElements[0];
+                lastFocusable = focusableElements[focusableElements.length - 1];
+                
+                // Focus close button
+                setTimeout(() => drawerCloseBtn.focus(), 100);
+                
+                // Add keyboard listener
+                document.addEventListener('keydown', handleDrawerKeydown);
+            }
+            
+            function closeDrawer() {
+                drawer.classList.remove('show');
+                drawerOverlay.classList.remove('show');
+                body.classList.remove('drawer-open');
+                menuBtn.setAttribute('aria-expanded', 'false');
+                drawer.setAttribute('aria-hidden', 'true');
+                drawerOverlay.setAttribute('aria-hidden', 'true');
+                
+                // Return focus to menu button
+                menuBtn.focus();
+                
+                // Remove keyboard listener
+                document.removeEventListener('keydown', handleDrawerKeydown);
+            }
+            
+            function handleDrawerKeydown(e) {
+                // Close on Escape
+                if (e.key === 'Escape') {
+                    closeDrawer();
+                    return;
+                }
+                
+                // Focus trap with Tab
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusable) {
+                            e.preventDefault();
+                            lastFocusable.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusable) {
+                            e.preventDefault();
+                            firstFocusable.focus();
+                        }
+                    }
+                }
+            }
+            
+            // Event listeners
+            menuBtn.addEventListener('click', openDrawer);
+            drawerCloseBtn.addEventListener('click', closeDrawer);
+            drawerOverlay.addEventListener('click', closeDrawer);
+            
+            // Close drawer when clicking a link (navigation)
+            drawer.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', closeDrawer);
+            });
+        })();
+        
+        // ========== Main Application Logic ==========
         let selectedFile = null;
         let selectedModel = 'xception';
         let availableModels = [];
         let currentJobId = null;
-        let currentResult = null;  // Store full analysis result
-        let videoDuration = 0;     // Video duration in seconds
-        let originalSegments = [];  // Store original segments with keyframes
-        let originalThreshold = 0.5;  // Store original threshold from server
+        let currentResult = null;
+        let videoDuration = 0;
+        let originalSegments = [];
+        let originalThreshold = 0.5;
+        let showOnlyAvailable = false;
         
         // Model detailed information
         const modelDetails = {
@@ -998,7 +1625,7 @@
             }
         };
         
-        // Load available models
+        // ========== Load Models ==========
         async function loadModels() {
             try {
                 const response = await fetch('/api/deepfakebench/models');
@@ -1008,7 +1635,7 @@
             } catch (error) {
                 console.error('Failed to load models:', error);
                 document.getElementById('modelGrid').innerHTML = 
-                    '<div style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Failed to load models</div>';
+                    '<div style="grid-column: 1/-1; text-align: center; color: #e74c3c;">Failed to load models. Please refresh.</div>';
             }
         }
         
@@ -1016,36 +1643,92 @@
             const grid = document.getElementById('modelGrid');
             grid.innerHTML = '';
             
-            availableModels.forEach(model => {
+            let modelsToRender = availableModels;
+            if (showOnlyAvailable) {
+                modelsToRender = availableModels.filter(m => m.available);
+            }
+            
+            if (modelsToRender.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #6b7280;">No available models found.</div>';
+                return;
+            }
+            
+            modelsToRender.forEach(model => {
                 const card = document.createElement('div');
                 card.className = `model-card ${model.available ? '' : 'unavailable'} ${model.key === selectedModel ? 'selected' : ''}`;
+                
+                const radioId = `model-${model.key}`;
+                
                 card.innerHTML = `
-                    <div class="model-card-header">
-                        <div class="model-name">${model.name}</div>
-                        <div class="model-info-icon" onclick="event.stopPropagation(); showModelDetail('${model.key}')" title="View detailed information">ℹ</div>
-                    </div>
-                    <div class="model-info">
-                        Speed: ${model.speed}<br>
-                        Accuracy: ${model.accuracy}<br>
-                        ${model.available ? '✅ Available' : '❌ Unavailable'}
-                    </div>
+                    <input 
+                        type="radio" 
+                        name="model" 
+                        id="${radioId}" 
+                        value="${model.key}" 
+                        class="model-radio"
+                        ${model.key === selectedModel ? 'checked' : ''}
+                        ${!model.available ? 'disabled' : ''}
+                        aria-label="${model.name} - ${model.available ? 'Available' : 'Unavailable'}">
+                    <label for="${radioId}" style="cursor: ${model.available ? 'pointer' : 'not-allowed'}; flex: 1;">
+                        <div class="model-card-header">
+                            <div class="model-name">${model.name}</div>
+                            <button 
+                                class="model-info-icon" 
+                                onclick="event.stopPropagation(); event.preventDefault(); showModelDetail('${model.key}')" 
+                                aria-label="View ${model.name} details"
+                                tabindex="0"
+                                type="button">
+                                ℹ
+                            </button>
+                        </div>
+                        <div class="model-badges">
+                            <span class="badge badge-speed">${model.speed}</span>
+                            <span class="badge badge-accuracy">${model.accuracy}</span>
+                            <span class="badge ${model.available ? 'badge-available' : 'badge-unavailable'}">
+                                ${model.available ? '✓ Available' : '✗ Unavailable'}
+                            </span>
+                        </div>
+                    </label>
                 `;
                 
                 if (model.available) {
-                    card.onclick = () => selectModel(model.key);
+                    card.onclick = (e) => {
+                        if (e.target.closest('.model-info-icon')) return;
+                        selectModel(model.key);
+                    };
                 }
                 
                 grid.appendChild(card);
             });
+            
+            // Auto-select first available model if none selected
+            if (!selectedModel || !modelsToRender.find(m => m.key === selectedModel)) {
+                const firstAvailable = modelsToRender.find(m => m.available);
+                if (firstAvailable) {
+                    selectModel(firstAvailable.key);
+                }
+            }
         }
         
         function selectModel(modelKey) {
             selectedModel = modelKey;
+            
+            // Update radio inputs
+            document.querySelectorAll('.model-radio').forEach(radio => {
+                radio.checked = radio.value === modelKey;
+            });
+            
             renderModels();
             updateAnalyzeButton();
         }
         
-        // Show model detail modal
+        // Filter toggle
+        document.getElementById('filterAvailable').addEventListener('change', (e) => {
+            showOnlyAvailable = e.target.checked;
+            renderModels();
+        });
+        
+        // ========== Show Model Detail Modal ==========
         function showModelDetail(modelKey) {
             const detail = modelDetails[modelKey];
             if (!detail) {
@@ -1095,6 +1778,9 @@
             const modal = document.getElementById('modelDetailModal');
             modal.classList.add('show');
             
+            // Focus close button
+            setTimeout(() => document.querySelector('.modal-close').focus(), 100);
+            
             // Close modal when clicking outside
             modal.onclick = (e) => {
                 if (e.target === modal) {
@@ -1103,7 +1789,6 @@
             };
         }
         
-        // Close model detail modal
         function closeModelDetail() {
             const modal = document.getElementById('modelDetailModal');
             modal.classList.remove('show');
@@ -1117,11 +1802,23 @@
             }
         });
         
-        // Upload area handlers
+        // ========== Upload Handlers ==========
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
+        const fileSelected = document.getElementById('fileSelected');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileRemoveBtn = document.getElementById('fileRemoveBtn');
         
         uploadArea.onclick = () => fileInput.click();
+        
+        // Keyboard support for upload area
+        uploadArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
         
         uploadArea.ondragover = (e) => {
             e.preventDefault();
@@ -1147,24 +1844,54 @@
         };
         
         function handleFileSelect(file) {
+            // Validate file size
+            const maxSize = 500 * 1024 * 1024; // 500MB
+            if (file.size > maxSize) {
+                alert('File too large. Maximum size is 500MB.');
+                return;
+            }
+            
             selectedFile = file;
-            document.getElementById('fileName').textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            fileName.textContent = file.name;
+            fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            fileSelected.style.display = 'flex';
+            uploadArea.style.display = 'none';
             updateAnalyzeButton();
         }
         
+        fileRemoveBtn.onclick = () => {
+            selectedFile = null;
+            fileInput.value = '';
+            fileSelected.style.display = 'none';
+            uploadArea.style.display = 'block';
+            updateAnalyzeButton();
+        };
+        
+        // ========== Update Analyze Buttons ==========
         function updateAnalyzeButton() {
-            const btn = document.getElementById('analyzeBtn');
+            const desktopBtn = document.getElementById('analyzeBtn');
+            const bottomBtn = document.getElementById('bottomAnalyzeBtn');
+            
             if (selectedFile && selectedModel) {
-                btn.disabled = false;
-                btn.textContent = `Analyze with ${availableModels.find(m => m.key === selectedModel)?.name}`;
+                const modelName = availableModels.find(m => m.key === selectedModel)?.name || 'selected model';
+                const text = `Analyze with ${modelName}`;
+                
+                desktopBtn.disabled = false;
+                desktopBtn.textContent = text;
+                
+                bottomBtn.disabled = false;
+                bottomBtn.textContent = 'Analyze';
             } else {
-                btn.disabled = true;
-                btn.textContent = 'Select file and model to start analysis';
+                desktopBtn.disabled = true;
+                desktopBtn.textContent = 'Select file and model to start analysis';
+                
+                bottomBtn.disabled = true;
+                bottomBtn.textContent = 'Select file and model';
             }
         }
         
-        // Analyze
-        document.getElementById('analyzeBtn').onclick = async () => {
+        // ========== Analyze Function ==========
+        async function startAnalysis() {
             if (!selectedFile || !selectedModel) return;
             
             const fps = parseFloat(document.getElementById('fps').value);
@@ -1175,6 +1902,8 @@
             document.getElementById('result').classList.remove('show');
             document.getElementById('error').style.display = 'none';
             document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('bottomAnalyzeBtn').disabled = true;
+            document.getElementById('bottomAnalyzeBtn').textContent = 'Analyzing...';
             
             try {
                 // Upload and analyze
@@ -1196,7 +1925,7 @@
                 }
                 
                 const { job_id } = await response.json();
-                currentJobId = job_id;  // Store for keyframe loading
+                currentJobId = job_id;
                 
                 // Poll for results
                 pollJobStatus(job_id);
@@ -1207,14 +1936,19 @@
                 document.getElementById('error').style.display = 'block';
                 document.getElementById('progress').classList.remove('show');
                 document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('bottomAnalyzeBtn').disabled = false;
+                document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
             }
-        };
+        }
         
+        // Bind both analyze buttons
+        document.getElementById('analyzeBtn').onclick = startAnalysis;
+        document.getElementById('bottomAnalyzeBtn').onclick = startAnalysis;
+        
+        // ========== Poll Job Status ==========
         async function pollJobStatus(jobId) {
-            
             let pollCount = 0;
             
-            // Polling function
             const doPoll = async () => {
                 pollCount++;
                 
@@ -1222,37 +1956,36 @@
                     const response = await fetch(`/api/deepfakebench/jobs/${jobId}`);
                     const job = await response.json();
                     
-                    
                     updateProgress(job.progress || 0, job.stage || 'Processing...', job.message || '');
                     
                     if (job.status === 'completed') {
-                        
                         if (interval) clearInterval(interval);
                         displayResults(job.result);
                         document.getElementById('progress').classList.remove('show');
                         document.getElementById('analyzeBtn').disabled = false;
-                        return true; // Done
+                        document.getElementById('bottomAnalyzeBtn').disabled = false;
+                        document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
+                        return true;
                     } else if (job.status === 'error') {
-                        
                         if (interval) clearInterval(interval);
                         document.getElementById('error').textContent = `Analysis failed: ${job.message}`;
                         document.getElementById('error').style.display = 'block';
                         document.getElementById('progress').classList.remove('show');
                         document.getElementById('analyzeBtn').disabled = false;
-                        return true; // Done
+                        document.getElementById('bottomAnalyzeBtn').disabled = false;
+                        document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
+                        return true;
                     }
-                    return false; // Continue polling
+                    return false;
                 } catch (error) {
                     console.error('Failed to poll status:', error);
                     return false;
                 }
             };
             
-            // Poll immediately first, then set interval
             const done = await doPoll();
-            if (done) return; // Already completed
+            if (done) return;
             
-            // Continue polling every 500ms for smooth updates
             const interval = setInterval(async () => {
                 const done = await doPoll();
                 if (done && interval) clearInterval(interval);
@@ -1266,15 +1999,12 @@
             document.getElementById('progressMessage').textContent = message;
         }
         
+        // ========== Display Results ==========
         function displayResults(result) {
-            // Store result for threshold updates
             currentResult = result;
-            // Store original segments with keyframe information
             originalSegments = result.suspicious_segments.map(seg => ({...seg}));
             originalThreshold = result.threshold;
             
-            
-            // Calculate video duration from frame_scores
             if (result.frame_scores && result.frame_scores.length > 0) {
                 const lastFrame = result.frame_scores[result.frame_scores.length - 1];
                 videoDuration = lastFrame.timestamp;
@@ -1283,6 +2013,11 @@
             }
             
             document.getElementById('result').classList.add('show');
+            
+            // Scroll to results
+            setTimeout(() => {
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
             
             // Verdict
             const verdict = document.getElementById('verdict');
@@ -1304,7 +2039,7 @@
             document.getElementById('thresholdSlider').value = initialThreshold;
             document.getElementById('currentThreshold').textContent = initialThreshold + '%';
             
-            // Render segments list (show keyframes since this is original threshold)
+            // Render segments list
             renderSegmentsList(result.suspicious_segments, true);
         }
         
@@ -1312,12 +2047,10 @@
             const timeline = document.getElementById('timelineChart');
             timeline.innerHTML = '';
             
-            // Display video duration
             const mins = Math.floor(videoDuration / 60);
             const secs = Math.floor(videoDuration % 60);
             document.getElementById('timelineEnd').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
             
-            // Render each segment on timeline
             segments.forEach((seg, i) => {
                 const segDiv = document.createElement('div');
                 segDiv.className = 'timeline-segment';
@@ -1330,7 +2063,6 @@
                 segDiv.title = `Segment ${i + 1}: ${seg.start.toFixed(2)}s - ${seg.end.toFixed(2)}s`;
                 segDiv.textContent = `#${i + 1}`;
                 
-                // Click to scroll to segment details
                 segDiv.onclick = () => {
                     const segmentElement = document.querySelector(`[data-segment-id="${i}"]`);
                     if (segmentElement) {
@@ -1348,7 +2080,7 @@
             const segmentsContainer = document.getElementById('segmentsContainer');
             
             if (segments.length > 0) {
-                segmentsContainer.innerHTML = `<div class="segments"><h3>Suspicious Time Segments (Click on timeline to jump)</h3></div>`;
+                segmentsContainer.innerHTML = `<div class="segments"><h3>Suspicious Time Segments</h3></div>`;
                 const segmentsDiv = segmentsContainer.querySelector('.segments');
                 
                 segments.forEach((seg, i) => {
@@ -1395,18 +2127,9 @@
                 return;
             }
             
-            
-            
-            // Recalculate segments based on new threshold
             const newSegments = findSuspiciousSegments(currentResult.frame_scores, threshold, currentResult.fps);
-            
-            
-            
-            // Match keyframes for new segments with UNIQUE assignment
-            
             await matchKeyframesUnique(newSegments);
             
-            // Update displays
             document.getElementById('segmentCount').textContent = newSegments.length;
             renderTimeline(newSegments);
             renderSegmentsList(newSegments, true);
@@ -1417,11 +2140,9 @@
             let inSegment = false;
             let segmentStartIdx = 0;
             
-            // Step 1: Smooth scores (same as backend: 5-frame moving average)
             const rawProbs = frameScores.map(f => f.probability);
             const smoothed = smoothScores(rawProbs, 5);
             
-            // Step 2: Find segments using smoothed scores (same as backend)
             for (let i = 0; i < smoothed.length; i++) {
                 const prob = smoothed[i];
                 
@@ -1434,9 +2155,7 @@
                     const endTime = frameScores[i - 1].timestamp;
                     const duration = endTime - startTime;
                     
-                    // Only keep segments >= 1 second (same as backend)
                     if (duration >= 1.0) {
-                        // Find peak in this segment
                         const segmentProbs = smoothed.slice(segmentStartIdx, i);
                         const peakIdx = segmentStartIdx + segmentProbs.indexOf(Math.max(...segmentProbs));
                         
@@ -1451,7 +2170,6 @@
                 }
             }
             
-            // Close last segment if still open
             if (inSegment && frameScores.length > 0) {
                 const startTime = frameScores[segmentStartIdx].timestamp;
                 const endTime = frameScores[frameScores.length - 1].timestamp;
@@ -1474,7 +2192,6 @@
             return segments;
         }
         
-        // Smooth scores using moving average (same as backend's np.convolve)
         function smoothScores(scores, windowSize) {
             if (scores.length < windowSize) {
                 return scores;
@@ -1485,7 +2202,6 @@
                 let sum = 0;
                 let count = 0;
                 
-                // Calculate window boundaries (same as numpy's 'same' mode)
                 const halfWindow = Math.floor(windowSize / 2);
                 const start = Math.max(0, i - halfWindow);
                 const end = Math.min(scores.length, i + halfWindow + 1);
@@ -1502,33 +2218,23 @@
         }
         
         async function matchKeyframesUnique(newSegments) {
-            // Build a match matrix: for each new segment, find all possible original segments
             const matches = [];
             
             newSegments.forEach((newSeg, newIdx) => {
-                
-                
                 originalSegments.forEach((origSeg, origIdx) => {
                     if (!origSeg.keyframe_path || !origSeg.peak_time) return;
                     
-                    
-                    
-                    // CRITICAL CHECK: The keyframe's peak_time MUST be within the new segment's time range
                     const isPeakWithinNewSeg = origSeg.peak_time >= newSeg.start && origSeg.peak_time <= newSeg.end;
                     
                     if (!isPeakWithinNewSeg) {
                         return;
                     }
                     
-                    // Calculate time overlap for scoring
                     const overlapStart = Math.max(newSeg.start, origSeg.start);
                     const overlapEnd = Math.min(newSeg.end, origSeg.end);
                     const overlapDuration = Math.max(0, overlapEnd - overlapStart);
                     const overlapRatio = overlapDuration / newSeg.duration;
                     
-                    
-                    
-                    // Add to candidates
                     matches.push({
                         newIdx,
                         origIdx,
@@ -1538,22 +2244,16 @@
                 });
             });
             
-            // Sort matches by overlap ratio (highest first)
             matches.sort((a, b) => b.overlapRatio - a.overlapRatio);
             
-            // Assign keyframes greedily (best matches first)
             const usedOriginals = new Set();
             const usedNews = new Set();
             
-            
-            
             for (const match of matches) {
-                // Skip if either segment already used
                 if (usedOriginals.has(match.origIdx) || usedNews.has(match.newIdx)) {
                     continue;
                 }
                 
-                // Assign keyframe
                 const newSeg = newSegments[match.newIdx];
                 newSeg.keyframe_path = match.origSeg.keyframe_path;
                 newSeg.peak_time = match.origSeg.peak_time;
@@ -1561,11 +2261,7 @@
                 
                 usedOriginals.add(match.origIdx);
                 usedNews.add(match.newIdx);
-                
-                        
             }
-            
-            // Generate keyframes for unmatched segments
             
             const unmatchedSegments = [];
             newSegments.forEach((seg, idx) => {
@@ -1575,13 +2271,8 @@
             });
             
             if (unmatchedSegments.length > 0) {
-                
-                
-                // Generate keyframes in parallel
                 const keyframePromises = unmatchedSegments.map(async ({ seg, idx }) => {
                     try {
-                        
-                        
                         const response = await fetch(`/api/deepfakebench/jobs/${currentJobId}/extract-keyframe?timestamp=${seg.peak_time}`, {
                             method: 'POST'
                         });
@@ -1589,20 +2280,13 @@
                         if (response.ok) {
                             const data = await response.json();
                             seg.keyframe_path = data.keyframe_path;
-                            
-                        } else {
-                            
                         }
                     } catch (error) {
-                        
+                        console.error('Failed to generate keyframe:', error);
                     }
                 });
                 
-                // Wait for all keyframes to be generated
                 await Promise.all(keyframePromises);
-                
-            } else {
-                
             }
         }
         
@@ -1612,17 +2296,16 @@
             return `${mins}:${secs.padStart(5, '0')}`;
         }
         
-        // Initialize
+        // ========== Initialize ==========
         loadModels();
     </script>
-    </div> <!-- /main-content -->
     
     <!-- Model Detail Modal -->
-    <div id="modelDetailModal" class="modal">
+    <div id="modelDetailModal" class="modal" role="dialog" aria-labelledby="modalModelName" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalModelName">Model Details</h2>
-                <button class="modal-close" onclick="closeModelDetail()">×</button>
+                <button class="modal-close" onclick="closeModelDetail()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body" id="modalBody">
                 <!-- Content will be dynamically inserted -->
@@ -1631,4 +2314,3 @@
     </div>
 </body>
 </html>
-

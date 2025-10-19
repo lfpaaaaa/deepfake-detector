@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Deepfake Detection System</title>
     <style>
+        /* ========== CSS Reset & Base ========== */
         * {
             margin: 0;
             padding: 0;
@@ -12,18 +13,22 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 0;
+            /* iOS safe-area support */
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
-        /* Navigation Bar */
+        /* ========== Navigation with Drawer (same as DeepfakeBench) ========== */
         .navbar {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding-top: env(safe-area-inset-top);
         }
         
         .nav-container {
@@ -32,41 +37,184 @@
             align-items: center;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 12px 16px;
+            position: relative;
         }
         
         .nav-brand {
             font-size: 20px;
-            font-weight: bold;
-            color: white;
+            font-weight: 700;
+            color: #111827;
             text-decoration: none;
+            z-index: 1;
         }
         
         .nav-links {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         
         .nav-link {
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 10px;
             text-decoration: none;
-            color: white;
-            transition: all 0.3s;
-            font-weight: 500;
+            color: #111827;
+            transition: all 0.2s;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            min-height: 44px;
         }
         
         .nav-link:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: #f3f4f6;
         }
         
         .nav-link.active {
-            background: rgba(255, 255, 255, 0.3);
+            background: #1f2937;
+            color: #fff;
         }
         
+        .nav-link:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            min-width: 44px;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-toggle:hover {
+            background: #f3f4f6;
+        }
+        
+        .menu-toggle:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+        
+        .drawer-overlay.show {
+            display: block;
+        }
+        
+        .drawer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            max-width: 85%;
+            background: #ffffff;
+            z-index: 250;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .drawer.show {
+            display: block;
+            transform: translateX(0);
+        }
+        
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 24px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .drawer-close {
+            background: #f3f4f6;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .drawer-close:hover {
+            background: #e5e7eb;
+        }
+        
+        .drawer-close:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        .drawer-nav {
+            padding: 16px 0;
+        }
+        
+        .drawer-nav .nav-link {
+            display: flex;
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            body.drawer-open {
+                overflow: hidden;
+            }
+            
+            .detection-options {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .option-card {
+                padding: 24px;
+            }
+        }
+        
+        /* ========== Page Content ========== */
         .page-content {
             display: flex;
             align-items: center;
@@ -90,13 +238,26 @@
             font-size: 48px;
             margin-bottom: 10px;
             text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-weight: 800;
         }
         
         .subtitle {
             font-size: 20px;
-            opacity: 0.9;
+            opacity: 0.95;
+            font-weight: 500;
         }
         
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+        }
+        
+        /* ========== Detection Options Cards ========== */
         .detection-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -121,6 +282,11 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.25);
         }
         
+        .option-card:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 4px;
+        }
+        
         .option-icon {
             font-size: 64px;
             margin-bottom: 20px;
@@ -140,6 +306,7 @@
             line-height: 1.6;
             margin-bottom: 20px;
             text-align: center;
+            font-size: 15px;
         }
         
         .option-features {
@@ -152,6 +319,7 @@
             color: #555;
             display: flex;
             align-items: center;
+            font-size: 14px;
         }
         
         .option-features li:before {
@@ -166,7 +334,7 @@
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 5px 15px;
+            padding: 6px 16px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
@@ -181,6 +349,7 @@
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
         
+        /* ========== Info Sections ========== */
         .info-section {
             background: rgba(255,255,255,0.95);
             border-radius: 16px;
@@ -192,10 +361,17 @@
             color: #333;
             margin-bottom: 15px;
             font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .comparison-table {
             width: 100%;
+            min-width: 560px;
             margin-top: 20px;
             border-collapse: collapse;
         }
@@ -226,169 +402,325 @@
         }
         
         .status.available {
-            background: #d4edda;
-            color: #155724;
+            background: #d1fae5;
+            color: #065f46;
         }
         
         .status.unavailable {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fee2e2;
+            color: #991b1b;
         }
         
+        .model-status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 640px) {
+            .model-status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .model-status-grid h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        /* ========== Footer ========== */
         footer {
             text-align: center;
             color: white;
             margin-top: 40px;
+            opacity: 0.9;
+        }
+        
+        footer p {
+            font-size: 16px;
+        }
+        
+        footer .tip {
+            margin-top: 10px;
+            font-size: 14px;
             opacity: 0.8;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
+    <!-- Navigation Bar with Drawer -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="/web/index_main.html" class="nav-brand">🎭 Deepfake Detector</a>
-            <div class="nav-links">
-                <a href="/web/index_main.html" class="nav-link active">
-                    <span>🏠</span>
+            <a href="/web/index_main.html" class="nav-brand" aria-label="Deepfake Detector Home">🎭 Deepfake Detector</a>
+            
+            <!-- Hamburger menu button (mobile only) -->
+            <button 
+                id="menuBtn" 
+                class="menu-toggle" 
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="drawer">
+                ☰
+            </button>
+            
+            <!-- Desktop nav links -->
+            <div class="nav-links" aria-label="Desktop navigation">
+                <a href="/web/index_main.html" class="nav-link active" aria-current="page">
+                    <span aria-hidden="true">🏠</span>
                     <span>Home</span>
                 </a>
                 <a href="/web/index.html" class="nav-link">
-                    <span>🎯</span>
-                    <span>TruFor Detection</span>
+                    <span aria-hidden="true">🖼️</span>
+                    <span>Images (TruFor)</span>
                 </a>
                 <a href="/web/deepfakebench.html" class="nav-link">
-                    <span>🔬</span>
-                    <span>DeepfakeBench</span>
+                    <span aria-hidden="true">🎬</span>
+                    <span>Video (DeepfakeBench)</span>
                 </a>
             </div>
         </div>
     </nav>
     
+    <!-- Mobile Drawer Overlay -->
+    <div id="drawerOverlay" class="drawer-overlay" aria-hidden="true"></div>
+    
+    <!-- Mobile Drawer -->
+    <aside id="drawer" class="drawer" role="dialog" aria-labelledby="drawerTitle" aria-modal="true">
+        <div class="drawer-header">
+            <h2 id="drawerTitle" class="drawer-title">Navigation</h2>
+            <button 
+                id="drawerCloseBtn" 
+                class="drawer-close" 
+                aria-label="Close navigation menu">
+                ×
+            </button>
+        </div>
+        <nav class="drawer-nav" aria-label="Mobile navigation">
+            <a href="/web/index_main.html" class="nav-link active" aria-current="page">
+                <span aria-hidden="true">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="/web/index.html" class="nav-link">
+                <span aria-hidden="true">🖼️</span>
+                <span>Images (TruFor)</span>
+            </a>
+            <a href="/web/deepfakebench.html" class="nav-link">
+                <span aria-hidden="true">🎬</span>
+                <span>Video (DeepfakeBench)</span>
+            </a>
+        </nav>
+    </aside>
+    
     <div class="page-content">
         <div class="container">
             <div class="header">
                 <h1>🎭 Deepfake Detection System</h1>
-            <p class="subtitle">Choose your detection method to start analysis</p>
-        </div>
+                <p class="subtitle">Choose your detection method to start analysis</p>
+            </div>
         
-        <div class="detection-options">
-            <!-- DeepfakeBench Option -->
-            <a href="/web/deepfakebench.html" class="option-card">
-                <div class="option-icon">🎬</div>
-                <div class="option-title">DeepfakeBench</div>
-                <span class="badge new">✨ New Feature</span>
-                <div class="option-description">
-                    12 advanced models, frame-by-frame analysis, suspicious segment detection
-                </div>
-                <ul class="option-features">
-                    <li>12 models available (Xception, F3Net, etc.)</li>
-                    <li>Frame-by-frame precision analysis</li>
-                    <li>Suspicious time segment localization</li>
-                    <li>Real-time progress tracking</li>
-                    <li>Flexible parameter adjustment</li>
-                </ul>
-            </a>
-            
-            <!-- Classic TruFor Option -->
-            <a href="/web/index.html" class="option-card">
-                <div class="option-icon">🔍</div>
-                <div class="option-title">TruFor</div>
-                <span class="badge classic">Forensic Analysis</span>
-                <div class="option-description">
-                    Advanced image forensic analysis with pixel-level deepfake detection
-                </div>
-                <ul class="option-features">
-                    <li>TruFor forensic model</li>
-                    <li>Noiseprint++ analysis</li>
-                    <li>Pixel-level anomaly localization</li>
-                    <li>Image and video support</li>
-                    <li>Heatmap visualization</li>
-                </ul>
-            </a>
-        </div>
+            <div class="detection-options">
+                <!-- DeepfakeBench Option -->
+                <a href="/web/deepfakebench.html" class="option-card" tabindex="0">
+                    <div class="option-icon" aria-hidden="true">🎬</div>
+                    <div class="option-title">DeepfakeBench</div>
+                    <span class="badge new">✨ New Feature</span>
+                    <div class="option-description">
+                        12 advanced models, frame-by-frame analysis, suspicious segment detection
+                    </div>
+                    <ul class="option-features">
+                        <li>12 models available (Xception, F3Net, etc.)</li>
+                        <li>Frame-by-frame precision analysis</li>
+                        <li>Suspicious time segment localization</li>
+                        <li>Real-time progress tracking</li>
+                        <li>Flexible parameter adjustment</li>
+                    </ul>
+                </a>
+                
+                <!-- Classic TruFor Option -->
+                <a href="/web/index.html" class="option-card" tabindex="0">
+                    <div class="option-icon" aria-hidden="true">🔍</div>
+                    <div class="option-title">TruFor</div>
+                    <span class="badge classic">Forensic Analysis</span>
+                    <div class="option-description">
+                        Advanced image forensic analysis with pixel-level deepfake detection
+                    </div>
+                    <ul class="option-features">
+                        <li>TruFor forensic model</li>
+                        <li>Noiseprint++ analysis</li>
+                        <li>Pixel-level anomaly localization</li>
+                        <li>Image and video support</li>
+                        <li>Heatmap visualization</li>
+                    </ul>
+                </a>
+            </div>
         
-        <!-- Comparison Section -->
-        <div class="info-section">
-            <h2>📊 Feature Comparison</h2>
-            <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th>Feature</th>
-                        <th>DeepfakeBench</th>
-                        <th>TruFor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Number of Models</strong></td>
-                        <td>12 models available</td>
-                        <td>1 forensic model</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Detection Target</strong></td>
-                        <td>Video (frame-level)</td>
-                        <td>Image + Video</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Analysis Method</strong></td>
-                        <td>Frame-by-frame + Segment detection</td>
-                        <td>Forensic analysis + Pixel-level localization</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Suspicious Segments</strong></td>
-                        <td>✅ Precise time localization</td>
-                        <td>❌</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Forensic Heatmap</strong></td>
-                        <td>❌</td>
-                        <td>✅ Pixel-level anomaly map</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Noiseprint Analysis</strong></td>
-                        <td>❌</td>
-                        <td>✅ Noiseprint++</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Processing Speed</strong></td>
-                        <td>Adjustable (FPS parameter)</td>
-                        <td>Moderate (forensic analysis)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Use Case</strong></td>
-                        <td>In-depth video analysis</td>
-                        <td>Forensic image verification</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Model Status -->
-        <div class="info-section">
-            <h2>🔧 Model Status</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-                <div>
-                    <h3 style="color: #667eea; margin-bottom: 10px;">DeepfakeBench Models</h3>
-                    <div id="dfbStatus">Checking...</div>
-                </div>
-                <div>
-                    <h3 style="color: #4facfe; margin-bottom: 10px;">TruFor Model</h3>
-                    <div id="truforStatus">Checking...</div>
+            <!-- Comparison Section -->
+            <div class="info-section">
+                <h2>📊 Feature Comparison</h2>
+                <div class="table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>DeepfakeBench</th>
+                                <th>TruFor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Number of Models</strong></td>
+                                <td>12 models available</td>
+                                <td>1 forensic model</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Detection Target</strong></td>
+                                <td>Video (frame-level)</td>
+                                <td>Image + Video</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Analysis Method</strong></td>
+                                <td>Frame-by-frame + Segment detection</td>
+                                <td>Forensic analysis + Pixel-level localization</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Suspicious Segments</strong></td>
+                                <td>✅ Precise time localization</td>
+                                <td>❌</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Forensic Heatmap</strong></td>
+                                <td>❌</td>
+                                <td>✅ Pixel-level anomaly map</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Noiseprint Analysis</strong></td>
+                                <td>❌</td>
+                                <td>✅ Noiseprint++</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Processing Speed</strong></td>
+                                <td>Adjustable (FPS parameter)</td>
+                                <td>Moderate (forensic analysis)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Use Case</strong></td>
+                                <td>In-depth video analysis</td>
+                                <td>Forensic image verification</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
         
-        <footer>
-            <p>Choose the detection method that fits your needs</p>
-            <p style="margin-top: 10px; font-size: 14px;">
-                💡 Tip: For first-time users, try DeepfakeBench's MesoNet-4 model (fastest)
-            </p>
-        </footer>
+            <!-- Model Status -->
+            <div class="info-section">
+                <h2>🔧 Model Status</h2>
+                <div class="model-status-grid">
+                    <div>
+                        <h3>DeepfakeBench Models</h3>
+                        <div id="dfbStatus">Checking...</div>
+                    </div>
+                    <div>
+                        <h3 style="color: #4facfe;">TruFor Model</h3>
+                        <div id="truforStatus">Checking...</div>
+                    </div>
+                </div>
+            </div>
+        
+            <footer>
+                <p>Choose the detection method that fits your needs</p>
+                <p class="tip">💡 Tip: For first-time users, try DeepfakeBench's MesoNet-4 model (fastest)</p>
+            </footer>
+        </div>
     </div>
 
     <script>
-        // Check model status
+        // ========== Navigation Drawer Logic (same as DeepfakeBench) ==========
+        (function() {
+            const menuBtn = document.getElementById('menuBtn');
+            const drawer = document.getElementById('drawer');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+            const body = document.body;
+            
+            let focusableElements = [];
+            let firstFocusable = null;
+            let lastFocusable = null;
+            
+            function openDrawer() {
+                drawer.classList.add('show');
+                drawerOverlay.classList.add('show');
+                body.classList.add('drawer-open');
+                menuBtn.setAttribute('aria-expanded', 'true');
+                drawer.setAttribute('aria-hidden', 'false');
+                drawerOverlay.setAttribute('aria-hidden', 'false');
+                
+                // Set up focus trap
+                focusableElements = drawer.querySelectorAll(
+                    'a[href], button:not([disabled]), input:not([disabled])'
+                );
+                firstFocusable = focusableElements[0];
+                lastFocusable = focusableElements[focusableElements.length - 1];
+                
+                // Focus close button
+                setTimeout(() => drawerCloseBtn.focus(), 100);
+                
+                // Add keyboard listener
+                document.addEventListener('keydown', handleDrawerKeydown);
+            }
+            
+            function closeDrawer() {
+                drawer.classList.remove('show');
+                drawerOverlay.classList.remove('show');
+                body.classList.remove('drawer-open');
+                menuBtn.setAttribute('aria-expanded', 'false');
+                drawer.setAttribute('aria-hidden', 'true');
+                drawerOverlay.setAttribute('aria-hidden', 'true');
+                
+                // Return focus to menu button
+                menuBtn.focus();
+                
+                // Remove keyboard listener
+                document.removeEventListener('keydown', handleDrawerKeydown);
+            }
+            
+            function handleDrawerKeydown(e) {
+                // Close on Escape
+                if (e.key === 'Escape') {
+                    closeDrawer();
+                    return;
+                }
+                
+                // Focus trap with Tab
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusable) {
+                            e.preventDefault();
+                            lastFocusable.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusable) {
+                            e.preventDefault();
+                            firstFocusable.focus();
+                        }
+                    }
+                }
+            }
+            
+            // Event listeners
+            menuBtn.addEventListener('click', openDrawer);
+            drawerCloseBtn.addEventListener('click', closeDrawer);
+            drawerOverlay.addEventListener('click', closeDrawer);
+            
+            // Close drawer when clicking a link (navigation)
+            drawer.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', closeDrawer);
+            });
+        })();
+        
+        // ========== Check Model Status ==========
         async function checkModels() {
             // Check DeepfakeBench models
             try {
@@ -434,7 +766,5 @@
         
         checkModels();
     </script>
-        </div> <!-- /container -->
-    </div> <!-- /page-content -->
 </body>
 </html>
