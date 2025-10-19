@@ -448,6 +448,109 @@
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 12px;
             margin-top: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Model selector collapsed state */
+        .model-selector.collapsed .model-grid {
+            display: none;
+        }
+        
+        .model-selector.collapsed .model-selector-header {
+            display: none;
+        }
+        
+        /* Compact mode indicator */
+        .compact-model-indicator {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .model-selector.collapsed .compact-model-indicator {
+            display: flex;
+        }
+        
+        .compact-model-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .compact-model-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .compact-model-details {
+            flex: 1;
+        }
+        
+        .compact-model-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+        
+        .compact-model-status {
+            font-size: 13px;
+            color: #6c757d;
+        }
+        
+        .compact-model-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .expand-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .expand-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        
+        .expand-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         /* Radio card style */
@@ -1092,6 +1195,32 @@
             white-space: nowrap;
             border-width: 0;
         }
+        
+        /* ========== Mobile Optimizations ========== */
+        @media (max-width: 768px) {
+            .compact-model-indicator {
+                padding: 12px;
+            }
+            
+            .compact-model-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            
+            .compact-model-name {
+                font-size: 14px;
+            }
+            
+            .compact-model-status {
+                font-size: 12px;
+            }
+            
+            .expand-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1202,7 +1331,33 @@
             </div>
             
             <!-- Model Selector -->
-            <div class="model-selector">
+            <div class="model-selector" id="modelSelector">
+                <!-- Compact Mode Indicator (shown when collapsed) -->
+                <div class="compact-model-indicator" id="compactIndicator">
+                    <div class="compact-model-info">
+                        <div class="compact-model-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="6"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                            </svg>
+                        </div>
+                        <div class="compact-model-details">
+                            <div class="compact-model-name" id="compactModelName">Xception</div>
+                            <div class="compact-model-status" id="compactModelStatus">Analysis in progress...</div>
+                        </div>
+                    </div>
+                    <div class="compact-model-actions">
+                        <button class="expand-btn" id="expandModelBtn" aria-label="Change model">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            Change
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Full Model Selection (hidden when collapsed) -->
                 <div class="model-selector-header">
                     <h3 class="model-selector-title">Select Detection Model</h3>
                     <label class="filter-toggle">
@@ -1897,6 +2052,18 @@
             const fps = parseFloat(document.getElementById('fps').value);
             const threshold = parseFloat(document.getElementById('threshold').value);
             
+            // Collapse model selector and show compact indicator
+            collapseModelSelector();
+            
+            // Smooth scroll to progress section
+            setTimeout(() => {
+                const progressSection = document.getElementById('progress');
+                progressSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 300); // Wait for collapse animation
+            
             // Show progress
             document.getElementById('progress').classList.add('show');
             document.getElementById('result').classList.remove('show');
@@ -1938,6 +2105,9 @@
                 document.getElementById('analyzeBtn').disabled = false;
                 document.getElementById('bottomAnalyzeBtn').disabled = false;
                 document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
+                
+                // Update compact indicator status
+                document.getElementById('compactModelStatus').textContent = 'Analysis failed';
             }
         }
         
@@ -1965,6 +2135,9 @@
                         document.getElementById('analyzeBtn').disabled = false;
                         document.getElementById('bottomAnalyzeBtn').disabled = false;
                         document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
+                        
+                        // Update compact indicator status
+                        document.getElementById('compactModelStatus').textContent = 'Analysis complete';
                         return true;
                     } else if (job.status === 'error') {
                         if (interval) clearInterval(interval);
@@ -1974,6 +2147,9 @@
                         document.getElementById('analyzeBtn').disabled = false;
                         document.getElementById('bottomAnalyzeBtn').disabled = false;
                         document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
+                        
+                        // Update compact indicator status
+                        document.getElementById('compactModelStatus').textContent = 'Analysis failed';
                         return true;
                     }
                     return false;
@@ -2295,6 +2471,42 @@
             const secs = (seconds % 60).toFixed(2);
             return `${mins}:${secs.padStart(5, '0')}`;
         }
+        
+        // ========== Model Selector Collapse/Expand ==========
+        function collapseModelSelector() {
+            const modelSelector = document.getElementById('modelSelector');
+            const compactModelName = document.getElementById('compactModelName');
+            const compactModelStatus = document.getElementById('compactModelStatus');
+            
+            // Find selected model name
+            const selectedModelData = availableModels.find(m => (m.key || m.value) === selectedModel);
+            const modelName = selectedModelData?.name || selectedModelData?.label || selectedModel;
+            
+            // Update compact indicator
+            compactModelName.textContent = modelName;
+            compactModelStatus.textContent = 'Analysis in progress...';
+            
+            // Collapse
+            modelSelector.classList.add('collapsed');
+        }
+        
+        function expandModelSelector() {
+            const modelSelector = document.getElementById('modelSelector');
+            modelSelector.classList.remove('collapsed');
+            
+            // Scroll back to model selector
+            setTimeout(() => {
+                modelSelector.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
+        }
+        
+        // Expand button handler
+        document.getElementById('expandModelBtn').addEventListener('click', function() {
+            expandModelSelector();
+        });
         
         // ========== Initialize ==========
         loadModels();
