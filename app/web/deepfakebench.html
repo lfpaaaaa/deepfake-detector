@@ -2049,6 +2049,12 @@
         async function startAnalysis() {
             if (!selectedFile || !selectedModel) return;
             
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('You are not logged in. Redirecting to login page.');
+                window.location.href = '/web/login.html';
+                return; // Stop the analysis if not logged in
+            }
             const fps = parseFloat(document.getElementById('fps').value);
             const threshold = parseFloat(document.getElementById('threshold').value);
             
@@ -2084,11 +2090,27 @@
                 
                 const response = await fetch('/api/deepfakebench/analyze', {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: formData
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Upload failed');
+                    if (response.status === 401) {
+                        // Token is invalid or expired
+                        alert('Your session has expired. Please log in again.');
+                        localStorage.removeItem('access_token'); // Clear invalid token
+                        localStorage.removeItem('user');
+                        window.location.href = '/web/login.html';
+                        throw new Error('Unauthorized'); // Stop further processing
+                    }
+                    else {
+                        // Handle other non-OK responses (e.g., 400, 500)
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || `Server error: ${response.status}`);
+                    }
+                    
                 }
                 
                 const { job_id } = await response.json();
@@ -2099,15 +2121,17 @@
                 
             } catch (error) {
                 console.error('Analysis failed:', error);
-                document.getElementById('error').textContent = `Analysis failed: ${error.message}`;
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('progress').classList.remove('show');
-                document.getElementById('analyzeBtn').disabled = false;
-                document.getElementById('bottomAnalyzeBtn').disabled = false;
-                document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
-                
-                // Update compact indicator status
-                document.getElementById('compactModelStatus').textContent = 'Analysis failed';
+                if (error.message !== 'Unauthorized') {
+                    document.getElementById('error').textContent = `Analysis failed: ${error.message}`;
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('progress').classList.remove('show');
+                    document.getElementById('analyzeBtn').disabled = false;
+                    document.getElementById('bottomAnalyzeBtn').disabled = false;
+                    document.getElementById('bottomAnalyzeBtn').textContent = 'Analyze';
+                    
+                    // Update compact indicator status
+                    document.getElementById('compactModelStatus').textContent = 'Analysis failed';
+                }
             }
         }
         

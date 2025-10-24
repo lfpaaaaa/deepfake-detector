@@ -1,0 +1,25 @@
+=====================================
+Deepfake Detector - Docker 一键部署
+=====================================
+
+快速开始（3 步）：
+
+1. 准备模型文件（可选但推荐）
+   - 将 trufor.pth.tar 放在项目根目录
+   - 将 DeepfakeBench 模型放在 vendors/DeepfakeBench/training/weights/
+
+2. 一键启动
+   docker-compose up -d
+
+3. 访问应用
+   http://localhost:8000/web/index_main.html
+
+就这么简单！
+
+---
+常用命令：
+  查看日志: docker-compose logs -f
+  停止服务: docker-compose down
+  重启服务: docker-compose restart
+
+详细文档：DOCKER_README.md

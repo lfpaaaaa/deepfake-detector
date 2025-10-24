@@ -8,19 +8,33 @@ import time
 from pathlib import Path
 from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from typing import Optional
+from pydantic import BaseModel
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
+
 try:
     # Try relative imports first (when run from app directory)
     from adapters.trufor_adapter import TruForAdapter
     from adapters.deepfakebench_adapter import DeepfakeBenchAdapter
+    from auth.user_manager import user_manager
+    from auth.decorators import get_current_user, get_current_admin, get_optional_user
+    from history.history_manager import history_manager
+    from reports.pdf_generator import generate_pdf_report
+    from reports.zip_generator import generate_zip_report
 except ImportError:
     # Fallback to absolute imports (when run from project root)
     from app.adapters.trufor_adapter import TruForAdapter
     from app.adapters.deepfakebench_adapter import DeepfakeBenchAdapter
+    from app.auth.user_manager import user_manager
+    from app.auth.decorators import get_current_user, get_current_admin, get_optional_user
+    from app.history.history_manager import history_manager
+    from app.reports.pdf_generator import generate_pdf_report
+    from app.reports.zip_generator import generate_zip_report
+
 import uvicorn
 
 # Load environment variables
@@ -93,8 +107,8 @@ MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_VIDEO_SIZE = 500 * 1024 * 1024  # 500MB
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png"}
 ALLOWED_VIDEO_TYPES = {
-    "video/mp4", 
-    "video/quicktime", 
+    "video/mp4",
+    "video/quicktime",
     "video/x-msvideo",  # AVI
     "video/mpeg",
     "video/webm",
@@ -103,6 +117,313 @@ ALLOWED_VIDEO_TYPES = {
 }
 
 
+# =============================================================================
+# Pydantic Models for Request/Response
+# =============================================================================
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    role: str = "investigator"
+    email: str = ""
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
+
+
+class UpdateUserRequest(BaseModel):
+    email: Optional[str] = None
+    role: Optional[str] = None
+
+
+# =============================================================================
+# Authentication API Endpoints
+# =============================================================================
+
+@app.post("/api/auth/register")
+async def register_user(request: RegisterRequest):
+    """Register a new user"""
+    
+    allowed_roles = {"analyst", "investigator"}
+    if request.role not in allowed_roles:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid role. Must be one of: {', '.join(allowed_roles)}"
+        )
+    try:    
+        user = user_manager.create_user(
+            username=request.username,
+            password=request.password,
+            role=request.role,
+            email=request.email
+        )
+        
+        user_data = {
+            "username": user.get("username"),
+            "role": user.get("role"),
+            "email": user.get("email")
+        }
+        return JSONResponse(content={"success": True, "user": user_data})
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/auth/login")
+async def login(request: LoginRequest):
+    """Authenticate user and return JWT token"""
+    user = user_manager.authenticate_user(request.username, request.password)
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password"
+        )
+
+    # Update last login
+    user_manager.update_last_login(request.username)
+
+    # Create token
+    token = user_manager.create_access_token(user["username"], user["role"])
+
+    return JSONResponse(content={
+        "access_token": token,
+        "token_type": "bearer",
+        "user": user
+    })
+
+
+@app.post("/api/auth/logout")
+async def logout(
+    user: dict = Depends(get_current_user),
+    authorization: Optional[str] = Header(None)
+):
+    """Logout user (revoke token)"""
+    if authorization:
+        try:
+            _, token = authorization.split()
+            user_manager.revoke_token(token)
+        except ValueError:
+            pass
+
+    return JSONResponse(content={"success": True, "message": "Logged out successfully"})
+
+
+@app.get("/api/auth/me")
+async def get_current_user_info(user: dict = Depends(get_current_user)):
+    """Get current user information"""
+    user_data = user_manager.get_user(user["username"])
+    if user_data:
+        return JSONResponse(content={k: v for k, v in user_data.items() if k != "password_hash"})
+
+    raise HTTPException(status_code=404, detail="User not found")
+
+
+@app.get("/api/auth/users")
+async def list_users(admin: dict = Depends(get_current_admin)):
+    """List all users (admin only)"""
+    users = user_manager.list_users()
+    return JSONResponse(content={"users": users})
+
+
+@app.patch("/api/auth/users/{username}")
+async def update_user(
+    username: str,
+    request: UpdateUserRequest,
+    admin: dict = Depends(get_current_admin)
+):
+    """Update user information (admin only)"""
+    try:
+        updated_user = user_manager.update_user(
+            username,
+            **{k: v for k, v in request.dict().items() if v is not None}
+        )
+        return JSONResponse(content={"success": True, "user": updated_user})
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.delete("/api/auth/users/{username}")
+async def delete_user(username: str, admin: dict = Depends(get_current_admin)):
+    """Delete user (admin only)"""
+    try:
+        user_manager.delete_user(username)
+        return JSONResponse(content={"success": True, "message": f"User {username} deleted"})
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/auth/change-password")
+async def change_password(
+    request: ChangePasswordRequest,
+    user: dict = Depends(get_current_user)
+):
+    """Change user password"""
+    try:
+        user_manager.change_password(
+            user["username"],
+            request.old_password,
+            request.new_password
+        )
+        return JSONResponse(content={"success": True, "message": "Password changed successfully"})
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# =============================================================================
+# History API Endpoints
+# =============================================================================
+
+@app.get("/api/history")
+async def get_history(
+    user: dict = Depends(get_current_user),
+    limit: int = 50,
+    offset: int = 0,
+    status: Optional[str] = None
+):
+    """Get detection history for current user"""
+    history = history_manager.get_user_history(
+        username=user["username"],
+        role=user["role"],
+        limit=limit,
+        offset=offset,
+        status=status
+    )
+    return JSONResponse(content=history)
+
+
+@app.get("/api/history/stats")
+async def get_history_stats(user: dict = Depends(get_current_user)):
+    """Get detection statistics for current user"""
+    stats = history_manager.get_statistics(
+        username=user["username"],
+        role=user["role"]
+    )
+    return JSONResponse(content=stats)
+
+
+@app.get("/api/history/{job_id}")
+async def get_job_details(job_id: str, user: dict = Depends(get_current_user)):
+    """Get detailed information about a specific job"""
+    details = history_manager.get_job_details(
+        job_id=job_id,
+        username=user["username"],
+        role=user["role"]
+    )
+
+    if not details:
+        raise HTTPException(status_code=404, detail="Job not found or access denied")
+
+    return JSONResponse(content=details)
+
+
+@app.delete("/api/history/{job_id}")
+async def delete_job(job_id: str, user: dict = Depends(get_current_user)):
+    """Delete a detection job"""
+    try:
+        success = history_manager.delete_job(
+            job_id=job_id,
+            username=user["username"],
+            role=user["role"]
+        )
+
+        if success:
+            # Also remove from in-memory jobs dict
+            if job_id in jobs:
+                del jobs[job_id]
+
+            return JSONResponse(content={"success": True, "message": "Job deleted"})
+        else:
+            raise HTTPException(status_code=404, detail="Job not found")
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+
+
+# =============================================================================
+# Report Generation API Endpoints
+# =============================================================================
+
+@app.get("/api/reports/{job_id}/pdf")
+async def download_pdf_report(job_id: str, user: dict = Depends(get_current_user)):
+    """Download PDF report for a job"""
+    # Check access permission
+    details = history_manager.get_job_details(
+        job_id=job_id,
+        username=user["username"],
+        role=user["role"]
+    )
+
+    if not details:
+        raise HTTPException(status_code=404, detail="Job not found or access denied")
+
+    job_dir = DATA_DIR / job_id
+    pdf_path = job_dir / "report.pdf"
+
+    # Generate PDF if it doesn't exist
+    if not pdf_path.exists():
+        try:
+            generate_pdf_report(job_id, str(job_dir), details)
+        except Exception as e:
+            logger.error(f"Failed to generate PDF report: {e}")
+            raise HTTPException(status_code=500, detail="Failed to generate PDF report")
+
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="PDF report not found")
+
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        filename=f"{job_id}_report.pdf"
+    )
+
+
+@app.get("/api/reports/{job_id}/zip")
+async def download_zip_report(
+    job_id: str,
+    user: dict = Depends(get_current_user),
+    include_video: bool = True
+):
+    """Download ZIP archive containing all job artifacts"""
+    # Check access permission
+    details = history_manager.get_job_details(
+        job_id=job_id,
+        username=user["username"],
+        role=user["role"]
+    )
+
+    if not details:
+        raise HTTPException(status_code=404, detail="Job not found or access denied")
+
+    job_dir = DATA_DIR / job_id
+    zip_path = job_dir / "report.zip"
+
+    # Generate ZIP if it doesn't exist or needs update
+    try:
+        generate_zip_report(str(job_dir), include_video=include_video)
+    except Exception as e:
+        logger.error(f"Failed to generate ZIP report: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate ZIP report")
+
+    if not zip_path.exists():
+        raise HTTPException(status_code=404, detail="ZIP report not found")
+
+    return FileResponse(
+        zip_path,
+        media_type="application/zip",
+        filename=f"{job_id}_report.zip"
+    )
+
+
+# =============================================================================
+# Health & Root Endpoints
+# =============================================================================
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -110,14 +431,17 @@ async def health_check():
 
 
 @app.post("/detect")
-async def detect_deepfake(file: UploadFile = File(...)):
+async def detect_deepfake(
+    file: UploadFile = File(...),
+    user: dict = Depends(get_current_user)
+):
     """
-    Detect deepfakes in uploaded media files
-    
+    Detect deepfakes in uploaded media files (requires authentication)
+
     Accepts:
     - Images: JPEG, PNG (max 10MB)
     - Videos: MP4, MOV (max 50MB)
-    
+
     Returns detection results including confidence score and verdict
     """
     # Validate MIME type
@@ -127,10 +451,10 @@ async def detect_deepfake(file: UploadFile = File(...)):
             status_code=400,
             detail=f"Unsupported file type: {mime_type}. Allowed: JPEG, PNG, MP4, MOV"
         )
-    
+
     # Read file content
     content = await file.read()
-    
+
     # Validate file size
     is_video = mime_type in ALLOWED_VIDEO_TYPES
     max_size = MAX_VIDEO_SIZE if is_video else MAX_IMAGE_SIZE
@@ -140,11 +464,16 @@ async def detect_deepfake(file: UploadFile = File(...)):
             status_code=400,
             detail=f"File too large. Maximum size: {size_limit_mb}MB"
         )
-    
+
     # Log request (without content)
     media_type = "video" if is_video else "image"
-    logger.info(f"Processing {media_type}: {file.filename} ({len(content)} bytes)")
-    
+    logger.info(f"User {user['username']} processing {media_type}: {file.filename} ({len(content)} bytes)")
+
+    # Generate job ID for tracking
+    timestamp = int(time.time())
+    file_hash = hashlib.sha256(content).hexdigest()[:12]
+    job_id = f"trufor_{file_hash}_{timestamp}"
+
     try:
         # Call detection adapter
         result = await detection_adapter.detect(
@@ -152,10 +481,111 @@ async def detect_deepfake(file: UploadFile = File(...)):
             filename=file.filename,
             mime_type=mime_type
         )
-        
+
+        # Generate and save heatmap visualizations for TruFor results
+        if result.get("status") == "success" and mime_type.startswith('image/'):
+            try:
+                import matplotlib
+                matplotlib.use('Agg')  # Non-interactive backend
+                import matplotlib.pyplot as plt
+                import numpy as np
+
+                # Create job directory for storing visualizations
+                job_dir = DATA_DIR / job_id
+                job_dir.mkdir(parents=True, exist_ok=True)
+
+                # Generate anomaly heatmap (prediction_map or weighted_prediction_map)
+                if "weighted_prediction_map" in result and result["weighted_prediction_map"]:
+                    weighted_map = np.array(result["weighted_prediction_map"])
+                    fig, ax = plt.subplots(figsize=(10, 10))
+                    im = ax.imshow(weighted_map, cmap='jet', vmin=0, vmax=1)
+                    ax.set_title("Anomaly Detection Heatmap (Confidence-Weighted)", fontsize=14, fontweight='bold')
+                    ax.axis('off')
+                    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+                    cbar.set_label('Anomaly Score', rotation=270, labelpad=20)
+                    heatmap_path = job_dir / f"{job_id}_heatmap.png"
+                    plt.savefig(heatmap_path, dpi=150, bbox_inches='tight')
+                    plt.close()
+                    logger.info(f"Saved anomaly heatmap to {heatmap_path}")
+                elif "prediction_map" in result and result["prediction_map"]:
+                    pred_map = np.array(result["prediction_map"])
+                    fig, ax = plt.subplots(figsize=(10, 10))
+                    im = ax.imshow(pred_map, cmap='jet', vmin=0, vmax=1)
+                    ax.set_title("Anomaly Detection Heatmap", fontsize=14, fontweight='bold')
+                    ax.axis('off')
+                    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+                    cbar.set_label('Anomaly Score', rotation=270, labelpad=20)
+                    heatmap_path = job_dir / f"{job_id}_heatmap.png"
+                    plt.savefig(heatmap_path, dpi=150, bbox_inches='tight')
+                    plt.close()
+                    logger.info(f"Saved anomaly heatmap to {heatmap_path}")
+
+                # Generate confidence map
+                if "confidence_map" in result and result["confidence_map"]:
+                    conf_map = np.array(result["confidence_map"])
+                    fig, ax = plt.subplots(figsize=(10, 10))
+                    im = ax.imshow(conf_map, cmap='viridis', vmin=0, vmax=1)
+                    ax.set_title("Model Confidence Map", fontsize=14, fontweight='bold')
+                    ax.axis('off')
+                    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+                    cbar.set_label('Confidence', rotation=270, labelpad=20)
+                    conf_path = job_dir / f"{job_id}_conf.png"
+                    plt.savefig(conf_path, dpi=150, bbox_inches='tight')
+                    plt.close()
+                    logger.info(f"Saved confidence map to {conf_path}")
+
+                # Generate noiseprint++ map if available
+                if result.get("has_noiseprint") and "noiseprint_map" in result and result["noiseprint_map"]:
+                    npp_map = np.array(result["noiseprint_map"])
+                    fig, ax = plt.subplots(figsize=(10, 10))
+                    im = ax.imshow(npp_map, cmap='gray', vmin=0, vmax=1)
+                    ax.set_title("Noiseprint++ Forensic Analysis", fontsize=14, fontweight='bold')
+                    ax.axis('off')
+                    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+                    cbar.set_label('Noise Pattern', rotation=270, labelpad=20)
+                    npp_path = job_dir / f"{job_id}_noiseprint.png"
+                    plt.savefig(npp_path, dpi=150, bbox_inches='tight')
+                    plt.close()
+                    logger.info(f"Saved noiseprint map to {npp_path}")
+
+            except Exception as e:
+                logger.warning(f"Failed to generate heatmap visualizations for job {job_id}: {e}")
+                import traceback
+                traceback.print_exc()
+
+        # Create metadata for history
+        history_manager.create_job_metadata(
+            job_id=job_id,
+            username=user["username"],
+            filename=file.filename,
+            detection_type="trufor",
+            model="trufor"
+        )
+
+        # Update job status with result
+        history_manager.update_job_status(
+            job_id=job_id,
+            status="completed",
+            result={
+                # Core verdict and scores
+                "verdict": result.get("decision", "unknown"), # Use 'decision' field
+                "confidence": result.get("confidence", 0),   # Prediction strength (0-1)
+                "score": result.get("score", 0),             # Authenticity score (0-1, 1=real)
+                "integrity": result.get("integrity", 0),     # Integrity score (TruFor specific)
+                "fake_prob": result.get("fake_prob", 0),     # Raw fake probability
+
+                # Metadata about the analysis
+                "image_size": result.get("image_size", None), # Original (H, W)
+                "has_confidence_map": result.get("has_confidence_map", False),
+                "has_noiseprint": result.get("has_noiseprint", False),
+                "portrait_note": result.get("portrait_note", "") # Portrait mode hint
+            }
+        )
+
         logger.info(f"Detection complete for {file.filename}: {result['status']}")
+        result["job_id"] = job_id  # Add job_id to response
         return JSONResponse(content=result)
-        
+
     except TimeoutError:
         logger.error(f"Timeout processing {file.filename}")
         raise HTTPException(
@@ -392,11 +822,12 @@ async def analyze_with_deepfakebench(
     file: UploadFile = File(...),
     model: str = Form("xception"),
     fps: float = Form(3.0),
-    threshold: float = Form(0.5)
+    threshold: float = Form(0.5),
+    user: dict = Depends(get_current_user)
 ):
     """
-    Analyze video using DeepfakeBench models
-    
+    Analyze video using DeepfakeBench models (requires authentication)
+
     Parameters:
     - file: Video file
     - model: Model key (e.g., 'xception', 'meso4', 'f3net')
@@ -409,26 +840,26 @@ async def analyze_with_deepfakebench(
             status_code=400,
             detail=f"Invalid file type: {file.content_type}. Allowed: {', '.join(ALLOWED_VIDEO_TYPES)}"
         )
-    
+
     # Read file content
     content = await file.read()
     file_size_mb = len(content) / (1024 * 1024)
-    logger.info(f"DeepfakeBench analysis request - File: {file.filename}, Size: {file_size_mb:.2f}MB, Model: {model}")
-    
+    logger.info(f"User {user['username']} - DeepfakeBench analysis request - File: {file.filename}, Size: {file_size_mb:.2f}MB, Model: {model}")
+
     # Validate size
     if len(content) > MAX_VIDEO_SIZE:
         raise HTTPException(
             status_code=400,
             detail=f"File too large: {file_size_mb:.1f}MB. Maximum size: 500MB"
         )
-    
+
     # Generate job ID
     timestamp = int(time.time())
     file_hash = hashlib.sha256(content).hexdigest()[:12]
     job_id = f"dfb_{file_hash}_{timestamp}"
-    
-    logger.info(f"Created DeepfakeBench job {job_id} for video {file.filename}")
-    
+
+    logger.info(f"Created DeepfakeBench job {job_id} for user {user['username']}, video {file.filename}")
+
     # Initialize job status FIRST (before saving file)
     jobs[job_id] = {
         "status": "processing",
@@ -440,7 +871,16 @@ async def analyze_with_deepfakebench(
         "stage": "Uploading...",
         "message": f"Preparing to analyze with {model}"
     }
-    
+
+    # Create metadata for history
+    history_manager.create_job_metadata(
+        job_id=job_id,
+        username=user["username"],
+        filename=file.filename,
+        detection_type="deepfakebench",
+        model=model
+    )
+
     # Start analysis in background thread (to avoid blocking event loop)
     loop = asyncio.get_event_loop()
     loop.run_in_executor(
@@ -448,7 +888,7 @@ async def analyze_with_deepfakebench(
         run_deepfakebench_analysis_sync,
         job_id, content, model, fps, threshold
     )
-    
+
     # Return job_id IMMEDIATELY (before file is saved)
     return JSONResponse(content={"job_id": job_id, "model": model})
 
@@ -527,10 +967,40 @@ def run_deepfakebench_analysis(job_id: str, video_path: str, model: str, fps: fl
         
         # Run analysis with progress callback
         result = adapter.analyze_video(video_path, fps=fps, threshold=threshold, progress_callback=update_progress)
-        
+
         if result["success"]:
             update_progress(95, "Generating report...", "Finalizing results")
-            
+
+            # Save timeline.json for PDF report generation
+            try:
+                timeline_data = {
+                    "summary": {
+                        "total_frames": result.get("total_frames", 0),
+                        "suspicious_frames": sum(1 for s in result.get("frame_scores", []) if s.get("probability", 0) >= threshold),
+                        "suspicious_segments": len(result.get("suspicious_segments", [])),
+                        "average_score": result.get("average_score", 0),
+                        "max_score": result.get("overall_score", 0)
+                    },
+                    "frame_scores": result.get("frame_scores", []),
+                    "segments": [
+                        {
+                            "start_time": seg["start"],
+                            "end_time": seg["end"],
+                            "duration": seg["duration"],
+                            "avg_score": seg["peak_score"],
+                            "frame_count": int(seg["duration"] * fps)
+                        }
+                        for seg in result.get("suspicious_segments", [])
+                    ]
+                }
+
+                timeline_path = job_dir / "timeline.json"
+                with open(timeline_path, 'w') as f:
+                    json.dump(timeline_data, f, indent=2)
+                logger.info(f"Saved timeline.json for job {job_id}")
+            except Exception as e:
+                logger.warning(f"Failed to save timeline.json for job {job_id}: {e}")
+
             jobs[job_id].update({
                 "status": "completed",
                 "progress": 100,
@@ -538,22 +1008,66 @@ def run_deepfakebench_analysis(job_id: str, video_path: str, model: str, fps: fl
                 "message": "Analysis finished",
                 "result": result
             })
+
+            # Update history with result
+            history_manager.update_job_status(
+                job_id=job_id,
+                status="completed",
+                result={
+                    # Core verdict and scores
+                    "verdict": result.get("verdict", "unknown"),
+                    "score": result.get("overall_score", 0),          # Overall detection score
+                    "average_score": result.get("average_score", 0),   # Average frame score
+                    "confidence": result.get("confidence", 0),         # Confidence level
+
+                    # Model information
+                    "model": result.get("model", model),
+                    "model_name": result.get("model_name", model),
+
+                    # Analysis parameters
+                    "fps": fps,
+                    "threshold": threshold,
+                    "total_frames": result.get("total_frames", 0),
+
+                    # Segment information
+                    "suspicious_segments": len(result.get("suspicious_segments", [])),
+                    "suspicious_frames": sum(1 for s in result.get("frame_scores", []) if s.get("probability", 0) >= threshold)
+                }
+            )
+
             update_progress(100, "Complete", "Analysis finished")
             logger.info(f"Job {job_id} completed successfully")
         else:
+            error_msg = result.get("error", "Analysis failed")
             jobs[job_id].update({
                 "status": "error",
-                "message": result.get("error", "Analysis failed")
+                "message": error_msg
             })
-            
+
+            # Update history with error
+            history_manager.update_job_status(
+                job_id=job_id,
+                status="failed",
+                error=error_msg
+            )
+
     except Exception as e:
         logger.error(f"DeepfakeBench analysis failed for job {job_id}: {e}")
         import traceback
         traceback.print_exc()
+
+        error_msg = f"Analysis failed: {str(e)}"
         jobs[job_id].update({
             "status": "error",
-            "message": f"Analysis failed: {str(e)}"
+            "message": error_msg
         })
+
+        # Update history with error
+        history_manager.update_job_status(
+            job_id=job_id,
+            status="failed",
+            error=error_msg
+        )
 
 
 @app.get("/api/deepfakebench/jobs/{job_id}")

@@ -7,9 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/web/css/app-compiled.css">
-    <!-- Feather Icons for consistent iconography -->
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
+        /* ... [你所有的 CSS 样式都保持不变] ... */
         /* ========== CSS Reset & Base ========== */
         * {
             margin: 0;
@@ -226,6 +226,7 @@
             }
         }
         
+        /* ... [其余所有 CSS 样式都保持不变] ... */
         /* ========== Page Content ========== */
         .page-content {
             display: flex;
@@ -761,6 +762,11 @@
                 <li><a href="/web/index_main.html" class="active" aria-current="page">🏠 Home</a></li>
                 <li><a href="/web/index.html">🖼️ Images (TruFor)</a></li>
                 <li><a href="/web/deepfakebench.html">🎬 Video (DeepfakeBench)</a></li>
+                
+                <li id="nav-history-li" style="display: none;"><a href="/web/history.html" id="nav-history">📜 History</a></li>
+                <li id="nav-login-li" style="display: none;"><a href="/web/login.html" id="nav-login">Login</a></li>
+                <li id="nav-register-li" style="display: none;"><a href="/web/register.html" id="nav-register">Register</a></li>
+                <li id="nav-logout-li" style="display: none;"><a href="#" id="nav-logout">Logout</a></li>
             </ul>
         </div>
         <!-- Mobile hamburger -->
@@ -803,8 +809,25 @@
                 <a href="/web/deepfakebench.html" class="nav-link">
                 <span aria-hidden="true">🎬</span>
                 <span>Video (DeepfakeBench)</span>
-                </a>
-    </nav>
+            </a>
+
+            <a href="/web/history.html" class="nav-link" id="nav-mobile-history" style="display: none;">
+                <span aria-hidden="true">📜</span>
+                <span>History</span>
+            </a>
+            <a href="/web/login.html" class="nav-link" id="nav-mobile-login" style="display: none;">
+                <span aria-hidden="true">→</span>
+                <span>Login</span>
+            </a>
+            <a href="/web/register.html" class="nav-link" id="nav-mobile-register" style="display: none;">
+                <span aria-hidden="true"></span>
+                <span>Register</span>
+            </a>
+            <a href="#" class="nav-link" id="nav-mobile-logout" style="display: none;">
+                <span aria-hidden="true">←</span>
+                <span>Logout</span>
+            </a>
+        </nav>
     </aside>
     
     <div class="page-content">
@@ -1017,6 +1040,76 @@
                 link.addEventListener('click', closeDrawer);
             });
         })();
+
+        // ========== Authentication link logic ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('access_token');
+
+            // Get the desktop navigation items
+            const historyLi = document.getElementById('nav-history-li');
+            const loginLi = document.getElementById('nav-login-li');
+            const registerLi = document.getElementById('nav-register-li');
+            const logoutLi = document.getElementById('nav-logout-li');
+            const logoutBtn = document.getElementById('nav-logout');
+
+            // Get the mobile navigation item
+            const mobileHistoryLink = document.getElementById('nav-mobile-history');
+            const mobileLoginLink = document.getElementById('nav-mobile-login');
+            const mobileRegisterLink = document.getElementById('nav-mobile-register');
+            const mobileLogoutLink = document.getElementById('nav-mobile-logout');
+
+            if (token) {
+                // --- The user has logged in. ---
+                historyLi.style.display = 'list-item';
+                logoutLi.style.display = 'list-item';
+                loginLi.style.display = 'none';
+                registerLi.style.display = 'none';
+
+                mobileHistoryLink.style.display = 'flex';
+                mobileLogoutLink.style.display = 'flex';
+                mobileLoginLink.style.display = 'none';
+                mobileRegisterLink.style.display = 'none';
+
+                // Log out function
+                const handleLogout = async (e) => {
+                    e.preventDefault();
+                    
+                    try {
+                        await fetch('/api/auth/logout', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Logout API call failed:', error);
+                    }
+
+                    // Clear local storage
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user');
+                    
+                    // Redirect to the login page
+                    window.location.href = '/web/login.html';
+                };
+
+                // Bind the logout event
+                logoutBtn.addEventListener('click', handleLogout);
+                mobileLogoutLink.addEventListener('click', handleLogout);
+
+            } else {
+                // --- The user is not logged in ---
+                historyLi.style.display = 'none';
+                logoutLi.style.display = 'none';
+                loginLi.style.display = 'list-item';
+                registerLi.style.display = 'list-item';
+
+                mobileHistoryLink.style.display = 'none';
+                mobileLogoutLink.style.display = 'none';
+                mobileLoginLink.style.display = 'flex';
+                mobileRegisterLink.style.display = 'flex';
+            }
+        });
         
         // ========== Check Model Status ==========
         function createStatusBadge(available, text, ariaLabel) {

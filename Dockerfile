@@ -4,42 +4,52 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (required for OpenCV and other libraries)
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
+    libgthread-2.0-0 \
+    curl \
+    git \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+COPY configs/requirements.txt /app/configs/requirements.txt
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r configs/requirements.txt
 
-# Copy application code
+# Copy all application code and model files
+# This includes:
+# - Application source code (app/)
+# - Model files (trufor.pth.tar, vendors/DeepfakeBench/*)
+# - Configuration files (configs/)
+# - TruFor framework (TruFor-main/)
+# NOTE: Ensure model files are in place before building the image
 COPY . .
 
-# Create logs directory
-RUN mkdir -p logs
+# Create necessary runtime directories
+RUN mkdir -p logs data/jobs temp
 
 # Expose port
 EXPOSE 8000
 
 # Set environment variables
-ENV MODEL_TYPE=trufor
-ENV MODEL_PATH=trufor.pth.tar
-ENV HOST=0.0.0.0
-ENV PORT=8000
+ENV MODEL_PATH=trufor.pth.tar \
+    HOST=0.0.0.0 \
+    PORT=8000 \
+    PYTHONUNBUFFERED=1
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run the application
-CMD ["python", "start_trufor.py"]
+# Start the application
+CMD ["python", "-m", "app.main"]
 
 

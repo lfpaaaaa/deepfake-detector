@@ -599,6 +599,13 @@
             document.getElementById('imageProgress').classList.remove('hidden');
             document.getElementById('imageResults').classList.add('hidden');
             
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('You are not logged in. Redirecting to login page.');
+                window.location.href = '/web/login.html';
+                return; // Stop the analysis if not logged in
+            }
+
             const formData = new FormData();
             formData.append('file', file);
             
@@ -615,6 +622,9 @@
                 
                 const response = await fetch('/detect', {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: formData
                 });
                 
@@ -623,16 +633,30 @@
                 document.getElementById('imageProgressPercent').textContent = '100%';
                 
                 if (!response.ok) {
-                    throw new Error('Detection failed');
+                    if (response.status === 401) {
+                        // Token is invalid or expired
+                        alert('Your session has expired. Please log in again.');
+                        localStorage.removeItem('access_token'); // Clear invalid token
+                        localStorage.removeItem('user');
+                        window.location.href = '/web/login.html';
+                        throw new Error('Unauthorized'); // Stop further processing
+                    }
+                    else {
+                        throw new Error('Detection failed');
+                    }
+                    
                 }
                 
                 const result = await response.json();
                 displayImageResults(file, result);
                 
             } catch (error) {
+                console.error('Image analysis error:', error);
                 // Note: Keep minimal user-facing error
-                alert('Error analyzing image: ' + error.message);
-                document.getElementById('imageProgress').classList.add('hidden');
+                if (error.message !== 'Unauthorized') {
+                    alert('Error analyzing image: ' + error.message);
+                    document.getElementById('imageProgress').classList.add('hidden');
+                }
             }
         }
         
