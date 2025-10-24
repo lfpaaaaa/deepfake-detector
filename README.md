@@ -55,7 +55,7 @@ Xiyu Guan : Product owner
 
 ## Quick Start
 
-1. Install dependencies:
+<!-- 1. Install dependencies:
 ```powershell
 python -m venv .venv
 pip install -r configs/requirements.txt
@@ -77,6 +77,18 @@ python scripts/start_trufor.py
 
 # Or start with all features
 python app/main.py
+``` -->
+
+1. Install docker desktop
+[Download here](https://www.docker.com/get-started/)
+
+2. Prepare model files *(optional but recommended)*
+- Place `trufor.pth.tar` in the project root.
+- Put DeepfakeBench weights under `vendors/DeepfakeBench/training/weights/`.
+
+3. One-click deployment
+```bash
+docker compose up -d --build
 ```
 
 4. Access the web interface:
@@ -98,6 +110,12 @@ python tools/list_models.py
 # Aggregate results
 python tools/aggregate_runs.py --root runs/image_infer --out summary.csv
 ```
+### Common Commands
+- **View logs:** `docker-compose logs -f`
+- **Stop services:** `docker-compose down`
+- **Restart services:** `docker-compose restart`
+
+**Full documentation:** `DOCKER_README.md`
 
 ### 📁 Model Files Required
 - `trufor.pth.tar` (~500MB) - Primary TruFor model for image/video forensics
