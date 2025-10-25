@@ -2,7 +2,7 @@
 
 **Project**: Deepfake Detector  
 **Version**: 3.0  
-**Last Updated**: October 25, 2025  
+**Last Updated**: October 26, 2025  
 **Document Owner**: Xiyu Guan
 
 ---
@@ -201,24 +201,48 @@ The testing strategy covers:
 
 ### Automated Test Execution
 
-**Local Development**:
+**Local Development** (Windows):
 ```bash
-# Run all tests
-python scripts/run_tests.py
+# Navigate to project
+cd c:\Users\21402\Desktop\deepfake-detector
+
+# Run all tests with coverage
+pytest tests/ -v --cov=app --cov-report=html
 
 # Run specific types
-python scripts/run_tests.py --unit
-python scripts/run_tests.py --integration
+pytest tests/ -v -m unit           # Unit tests only
+pytest tests/ -v -m integration    # Integration tests only
 
-# With coverage
-python scripts/run_tests.py --coverage
+# View coverage report
+# Open htmlcov/index.html in browser
 ```
 
-**CI/CD Pipeline**:
-- Triggered on every push to `main` or `dev`
-- Runs all automated tests
-- Generates coverage reports
-- Fails build if critical tests fail
+**Expected Local Results**:
+- ⏱️ Execution time: ~12 seconds
+- ✅ 67 tests passed, 2 skipped
+- 📊 Coverage: 70%
+
+**CI/CD Pipeline** (GitHub Actions):
+- **Platform**: Ubuntu Latest
+- **Triggers**: Push to `main`, Pull Requests
+- **Duration**: ~4 minutes (full pipeline)
+- **Jobs**: 5 parallel jobs
+  1. Code Quality (flake8, black, isort)
+  2. Security Scan (Trivy)
+  3. Quick Validation (syntax check)
+  4. Unit Tests (pytest + coverage)
+  5. Docker Build + Config Validation
+
+**CI Results**:
+- ✅ All 67 tests pass on Ubuntu
+- ✅ No security vulnerabilities
+- ✅ 70% code coverage
+- ✅ Docker image builds successfully
+
+**Dual Testing Benefits**:
+- 🚀 **Local**: Fast feedback for development (~12s)
+- 🛡️ **CI**: Cross-platform validation + security checks (~4m)
+- 📊 **Both**: Comprehensive quality assurance
 
 ---
 
@@ -236,21 +260,30 @@ Each test cycle focuses on specific features and includes:
 
 ### Planned Cycles
 
-#### **Cycle 1: Basic Functionality** ✅ Current
+#### **Cycle 1: Basic Functionality** ✅ Complete
 **Focus**: Core system setup and authentication  
-**Duration**: 3 days  
-**Status**: In Progress
+**Duration**: 2 days (Oct 25-26, 2025)  
+**Status**: ✅ Complete
 
 **Key Areas**:
-- Module imports and configuration
-- User registration and login
-- JWT authentication
-- API endpoint accessibility
-- CI/CD pipeline
+- ✅ Module imports and configuration (3 tests)
+- ✅ User registration and login (10 tests)
+- ✅ JWT authentication (10 tests)
+- ✅ API endpoint accessibility (10 tests)
+- ✅ CI/CD pipeline (5 jobs)
+- ✅ History management (16 tests)
+- ✅ Model adapters (26 tests)
+
+**Test Results**:
+- **Tests Executed**: 67 automated tests
+- **Pass Rate**: 100% (67 passed, 0 failed)
+- **Code Coverage**: 70% (target: ≥60%)
+- **Test Environment**: Local (Windows) + CI (Ubuntu)
+- **Bugs Found**: 6 (all fixed)
 
 **Documentation**:
-- [Test Plan](test_plans/cycle_1_basic_functionality.md)
-- [Test Report](test_reports/cycle_1_report.md)
+- [Test Plan](test_plans/cycle_1_basic_functionality.md) - V2.0 ✅
+- [Test Report](test_reports/cycle_1_report.md) - V2.0 ✅
 
 ---
 
