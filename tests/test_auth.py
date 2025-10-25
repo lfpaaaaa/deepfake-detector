@@ -107,8 +107,12 @@ def test_user_data_structure():
         pytest.skip("users.json doesn't exist yet")
     
     with open(users_file, 'r') as f:
-        users = json.load(f)
+        data = json.load(f)
     
+    # users.json format is {"users": [...]}
+    assert isinstance(data, dict)
+    assert "users" in data
+    users = data["users"]
     assert isinstance(users, list)
     
     # If there are users, check structure
@@ -116,7 +120,7 @@ def test_user_data_structure():
         user = users[0]
         assert "username" in user
         assert "email" in user
-        assert "hashed_password" in user
+        assert "password_hash" in user or "hashed_password" in user
 
 
 @pytest.mark.unit

@@ -84,7 +84,8 @@ def test_register_user(client, test_user_credentials):
     
     if response.status_code == 200:
         data = response.json()
-        assert "message" in data or "username" in data
+        # API returns {"success": True, "user": {...}}
+        assert "success" in data or "user" in data
 
 
 @pytest.mark.integration
@@ -159,8 +160,12 @@ def test_history_endpoint_authenticated(client, auth_token):
     assert response.status_code == 200
     data = response.json()
     
-    # History should be a list (even if empty)
-    assert isinstance(data, list)
+    # History returns paginated format: {total, offset, limit, jobs}
+    assert isinstance(data, dict)
+    assert "jobs" in data
+    assert isinstance(data["jobs"], list)
+    assert "total" in data
+    assert "limit" in data
 
 
 @pytest.mark.integration
