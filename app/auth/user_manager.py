@@ -14,7 +14,7 @@ from jose import JWTError, jwt
 # Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 24
+ACCESS_TOKEN_EXPIRE_HOURS = 24  # Token expires after 24 hours. Change this value to adjust (e.g., 168 for 7 days, 720 for 30 days)
 
 # File paths
 DATA_DIR = Path("data")

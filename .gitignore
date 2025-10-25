@@ -45,8 +45,9 @@ env/
 *.weights
 *.pt
 models/*.pth
-vendors/DeepfakeBench/training/weights/*.pth
-vendors/DeepfakeBench/training/pretrained/*.pth
+
+# Vendors directory (contains large model files)
+vendors/
 
 # Data directories
 data/jobs/*
@@ -90,10 +91,6 @@ test_*.py
 
 # Compiled CSS
 *.css.map
-
-# Large vendor files (optional - uncomment if needed)
-# vendors/DeepfakeBench/training/weights/*.pth
-# vendors/DeepfakeBench/training/pretrained/*.pth
 
 # Documentation build
 docs/_build/

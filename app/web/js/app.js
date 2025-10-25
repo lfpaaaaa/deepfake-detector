@@ -118,6 +118,16 @@ async function handleFile(file) {
         return;
     }
     
+    // Check authentication
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        showError('Please login first. Redirecting to login page...');
+        setTimeout(() => {
+            window.location.href = '/web/login.html';
+        }, 2000);
+        return;
+    }
+    
     // Hide errors and results
     elements.errorAlert.classList.add('hidden');
     elements.resultPanel.classList.add('hidden');
@@ -133,12 +143,27 @@ async function handleFile(file) {
     try {
         const response = await fetch('/detect', {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             body: formData
         });
         
         if (!response.ok) {
             const error = await response.json();
             console.error('API error:', error);
+            
+            // Handle authentication errors
+            if (response.status === 401) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+                showError('Session expired. Please login again...');
+                setTimeout(() => {
+                    window.location.href = '/web/login.html';
+                }, 2000);
+                return;
+            }
+            
             throw new Error(error.detail || 'Detection failed');
         }
         
