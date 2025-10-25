@@ -83,6 +83,10 @@ package-lock.json
 test_*.py
 *_test.py
 *.test.py
+# But allow test files in tests/ directory
+!tests/test_*.py
+!tests/*_test.py
+!tests/*.test.py
 
 # Temporary documentation files
 *_COMPLETE.md
