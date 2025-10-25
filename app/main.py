@@ -199,6 +199,20 @@ async def login(request: LoginRequest):
     })
 
 
+# Compatibility aliases for testing and OAuth2 standard
+@app.post("/register")
+async def register_user_alias(request: RegisterRequest):
+    """Alias for /api/auth/register (for compatibility)"""
+    return await register_user(request)
+
+
+@app.post("/token")
+async def token_alias(username: str = Form(...), password: str = Form(...)):
+    """OAuth2 compatible token endpoint (for compatibility)"""
+    request = LoginRequest(username=username, password=password)
+    return await login(request)
+
+
 @app.post("/api/auth/logout")
 async def logout(
     user: dict = Depends(get_current_user),
@@ -427,7 +441,39 @@ async def download_zip_report(
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "service": "deepfake-detection"}
+    return {"status": "healthy", "service": "deepfake-detection", "timestamp": datetime.now().isoformat()}
+
+
+@app.get("/api/models/status")
+async def get_models_status(user: dict = Depends(get_current_user)):
+    """Get status of all detection models (requires authentication)"""
+    from pathlib import Path
+    from tools.weight_registry import WEIGHT_REGISTRY
+    
+    # Check TruFor model
+    trufor_path = Path("trufor.pth.tar")
+    trufor_available = trufor_path.exists()
+    
+    # Check DeepfakeBench models
+    weights_dir = Path("vendors/DeepfakeBench/training/weights")
+    available_models = []
+    
+    if weights_dir.exists():
+        for weight_file, config in WEIGHT_REGISTRY.items():
+            weight_path = weights_dir / weight_file
+            if weight_path.exists():
+                available_models.append(config["model_key"])
+    
+    return {
+        "trufor": {
+            "available": trufor_available,
+            "path": str(trufor_path) if trufor_available else None
+        },
+        "deepfakebench": {
+            "available_models": available_models,
+            "total_models": len(WEIGHT_REGISTRY)
+        }
+    }
 
 
 @app.post("/detect")
