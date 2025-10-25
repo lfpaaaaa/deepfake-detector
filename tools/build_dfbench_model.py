@@ -1,14 +1,11 @@
 # tools/build_dfbench_model.py
 """
 Factory for building DeepfakeBench detector models.
-Auto-discovers detector modules from vendors/DeepfakeBench/training/detectors/
+Uses the DETECTOR registry from DeepfakeBench.
 """
 
 import sys
 import os
-import glob
-import importlib
-import inspect
 import torch
 import yaml
 from typing import Tuple, Optional, Callable
@@ -17,99 +14,28 @@ from typing import Tuple, Optional, Callable
 DFB_ROOT = os.path.join(os.path.dirname(__file__), "..", "vendors", "DeepfakeBench")
 sys.path.insert(0, DFB_ROOT)
 
+# Also add the training directory so modules can import each other
+TRAINING_ROOT = os.path.join(DFB_ROOT, "training")
+sys.path.insert(0, TRAINING_ROOT)
 
-def _auto_import_detector(model_key: str):
+
+def _get_detector_class(model_key: str):
     """
-    Automatically import the detector module for given model_key.
-    Searches through training/detectors/*_detector.py files.
+    Get the detector class from the DETECTOR registry.
+    Returns the detector class for the given model_key.
     """
-    # First try: exact match with model_key in filename
-    search_pattern = os.path.join(DFB_ROOT, "training", "detectors", f"*{model_key}*detector.py")
-    candidates = sorted(glob.glob(search_pattern, recursive=False))
+    from detectors import DETECTOR
     
-    if not candidates:
-        # Fallback: try all detector files
-        search_pattern = os.path.join(DFB_ROOT, "training", "detectors", "*detector.py")
-        candidates = sorted(glob.glob(search_pattern, recursive=False))
+    if model_key not in DETECTOR.data:
+        available_models = list(DETECTOR.data.keys())
+        raise ValueError(
+            f"Model '{model_key}' not found in DETECTOR registry. "
+            f"Available models: {available_models}"
+        )
     
-    # Try to import each candidate and find the builder function
-    # First pass: look for exact matches
-    for py_file in candidates:
-        if "base_detector" in py_file:
-            continue  # Skip base class
-            
-        # Convert file path to module path
-        rel_path = os.path.relpath(py_file, DFB_ROOT)
-        module_path = rel_path.replace(os.sep, ".")[:-3]  # Remove .py
-        
-        try:
-            mod = importlib.import_module(module_path)
-            
-            # Look for exact match detector class (e.g., "xception" -> "XceptionDetector")
-            expected_class_name = f"{model_key}Detector".lower()
-            for attr_name in dir(mod):
-                if attr_name.lower() == expected_class_name:
-                    attr = getattr(mod, attr_name)
-                    # Skip abstract base classes
-                    if callable(attr) and inspect.isclass(attr) and not inspect.isabstract(attr):
-                        print(f"[INFO] Found detector class (exact match): {module_path}.{attr_name}")
-                        return attr
-        except Exception as e:
-            continue
-    
-    # Second pass: look for partial matches
-    for py_file in candidates:
-        if "base_detector" in py_file:
-            continue
-            
-        rel_path = os.path.relpath(py_file, DFB_ROOT)
-        module_path = rel_path.replace(os.sep, ".")[:-3]
-        
-        try:
-            mod = importlib.import_module(module_path)
-            
-            for attr_name in dir(mod):
-                attr = getattr(mod, attr_name)
-                
-                # Check for build_xxx() function
-                if attr_name.startswith("build_") and callable(attr):
-                    if model_key.lower() in attr_name.lower():
-                        print(f"[INFO] Found builder: {module_path}.{attr_name}")
-                        return attr
-                
-                # Check for XXXDetector class (skip abstract classes)
-                if attr_name.lower().endswith("detector") and callable(attr) and inspect.isclass(attr):
-                    # Skip abstract base classes
-                    if inspect.isabstract(attr):
-                        continue
-                    
-                    # Try exact match first (e.g., xception -> XceptionDetector)
-                    if model_key.lower() == attr_name.lower().replace("detector", ""):
-                        print(f"[INFO] Found detector class (exact match): {module_path}.{attr_name}")
-                        return attr
-                    # Then try partial match (e.g., efficientnetb4 contains efficient)
-                    elif model_key.lower() in attr_name.lower():
-                        print(f"[INFO] Found detector class (partial match): {module_path}.{attr_name}")
-                        return attr
-            
-            # If no class found, check if filename matches (e.g., efficientnetb4_detector.py contains efficientnetb4)
-            filename = os.path.basename(py_file).replace("_detector.py", "")
-            if filename.lower() == model_key.lower():
-                # Re-import and get the main detector class
-                for attr_name in dir(mod):
-                    attr = getattr(mod, attr_name)
-                    if attr_name.lower().endswith("detector") and callable(attr) and inspect.isclass(attr):
-                        # Skip abstract base classes
-                        if inspect.isabstract(attr):
-                            continue
-                        print(f"[INFO] Found detector class (filename match): {module_path}.{attr_name}")
-                        return attr
-                        
-        except Exception as e:
-            continue
-    
-    raise ImportError(f"Cannot locate detector builder for model_key='{model_key}'. "
-                      f"Searched in {DFB_ROOT}/training/detectors/")
+    detector_class = DETECTOR.data[model_key]
+    print(f"[INFO] Found detector class for '{model_key}': {detector_class.__name__}")
+    return detector_class
 
 
 def _load_config(model_key: str) -> dict:
@@ -198,7 +124,7 @@ def build_model_and_transforms(model_key: str, num_classes: int = 2) -> Tuple[to
         - model: PyTorch model ready for inference
         - transform_function: Optional preprocessing function (None if using default)
     """
-    builder = _auto_import_detector(model_key)
+    detector_class = _get_detector_class(model_key)
     
     # Load configuration
     config = _load_config(model_key)
@@ -207,22 +133,10 @@ def build_model_and_transforms(model_key: str, num_classes: int = 2) -> Tuple[to
     if "backbone_config" in config:
         config["backbone_config"]["num_classes"] = num_classes
     
-    # Try to instantiate the model
+    # Instantiate the detector model
     try:
-        # Some detectors are classes that need instantiation
-        if isinstance(builder, type):
-            # It's a class, instantiate it with config
-            model = builder(config)
-        else:
-            # It's a function, call it
-            result = builder(config)
-            
-            # Check if result is tuple (model, transform) or just model
-            if isinstance(result, tuple) and len(result) == 2:
-                return result[0], result[1]
-            else:
-                model = result
-        
+        # All detectors in the registry are classes, instantiate with config
+        model = detector_class(config)
         return model, None
         
     except Exception as e:

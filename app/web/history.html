@@ -259,6 +259,163 @@
             font-size: 14px;
             opacity: 0.8;
         }
+
+        /* Mobile Card Layout (hidden by default) */
+        .history-cards {
+            display: none;
+        }
+
+        .history-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-row:last-child {
+            border-bottom: none;
+        }
+
+        .card-label {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .card-value {
+            font-size: 14px;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-actions .action-btn {
+            flex: 1;
+            margin: 0;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            /* Hide desktop table */
+            .history-table {
+                display: none;
+            }
+
+            /* Show mobile cards */
+            .history-cards {
+                display: block;
+            }
+
+            /* Adjust navigation */
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .nav-brand {
+                font-size: 16px;
+            }
+
+            .nav-links {
+                gap: 8px;
+            }
+
+            .nav-link {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            /* Adjust container */
+            .container {
+                margin: 15px auto;
+                padding: 0 15px;
+            }
+
+            /* Adjust stats */
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            /* Adjust history panel */
+            .history-panel {
+                padding: 15px;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .panel-title {
+                font-size: 20px;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+
+            .filter-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .card-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .card-value {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body>
@@ -400,6 +557,7 @@
                     return;
                 }
 
+                // Desktop table view
                 const tableHTML = `
                     <table class="history-table">
                         <thead>
@@ -437,7 +595,52 @@
                     </table>
                 `;
 
-                document.getElementById('historyContent').innerHTML = tableHTML;
+                // Mobile card view
+                const cardsHTML = `
+                    <div class="history-cards">
+                        ${data.jobs.map(job => `
+                            <div class="history-card">
+                                <div class="card-row">
+                                    <span class="card-label">File</span>
+                                    <span class="card-value">${job.filename}</span>
+                                </div>
+                                <div class="card-row">
+                                    <span class="card-label">Type</span>
+                                    <span class="card-value">${job.detection_type}</span>
+                                </div>
+                                <div class="card-row">
+                                    <span class="card-label">Model</span>
+                                    <span class="card-value">${job.model || '-'}</span>
+                                </div>
+                                <div class="card-row">
+                                    <span class="card-label">Status</span>
+                                    <span class="card-value"><span class="status-badge status-${job.status}">${job.status}</span></span>
+                                </div>
+                                <div class="card-row">
+                                    <span class="card-label">Verdict</span>
+                                    <span class="card-value">${job.verdict ? `<span class="verdict-badge verdict-${job.verdict}">${job.verdict}</span>` : '-'}</span>
+                                </div>
+                                <div class="card-row">
+                                    <span class="card-label">Score</span>
+                                    <span class="card-value">${job.score ? (job.score * 100).toFixed(1) + '%' : '-'}</span>
+                                </div>
+                                <div class="card-row">
+                                    <span class="card-label">Date</span>
+                                    <span class="card-value">${new Date(job.created_at).toLocaleString()}</span>
+                                </div>
+                                <div class="card-actions">
+                                    ${job.status === 'completed' ? `
+                                        <button class="action-btn" onclick="downloadPDF('${job.job_id}')">📄 PDF</button>
+                                        <button class="action-btn" onclick="downloadZIP('${job.job_id}')">📦 ZIP</button>
+                                    ` : ''}
+                                    <button class="action-btn delete" onclick="deleteJob('${job.job_id}')">🗑️ Delete</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                document.getElementById('historyContent').innerHTML = tableHTML + cardsHTML;
             } catch (error) {
                 console.error('Error loading history:', error);
                 document.getElementById('historyContent').innerHTML = `

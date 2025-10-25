@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     wget \
+    cmake \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
