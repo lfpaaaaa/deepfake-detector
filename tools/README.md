@@ -156,8 +156,7 @@ python tools/fuse_scores.py \
 | SRM | `srm` | 299x299 | Spatial Rich Model |
 | RECCE | `recce` | 224x224 | Relationship-aware |
 | SPSL | `spsl` | 224x224 | Self-supervised learning |
-| FFD | `ffd` | 224x224 | Face forgery detection |
-| UCF | `ucf` | 224x224 | Unified contrastive learning |
+| UCF | `ucf` | 256x256 | Unified contrastive learning |
 | CNN-AUG | `multi_attention` | 224x224 | Multi-attention mechanism |
 | CORE | `core` | 224x224 | Core features |
 

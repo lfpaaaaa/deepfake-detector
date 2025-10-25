@@ -1,14 +1,59 @@
 # UI Features Documentation
 
-## ✅ Update Complete
+## ✅ V3.0 Update Complete
 
-Your UI has been fully updated and now supports both **Image Detection** and **Video Analysis** modes!
+Your UI has been fully updated with **Authentication**, **History Management**, **Image Detection**, and **Video Analysis** features!
 
 ---
 
-## 🎨 New UI Features
+## 🎨 UI Features Overview
 
-### 1. Dual Mode Switching
+### 1. Authentication System 🔐
+
+**Registration Page** (`/web/register.html`)
+- Create new user account
+- Username and password input
+- Client-side validation
+- Secure password requirements
+- Redirect to login after successful registration
+
+**Login Page** (`/web/login.html`)
+- User authentication
+- JWT token generation
+- Remember me functionality (token stored in localStorage)
+- Auto-redirect to main page after login
+- Session expiration: 24 hours
+
+**Session Management**
+- Automatic token validation on protected pages
+- Token expiration handling
+- Auto-redirect to login when session expires
+- Logout functionality (token revocation)
+- "Please login first" prompts for unauthenticated access
+
+### 2. Detection History 📜
+
+**History Page** (`/web/history.html`)
+- View all your detection jobs
+- Filter by status: All, Pending, Processing, Completed, Failed
+- Desktop view: Table layout with sortable columns
+- Mobile view: Card-based layout (< 768px)
+- Real-time status updates
+
+**Features**:
+- 📄 **Download PDF**: Generate comprehensive report
+- 📦 **Download ZIP**: Get complete results package
+- 🗑️ **Delete Job**: Remove detection record
+- 🔍 **Job Details**: View detection metadata
+- 📊 **Statistics**: Total jobs, completed, pending counts
+
+**Mobile Responsive**:
+- Automatic layout switch at 768px breakpoint
+- Touch-friendly card interface
+- Swipe-optimized interactions
+- Compact statistics display
+
+### 3. Dual Mode Detection Switching
 
 **Image Detection Mode** 📷
 - Drag & drop or click to upload images
@@ -277,29 +322,107 @@ Each segment displays:
 
 ---
 
-## 🎉 Completion Status
+## 🎉 V3.0 Feature Completion Status
 
-✅ **All Features Implemented**:
-- [x] Dual mode UI
-- [x] Image detection
-- [x] Video upload
-- [x] Real-time progress
+✅ **All V3 Features Implemented**:
+- [x] User authentication (JWT)
+- [x] User registration and login
+- [x] Detection history management
+- [x] PDF/ZIP report generation
+- [x] Mobile responsive design
+- [x] Dual mode UI (Image/Video)
+- [x] Image detection (TruFor)
+- [x] Video analysis (DeepfakeBench 12 models)
+- [x] Real-time progress tracking
 - [x] Timeline visualization
 - [x] Segments display
 - [x] Keyframes gallery
 - [x] Threshold adjustment
-- [x] Responsive design
 - [x] Error handling
+- [x] CI/CD pipeline
 
 ---
 
-## 🚀 Start Testing Now!
+## 🚀 V3.0 User Flow
 
-1. Open browser
-2. Visit http://localhost:8000
-3. Click "🎥 Video Analysis"
-4. Upload test video
-5. Enjoy the new video analysis experience!
+### First Time Users
+1. **Register**: Visit `http://localhost:8000/web/register.html`
+   - Enter username and password
+   - Click "Register"
+2. **Login**: Redirect to login page automatically
+   - Enter credentials
+   - Session valid for 24 hours
+3. **Main Page**: Start detecting after login!
 
-**Happy Testing!** 🎊
+### Returning Users
+1. **Login**: Visit `http://localhost:8000/web/login.html`
+   - Use existing credentials
+   - Token stored in browser
+2. **Access Features**:
+   - Main Page: Image detection
+   - DeepfakeBench: Video analysis
+   - History: View past detections
+
+### Typical Workflow
+```
+Register → Login → Upload Media → Detect → View Results → Check History → Download Reports
+```
+
+### Detection Flow
+1. **Choose Detection Type**:
+   - Image: Use main page or TruFor page
+   - Video: Use DeepfakeBench page
+
+2. **Upload & Analyze**:
+   - Select file (drag & drop or click)
+   - Wait for analysis (with progress bar)
+   - View results with visualizations
+
+3. **Access History**:
+   - Go to History page
+   - See all your detections
+   - Download PDF/ZIP reports
+   - Delete old records
+
+### Mobile Usage
+- Access any page on mobile browser
+- History page automatically switches to card layout
+- Touch-optimized buttons and interactions
+- All features available on mobile
+
+---
+
+## 🔒 Security Notes
+
+- **Session Duration**: 24 hours after login
+- **Token Storage**: Secure localStorage
+- **Auto Logout**: Expired sessions redirect to login
+- **Protected Pages**: All detection features require authentication
+- **User Isolation**: You can only see your own detection history
+
+---
+
+## 🛠️ Troubleshooting
+
+### "Please login first" Error
+- Session expired (>24 hours)
+- Solution: Login again at `/web/login.html`
+
+### Can't See History
+- Not logged in
+- Solution: Check authentication token in localStorage
+
+### Reports Won't Download
+- Job not completed yet
+- Solution: Wait for "Completed" status
+
+### Mobile Layout Not Showing
+- Screen width > 768px
+- Solution: Resize browser window or use actual mobile device
+
+---
+
+**Version**: 3.0  
+**Last Updated**: October 25, 2025  
+**Author**: Xiyu Guan
 

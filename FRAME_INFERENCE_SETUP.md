@@ -15,7 +15,7 @@ The following tool files have been created:
 
 ### 2. Supported Models
 
-13 DeepfakeBench models have been configured:
+12 DeepfakeBench models are currently available (FFD was removed in V3.0):
 
 | Model | Weight File | Input Size | Status |
 |------|---------|---------|------|
@@ -28,8 +28,7 @@ The following tool files have been created:
 | SRM | srm_best.pth | 299x299 | ✅ Ready |
 | RECCE | recce_best.pth | 224x224 | ✅ Ready |
 | SPSL | spsl_best.pth | 224x224 | ✅ Ready |
-| FFD | ffd_best.pth | 224x224 | ✅ Ready |
-| UCF | ucf_best.pth | 224x224 | ✅ Ready |
+| UCF | ucf_best.pth | 256x256 | ✅ Ready |
 | CNN-AUG | cnnaug_best.pth | 224x224 | ✅ Ready |
 | CORE | core_best.pth | 224x224 | ✅ Ready |
 
@@ -38,7 +37,7 @@ All weight files are placed in: `vendors/DeepfakeBench/training/weights/`
 ### 3. Feature Capabilities
 
 ✅ **Frame-by-Frame Analysis**: Can set any FPS extraction rate
-✅ **Multi-Model Support**: Supports 13 different detection models
+✅ **Multi-Model Support**: Supports 12 different detection models
 ✅ **Batch Processing**: Can process single videos or entire directories
 ✅ **Timeline Generation**: Automatically identifies suspicious time periods
 ✅ **Score Fusion**: Can fuse with VideoMAE results

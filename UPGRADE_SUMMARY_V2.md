@@ -167,17 +167,17 @@ deepfake-detector/
 
 ## 📊 Supported Models
 
-### DeepfakeBench Models (13 models)
+### DeepfakeBench Models (13 models in V2.0)
 1. **Xception** - High accuracy, moderate speed
 2. **Meso4** - Fast, good for real-time
 3. **Meso4Inception** - Enhanced Meso4
 4. **F3Net** - Frequency domain analysis
 5. **EfficientNet-B4** - Excellent accuracy
-6. **Capsule** - Novel architecture
-7. **Xception-SRM** - SRM layer enhanced
+6. **Capsule Net** - Novel architecture
+7. **SRM** - Spatial Rich Model
 8. **RECCE** - Relationship descriptor
 9. **SPSL** - Spatial pyramid
-10. **FFD** - Face forgery detection
+10. **FFD** - Face Forgery Detection
 11. **UCF** - Universal face forgery
 12. **CNN-Aug** - Data augmentation enhanced
 13. **CORE** - Consistency regularization

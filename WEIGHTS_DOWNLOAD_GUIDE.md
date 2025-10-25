@@ -1,241 +1,649 @@
-# VideoMAE Weights Download Guide
+# Model Weights Download Guide
 
-## 📥 Question 1: Where to download weights?
+## 🚀 Quick Reference (TL;DR)
 
-### ⚠️ Important Finding: VideoMAE Weights Not Available!
+For users who just want to get started quickly:
 
-**After checking DeepfakeBench GitHub Releases**:
+```bash
+# 1. Clone repository
+git clone https://github.com/lfpaaaaa/deepfake-detector.git
+cd deepfake-detector
+
+# 2. Download from Google Drive (in browser):
+#    https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing
+#    - TruFor_weights.zip (248.8 MB)
+#    - vendors.zip (1.1 GB)
+
+# 3. Move files to project directory and extract
+# (Adjust path to your Downloads folder)
+
+# Windows:
+Move-Item $HOME\Downloads\*.zip .
+Expand-Archive TruFor_weights.zip -DestinationPath . -Force
+Expand-Archive vendors.zip -DestinationPath . -Force
+
+# Linux/Mac:
+mv ~/Downloads/*.zip .
+unzip TruFor_weights.zip
+unzip vendors.zip
+
+# 4. Verify files
+ls -lh trufor.pth.tar  # Should show ~249 MB
+ls vendors/DeepfakeBench/training/weights/*.pth  # Should show 12 files
+
+# 5. Start Docker
+docker compose up -d --build
+
+# 6. Access application
+# http://localhost:8000/web/register.html (first time)
+# http://localhost:8000/web/login.html (login)
 ```
-https://github.com/SCLBD/DeepfakeBench/releases
-```
 
-**Results**:
-- ❌ v1.0.1 - Only weights for other detectors (xception, f3net, core, etc.), **NO VideoMAE**
-- ❌ v1.0.2 - Face X-ray related files
-- ❌ v1.0.3 - I3D related weights
-
-**Conclusion**: 
-DeepfakeBench has **NOT released** VideoMAE pretrained weights!
-
-### ✅ Only Available Solution: Hugging Face Model (Recommended)
-
-Since official weights are not provided, **you can only use Hugging Face model**:
-- Model will be automatically downloaded from internet
-- No manual operations needed
-- System is already configured, works out of the box
-
-### Why No VideoMAE Weights?
-
-Possible reasons:
-1. VideoMAE is a newer video detector
-2. Requires significant computational resources to train
-3. DeepfakeBench team hasn't released yet
-4. May need to train yourself (not recommended, requires large dataset and GPU)
+**Need details?** Read the full guide below ⬇️
 
 ---
 
-## 📁 Question 2: Where should it be placed?
+## 📥 Download Links
 
-### ❌ No Need to Manually Place Weights!
+**All model weights are hosted on Google Drive for easy access:**
 
-Since DeepfakeBench **doesn't provide** VideoMAE weights, you:
-- ❌ Don't need to download any files
-- ❌ Don't need to manually place weights
-- ✅ System will automatically use Hugging Face model
+🔗 **[Download All Models (Google Drive)](https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing)**
 
-**If weights become available in the future**, they should be placed at:
-```
-vendors/DeepfakeBench/training/weights/videomae_pretrained.pth
-```
+### Available Files:
+1. **TruFor_weights.zip** (248.8 MB)
+   - Contains: `trufor.pth.tar`
+   - For: Image forgery detection and localization
 
-But currently this file **doesn't exist and isn't needed**!
+2. **vendors.zip** (1.1 GB)
+   - Contains: Complete DeepfakeBench framework and 12 model weights
+   - For: Video deepfake detection with multiple models
 
----
-
-## 🤖 Question 3: What is Hugging Face Model?
-
-### Simple Explanation
-
-**Hugging Face** is an AI model sharing platform, similar to GitHub but specifically for AI models.
-
-### Its Role in This Project
-
-#### Comparison of Two Model Sources:
-
-| Feature | DeepfakeBench Weights (Local) | Hugging Face Model (Online) |
-|---------|------------------------------|----------------------------|
-| **Source** | Manual download from GitHub | Auto-download from internet |
-| **Training Data** | Specifically trained for deepfake detection | General video understanding tasks |
-| **Accuracy** | 🟢 High (specifically trained) | 🟡 Medium (general model) |
-| **Speed** | 🟢 Fast (local loading) | 🟡 First-time download needed |
-| **File Size** | ~350MB | ~350MB |
-| **Use Case** | ✅ Production environment | ⚠️ Testing/Development |
-
-### Detailed Explanation
-
-**1. DeepfakeBench Weights (Recommended for Production)**:
-```
-✅ Specifically trained for detecting deepfake videos
-✅ Trained on multiple deepfake datasets
-✅ Higher detection accuracy
-✅ This is the best model released by researchers
-```
-
-**2. Hugging Face Model (Temporary Solution)**:
-```
-⚠️ Base pretrained VideoMAE model
-⚠️ Originally for general video classification tasks (like action recognition)
-⚠️ Not fine-tuned for deepfake
-⚠️ Detection accuracy will be lower
-✅ But allows system to run
-```
-
-### How System Chooses
-
-The code I wrote follows this priority:
-
-```python
-1. First check: vendors/DeepfakeBench/training/weights/videomae_pretrained.pth
-   ├─ If exists → Use local DeepfakeBench weights ✅
-   └─ If not exists → Continue to next step
-
-2. Then try downloading from Hugging Face:
-   ├─ Access: MCG-NJU/videomae-base
-   ├─ Auto-download to cache
-   └─ Use Hugging Face model ⚠️
-```
-
-### Actual Difference Example
-
-Suppose analyzing a video containing deepfake:
-
-**Using DeepfakeBench Weights**:
-```
-Segment 1: 0:05-0:12, score: 0.87 (high confidence detection)
-Segment 2: 0:28-0:35, score: 0.92 (high confidence detection)
-Result: Accurately identifies deepfake segments
-```
-
-**Using Hugging Face Model**:
-```
-Segment 1: 0:05-0:12, score: 0.61 (medium confidence)
-Segment 2: 0:28-0:35, score: 0.68 (medium confidence)
-Result: May identify, but with lower confidence
-Or: May miss some segments
-```
+**Important:** These files are **NOT** included in `git clone` - they're in `.gitignore` to keep the repository small.
 
 ---
 
-## 🎯 My Recommendation
+## 🤖 Model Information
 
-### ✅ Only Option: Use Hugging Face Model
+### 1. TruFor Model
 
-**Since official VideoMAE weights are not provided, this is the only viable solution!**
+#### About
+- **Full Name**: TruFor - Improving Deepfake Detection via Transformer-based Fusion
+- **Developed by**: GRIP (Research Group on Image Processing) - University of Naples Federico II
+- **Official Repository**: https://github.com/grip-unina/TruFor
+- **Paper**: [TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection and Localization](https://arxiv.org/abs/2212.10957)
 
+#### What We Use
+- **Pre-trained weights**: `trufor.pth.tar`
+- **Source**: Provided by original authors
+- **License**: Check official repository
+- **Our Role**: **Integration only** - we did not train this model
+
+#### Capabilities
+- Pixel-level forgery localization
+- Confidence mapping
+- Noiseprint++ analysis
+- Works on images (JPG, PNG)
+
+---
+
+### 2. DeepfakeBench Models
+
+#### About
+- **Project**: DeepfakeBench - A Comprehensive Benchmark for Deepfake Detection
+- **Developed by**: SCLBD (Shenzhen Campus of  Learning and Big Data)
+- **Official Repository**: https://github.com/SCLBD/DeepfakeBench
+- **Paper**: [DeepfakeBench: A Comprehensive Benchmark of Deep Learning Methods for Deepfake Detection](https://arxiv.org/abs/2307.01426)
+
+#### What We Use
+- **12 Pre-trained Models** (V3.0):
+  1. Xception (299×299)
+  2. MesoNet-4 (256×256)
+  3. MesoNet-4 Inception (256×256)
+  4. F3Net (256×256)
+  5. EfficientNet-B4 (380×380)
+  6. Capsule Net (128×128)
+  7. SRM (256×256)
+  8. RECCE (224×224)
+  9. SPSL (224×224)
+  10. UCF (256×256)
+  11. CNN-AUG (224×224)
+  12. CORE (256×256)
+
+- **Source**: Provided by DeepfakeBench project
+- **License**: Check official repository
+- **Our Role**: **Integration only** - we did not train these models
+
+#### Capabilities
+- Frame-by-frame video analysis
+- Multi-model ensemble predictions
+- Suspicious segment detection
+- Works on videos (MP4, MOV, AVI)
+
+---
+
+## 📋 Complete Installation Guide
+
+### Understanding the Setup
+
+**Important Notes:**
+1. When you `git clone` the repository, model weights are **NOT included** (they're in `.gitignore`)
+2. The compressed files contain:
+   - `TruFor_weights.zip` → `trufor.pth.tar` (single file)
+   - `vendors.zip` → entire `vendors/` folder structure
+3. Extract these files **directly in the project root** before running Docker
+
+---
+
+### Step 1: Clone Repository
+
+```bash
+# Clone the project
+git clone https://github.com/lfpaaaaa/deepfake-detector.git
+
+# Navigate to project directory
+cd deepfake-detector
 ```
-Pros: 
-✅ No need to manually download weight files
-✅ System handles everything automatically
-✅ Can start testing immediately
-✅ Model from official Hugging Face
 
-Explanation:
-📝 This is VideoMAE's base pretrained model
-📝 Originally for video classification tasks
-📝 Can be used for deepfake detection, but accuracy may not be optimal
-📝 First run will auto-download (~350MB)
+**Current state:** You have the code, but **NO model weights yet**.
 
-Conclusion:
-✅ Fully functional, can perform video analysis
-⚠️ Detection accuracy may be lower than specifically trained model
-✅ Suitable for testing, development and general use
+---
+
+### Step 2: Download Model Weights
+
+**Visit Google Drive:**
+🔗 https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing
+
+**Download these two files to your Downloads folder:**
+- ✅ `TruFor_weights.zip` (248.8 MB)
+- ✅ `vendors.zip` (1.1 GB)
+
+**Total download size:** ~1.35 GB  
+**Time estimate:** 5-15 minutes depending on internet speed
+
+---
+
+### Step 3: Move Files to Project Directory
+
+Move the downloaded ZIP files into your project directory:
+
+#### Windows (PowerShell):
+```powershell
+# Navigate to project
+cd C:\path\to\deepfake-detector
+
+# Move files from Downloads (adjust path if needed)
+Move-Item $HOME\Downloads\TruFor_weights.zip .
+Move-Item $HOME\Downloads\vendors.zip .
 ```
 
-### ❌ Not Recommended: Train Weights Yourself
+#### Linux/Mac:
+```bash
+# Navigate to project
+cd /path/to/deepfake-detector
 
+# Move files from Downloads
+mv ~/Downloads/TruFor_weights.zip .
+mv ~/Downloads/vendors.zip .
 ```
-Difficulty: ⭐⭐⭐⭐⭐ Extremely High
-Cost: Requires significant GPU and time
-Data: Needs large-scale deepfake dataset
-Conclusion: Not suitable for individual users
+
+**Now you should have:**
+```
+deepfake-detector/
+├── TruFor_weights.zip    ← Downloaded file
+├── vendors.zip           ← Downloaded file
+├── app/
+├── configs/
+├── docker-compose.yml
+└── ...
 ```
 
 ---
 
-## 📝 Usage Steps Summary
+### Step 4: Extract Files
 
-### Quick Start Guide (Using Hugging Face)
+**⚠️ IMPORTANT: Extract in the PROJECT ROOT directory (where docker-compose.yml is)**
+
+#### Windows (PowerShell):
 
 ```powershell
-# 1. Confirm service is running
-# Your service is already running: http://localhost:8000
+# Make sure you're in project root
+cd C:\path\to\deepfake-detector
 
-# 2. Test VideoMAE model loading
-python scripts/test_with_huggingface.py
-# First run will auto-download model (~350MB)
+# Extract TruFor weights
+Expand-Archive -Path "TruFor_weights.zip" -DestinationPath "." -Force
+# This creates: trufor.pth.tar
 
-# 3. Test video analysis
-# Method A: Use browser
-# Visit: http://localhost:8000/docs
-# Find POST /video/analyze
-# Upload video to test
+# Extract vendors folder
+Expand-Archive -Path "vendors.zip" -DestinationPath "." -Force
+# This creates: vendors/ folder
 
-# Method B: Use test script (need to upload video first)
-powershell -ExecutionPolicy Bypass -File scripts/test_video_api.ps1
-
-# 4. View results
-# System will return:
-# - timeline.json: Complete analysis results
-# - segments: Detected suspicious segments
-# - keyframes: Keyframe images
+# Optional: Delete ZIP files after extraction
+Remove-Item TruFor_weights.zip
+Remove-Item vendors.zip
 ```
 
-### ❌ Not Needed Steps
+#### Linux/Mac:
 
-```
-❌ No need to download weights from GitHub
-❌ No need to manually place files
-❌ No need to configure paths
-✅ Everything is automatically configured!
+```bash
+# Make sure you're in project root
+cd /path/to/deepfake-detector
+
+# Extract TruFor weights
+unzip TruFor_weights.zip
+# This creates: trufor.pth.tar
+
+# Extract vendors folder
+unzip vendors.zip
+# This creates: vendors/ folder
+
+# Optional: Delete ZIP files after extraction
+rm TruFor_weights.zip vendors.zip
 ```
 
 ---
 
-## ❓ Frequently Asked Questions
+### Step 5: Verify Directory Structure
 
-### Q1: Why can't I find VideoMAE weight files?
-A: Because DeepfakeBench official has **NOT released** VideoMAE pretrained weights!
+**After extraction, your directory should look like this:**
 
-### Q2: What to do without weight files?
-A: Use Hugging Face model (system is configured, auto-used)
+```
+deepfake-detector/
+├── trufor.pth.tar              ← TruFor model (249 MB) ✅
+├── vendors/                    ← DeepfakeBench folder ✅
+│   └── DeepfakeBench/
+│       ├── analysis/
+│       ├── preprocessing/
+│       ├── tools/
+│       └── training/
+│           ├── config/
+│           ├── dataset/
+│           ├── detectors/
+│           ├── networks/
+│           └── weights/        ← Model weights here ✅
+│               ├── xception_best.pth
+│               ├── meso4_best.pth
+│               ├── meso4Incep_best.pth
+│               ├── f3net_best.pth
+│               ├── effnb4_best.pth
+│               ├── capsule_best.pth
+│               ├── srm_best.pth
+│               ├── recce_best.pth
+│               ├── spsl_best.pth
+│               ├── ucf_best.pth
+│               ├── cnnaug_best.pth
+│               └── core_best.pth
+├── app/
+├── configs/
+├── data/
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
+└── ...
+```
 
-### Q3: How is Hugging Face model's performance?
-A: Works normally, but accuracy may be lower than specifically trained model
+**Run verification commands:**
 
-### Q4: Can I always use Hugging Face model?
-A: **Yes!** This is currently the **only available** solution
+#### Windows (PowerShell):
+```powershell
+# Check TruFor exists
+Get-Item trufor.pth.tar
+# Should show: ~249 MB
 
-### Q5: Does first-time use require download?
-A: Yes, first run will auto-download approximately 350MB model file
+# Count DeepfakeBench weights
+(Get-ChildItem vendors\DeepfakeBench\training\weights\*.pth).Count
+# Should show: 12
+```
 
-### Q6: Need internet connection?
-A: First-time use requires internet to download model, then cached locally
+#### Linux/Mac:
+```bash
+# Check TruFor exists
+ls -lh trufor.pth.tar
+# Should show: ~249 MB
 
-### Q7: How to know which model system is using?
-A: Run `python scripts/test_with_huggingface.py` to see details
+# Count DeepfakeBench weights
+ls vendors/DeepfakeBench/training/weights/*.pth | wc -l
+# Should show: 12
+```
+
+✅ **If both checks pass, you're ready for Docker!**
 
 ---
 
-## 🔗 Related Links
+### Step 6: Start with Docker
 
-- **DeepfakeBench GitHub**: https://github.com/SCLBD/DeepfakeBench
-- **DeepfakeBench Releases**: https://github.com/SCLBD/DeepfakeBench/releases
-- **Hugging Face VideoMAE**: https://huggingface.co/MCG-NJU/videomae-base
-- **VideoMAE Paper**: https://arxiv.org/abs/2203.12602
+#### First Time Setup:
+
+```bash
+# Build and start container
+docker compose up -d --build
+```
+
+**What happens:**
+1. Docker builds the image (~5-10 minutes first time)
+2. Copies `trufor.pth.tar` into container
+3. Copies `vendors/` folder into container
+4. Installs all Python dependencies
+5. Starts FastAPI server on port 8000
+
+**Wait for startup:**
+```bash
+# Monitor startup progress
+docker compose logs -f
+
+# Look for this message:
+# "INFO:     Application startup complete."
+# "INFO:     Uvicorn running on http://0.0.0.0:8000"
+```
+
+Press `Ctrl+C` to stop viewing logs (container keeps running)
 
 ---
 
-**Need Help?** 
-- If you encounter download issues, let me know
-- If you want to test with Hugging Face model first, you can start directly
+### Step 7: Access the Application
 
+**Open your browser:**
+
+1. **First-time users - Register:**
+   ```
+   http://localhost:8000/web/register.html
+   ```
+   - Create username and password
+   - Click "Register"
+
+2. **Login:**
+   ```
+   http://localhost:8000/web/login.html
+   ```
+   - Enter your credentials
+   - Session valid for 24 hours
+
+3. **Start detecting:**
+   - Main Page: `http://localhost:8000/web/index_main.html`
+   - DeepfakeBench: `http://localhost:8000/web/deepfakebench.html`
+   - History: `http://localhost:8000/web/history.html`
+
+---
+
+### Step 8: Stop Docker (When Done)
+
+```bash
+# Stop container (preserves data)
+docker compose down
+
+# Stop and remove all data
+docker compose down -v
+```
+
+---
+
+### Step 9: Restart Docker (Next Time)
+
+```bash
+# Just start (no rebuild needed if no code changes)
+docker compose up -d
+
+# Rebuild if you updated code
+docker compose up -d --build
+```
+
+---
+
+## 🐳 Docker Usage Details
+
+### Understanding Docker Commands
+
+**First Time (or after code changes):**
+```bash
+docker compose up -d --build
+```
+- `up`: Start the container
+- `-d`: Run in background (detached mode)
+- `--build`: Rebuild the image (includes new code/weights)
+
+**Regular Start (weights/code unchanged):**
+```bash
+docker compose up -d
+```
+- Faster, uses existing image
+
+**View Logs:**
+```bash
+# Follow logs in real-time
+docker compose logs -f
+
+# View last 100 lines
+docker compose logs --tail 100
+
+# View specific service logs
+docker compose logs -f deepfake-detector
+```
+
+**Stop Container:**
+```bash
+# Stop but keep data
+docker compose down
+
+# Stop and remove volumes (clears all data)
+docker compose down -v
+```
+
+**Rebuild from Scratch:**
+```bash
+# Remove old images and rebuild
+docker compose down
+docker system prune -f
+docker compose up -d --build
+```
+
+### LAN Access (Access from Other Devices)
+
+The container is configured for LAN access by default:
+
+**In `docker-compose.yml`:**
+```yaml
+ports:
+  - "8000:8000"  # Exposes to all network interfaces
+environment:
+  - HOST=0.0.0.0  # Listens on all IPs
+```
+
+**Access from other devices:**
+1. Find your computer's IP:
+   ```bash
+   # Windows
+   ipconfig
+   # Look for "IPv4 Address"
+   
+   # Linux/Mac
+   ifconfig
+   # Look for "inet" address
+   ```
+
+2. On other device (phone/tablet/another computer):
+   ```
+   http://YOUR_IP:8000/web/login.html
+   ```
+   Example: `http://192.168.1.100:8000/web/login.html`
+
+**Firewall Note:** Make sure port 8000 is allowed in your firewall.
+
+### Docker Troubleshooting
+
+**Container won't start:**
+```bash
+# Check container status
+docker compose ps
+
+# Check detailed logs
+docker compose logs
+
+# Restart container
+docker compose restart
+```
+
+**Models not loading:**
+```bash
+# Check if files exist IN container
+docker compose exec deepfake-detector ls -lh /app/trufor.pth.tar
+docker compose exec deepfake-detector ls /app/vendors/DeepfakeBench/training/weights/
+
+# If missing, files weren't copied during build
+# Solution: Make sure files exist on host, then rebuild
+docker compose down
+docker compose up -d --build
+```
+
+**Out of disk space:**
+```bash
+# Clean up old Docker data
+docker system prune -a
+
+# Remove unused images
+docker image prune -a
+```
+
+**Note**: The `.dockerignore` file is configured to **NOT** ignore model files during build, so they will be copied into the container.
+
+---
+
+## 🔍 Model Weight Details
+
+### TruFor Model File
+
+| Property | Value |
+|----------|-------|
+| Filename | `trufor.pth.tar` |
+| Size | ~249 MB |
+| Format | PyTorch checkpoint |
+| Location | Project root |
+| Required for | Image detection |
+
+### DeepfakeBench Weight Files
+
+| Model | Filename | Size | Input Size |
+|-------|----------|------|------------|
+| Xception | `xception_best.pth` | ~85 MB | 299×299 |
+| MesoNet-4 | `meso4_best.pth` | ~2 MB | 256×256 |
+| MesoNet-4 Inception | `meso4Incep_best.pth` | ~3 MB | 256×256 |
+| F3Net | `f3net_best.pth` | ~90 MB | 256×256 |
+| EfficientNet-B4 | `effnb4_best.pth` | ~70 MB | 380×380 |
+| Capsule Net | `capsule_best.pth` | ~10 MB | 128×128 |
+| SRM | `srm_best.pth` | ~90 MB | 256×256 |
+| RECCE | `recce_best.pth` | ~85 MB | 224×224 |
+| SPSL | `spsl_best.pth` | ~85 MB | 224×224 |
+| UCF | `ucf_best.pth` | ~90 MB | 256×256 |
+| CNN-AUG | `cnnaug_best.pth` | ~85 MB | 224×224 |
+| CORE | `core_best.pth` | ~85 MB | 256×256 |
+
+**Total DeepfakeBench weights**: ~780 MB
+
+---
+
+## ⚠️ Important Notes
+
+### License and Usage
+
+1. **TruFor Model**
+   - Developed by GRIP-UNINA
+   - Check license at: https://github.com/grip-unina/TruFor
+   - Cite the original paper if using in research
+
+2. **DeepfakeBench Models**
+   - Developed by SCLBD
+   - Check license at: https://github.com/SCLBD/DeepfakeBench
+   - Cite the original paper if using in research
+
+### Our Integration
+
+**We only integrated these models into our system. We did NOT:**
+- Train any of these models
+- Modify the model architectures
+- Create the training datasets
+- Claim ownership of the models
+
+**All credit goes to the original authors and research teams.**
+
+### Citations
+
+If you use this system in your research, please cite:
+
+**TruFor:**
+```bibtex
+@article{guillaro2023trufor,
+  title={TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection and Localization},
+  author={Guillaro, Fabrizio and Cozzolino, Davide and Sud, Avneesh and Dufour, Nicholas and Verdoliva, Luisa},
+  journal={arXiv preprint arXiv:2212.10957},
+  year={2023}
+}
+```
+
+**DeepfakeBench:**
+```bibtex
+@article{yan2023deepfakebench,
+  title={DeepfakeBench: A Comprehensive Benchmark of Deep Learning Methods for Deepfake Detection},
+  author={Yan, Zhiyuan and Zhang, Yong and Fan, Yanbo and Wu, Baoyuan},
+  journal={arXiv preprint arXiv:2307.01426},
+  year={2023}
+}
+```
+
+---
+
+## 🆘 Troubleshooting
+
+### Problem: Download fails from Google Drive
+
+**Solution**:
+- Google Drive may have download limits
+- Try downloading at a different time
+- Use "Download All" and extract locally
+
+### Problem: "Model not found" error
+
+**Checklist**:
+- [ ] TruFor: Check `trufor.pth.tar` is in project root
+- [ ] DeepfakeBench: Check `vendors/DeepfakeBench/training/weights/*.pth` exist
+- [ ] Verify file names match exactly (case-sensitive)
+- [ ] Check file sizes match expected values
+
+### Problem: Docker build doesn't include weights
+
+**Solution**:
+```bash
+# Make sure files exist before building
+ls -lh trufor.pth.tar
+ls vendors/DeepfakeBench/training/weights/
+
+# Rebuild with --no-cache
+docker compose build --no-cache
+docker compose up -d
+```
+
+### Problem: Out of disk space
+
+**Requirements**:
+- TruFor: 250 MB
+- DeepfakeBench: 1.1 GB (compressed), ~800 MB (extracted weights)
+- **Total**: ~1.5 GB minimum
+
+---
+
+## 📞 Need Help?
+
+1. **Check the official repositories:**
+   - TruFor: https://github.com/grip-unina/TruFor
+   - DeepfakeBench: https://github.com/SCLBD/DeepfakeBench
+
+2. **Read our documentation:**
+   - [README.md](README.md) - Project overview
+   - [MODEL_SETUP.md](docs/MODEL_SETUP.md) - Model configuration
+   - [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md) - DeepfakeBench usage
+
+3. **Contact:**
+   - Project Maintainer: Xiyu Guan (xiyug@student.unimelb.edu.au)
+
+---
+
+**Last Updated**: October 25, 2025  
+**Document Version**: 3.0  
+**Download Link**: https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing

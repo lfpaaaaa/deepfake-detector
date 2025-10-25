@@ -1,6 +1,6 @@
 """
 DeepfakeBench Adapter for Web API
-Provides unified interface for 13 DeepfakeBench models
+Provides unified interface for 12 DeepfakeBench models
 """
 
 import os
