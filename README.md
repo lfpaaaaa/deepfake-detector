@@ -276,7 +276,7 @@ python tools/aggregate_runs.py --root runs/image_infer --out summary.csv
   - Location: `vendors/DeepfakeBench/training/weights/`
   - Models: `xception_best.pth`, `meso4_best.pth`, `f3net_best.pth`, etc.
 
-See [MODEL_SETUP.md](MODEL_SETUP.md) for detailed setup instructions and [TRUFOR_TECHNICAL_GUIDE.md](TRUFOR_TECHNICAL_GUIDE.md) for technical implementation details.
+See [MODEL_SETUP.md](docs/MODEL_SETUP.md) for detailed setup instructions and [TRUFOR_TECHNICAL_GUIDE.md](docs/TRUFOR_TECHNICAL_GUIDE.md) for technical implementation details.
 
 For DeepfakeBench frame-level detection:
 - **Quick Start**: [QUICK_START.md](QUICK_START.md)
