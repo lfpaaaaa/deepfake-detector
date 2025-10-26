@@ -86,7 +86,10 @@ docker compose up -d --build
 ### 2.6 UI Documentation
 | Document | Purpose | Location |
 |----------|---------|----------|
-| UI Features | Frontend feature list | [UI_FEATURES.md](../UI_FEATURES.md) |
+| UI Features | Frontend feature list & guide | [UI_FEATURES.md](ui/UI_FEATURES.md) |
+| UI Screenshots Index | Categorized screenshot documentation | [ui/README.md](ui/README.md) |
+| Desktop Screenshots | 16 PNG files (full desktop UI) | [ui/](ui/) (20-35.png) |
+| Mobile Screenshots | 16 JPG files (responsive mobile UI) | [ui/](ui/) (36-51.jpg) |
 
 ---
 
@@ -254,6 +257,9 @@ docker compose logs -f
 - [ ] Demonstrate system setup (Docker)
 - [ ] Show key features (detection workflows)
 - [ ] Review [architecture diagrams](architecture/v3_domain_model_diagram.md)
+- [ ] Review [UI screenshots](ui/) - 32 screenshots (16 desktop + 16 mobile)
+  - Desktop experience (PNG 20-35)
+  - Mobile responsive design (JPG 36-51)
 - [ ] Explain [testing strategy](testing/README.md)
 - [ ] Discuss [known issues](#51-active-bugs) and workarounds
 
