@@ -24,8 +24,8 @@ The Deepfake Detector is a production-ready web application for detecting manipu
 **Essential Reading Order**:
 1. **Start Here**: [README.md](../README.md) - System overview and quick start
 2. **Setup**: [WEIGHTS_DOWNLOAD_GUIDE.md](../WEIGHTS_DOWNLOAD_GUIDE.md) - Download and setup model weights
-3. **Architecture**: [docs/architecture/v3_domain_model_diagram.md](architecture/v3_domain_model_diagram.md) - System design
-4. **Testing**: [docs/testing/README.md](testing/README.md) - Testing strategy and results
+3. **Architecture**: [V3 Domain Model](architecture/v3_domain_model_diagram.md) - System design
+4. **Testing**: [Testing README](testing/README.md) - Testing strategy and results
 
 **Quick Commands**:
 ```bash
@@ -54,22 +54,22 @@ docker compose up -d --build
 ### 2.2 Architecture & Design
 | Document | Purpose | Location |
 |----------|---------|----------|
-| V3 Domain Model | Current system architecture | [docs/architecture/v3_domain_model_diagram.md](architecture/v3_domain_model_diagram.md) |
-| V3 Sequence Diagram | System interaction flows | [docs/architecture/v3_sequence_diagram.md](architecture/v3_sequence_diagram.md) |
+| V3 Domain Model | Current system architecture | [v3_domain_model_diagram.md](architecture/v3_domain_model_diagram.md) |
+| V3 Sequence Diagram | System interaction flows | [v3_sequence_diagram.md](architecture/v3_sequence_diagram.md) |
 | Upgrade Summary | V1.0 → V2.0 changes | [UPGRADE_SUMMARY_V2.md](../UPGRADE_SUMMARY_V2.md) |
 
 ### 2.3 User Research & Requirements
 | Document | Purpose | Location |
 |----------|---------|----------|
-| User Stories | User requirements | [docs/usecases/](usecases/) |
-| Personas | Target user profiles | [docs/usecases/personas.md](usecases/personas.md) |
-| Meeting Notes | Client meetings | [docs/meetings/](meetings/) |
+| User Stories | User requirements | [usecases/](usecases/) |
+| Personas | Target user profiles | [personas.md](usecases/personas.md) |
+| Meeting Notes | Client meetings | [meetings/](meetings/) |
 
 ### 2.4 Technical Guides
 | Document | Purpose | Location |
 |----------|---------|----------|
-| TruFor Guide | TruFor integration details | [docs/TRUFOR_TECHNICAL_GUIDE.md](TRUFOR_TECHNICAL_GUIDE.md) |
-| Model Setup | DeepfakeBench setup | [docs/MODEL_SETUP.md](MODEL_SETUP.md) |
+| TruFor Guide | TruFor integration details | [TRUFOR_TECHNICAL_GUIDE.md](TRUFOR_TECHNICAL_GUIDE.md) |
+| Model Setup | DeepfakeBench setup | [MODEL_SETUP.md](MODEL_SETUP.md) |
 | Frame Inference | Video frame processing | [FRAME_INFERENCE_SETUP.md](../FRAME_INFERENCE_SETUP.md) |
 | DeepfakeBench Quick Start | DeepfakeBench usage | [DeepfakeBench_QUICK_START.md](../DeepfakeBench_QUICK_START.md) |
 | Batch Processing | Batch detection guide | [BATCH_PROCESSING_GUIDE.md](../BATCH_PROCESSING_GUIDE.md) |
@@ -77,11 +77,11 @@ docker compose up -d --build
 ### 2.5 Testing Documentation
 | Document | Purpose | Location |
 |----------|---------|----------|
-| Testing Overview | Complete testing strategy | [docs/testing/README.md](testing/README.md) |
-| Test Cases | All 28 test scenarios | [docs/testing/TEST_CASES.md](testing/TEST_CASES.md) |
-| Cycle 1 Report | Automated tests (67 tests) | [docs/testing/test_reports/cycle_1_report.md](testing/test_reports/cycle_1_report.md) |
-| Cycle 2 Report | Manual tests (42 tests) | [docs/testing/test_reports/cycle_2_report.md](testing/test_reports/cycle_2_report.md) |
-| Test Plans | Cycle-specific test plans | [docs/testing/test_plans/](testing/test_plans/) |
+| Testing Overview | Complete testing strategy | [testing/README.md](testing/README.md) |
+| Test Cases | All 28 test scenarios | [TEST_CASES.md](testing/TEST_CASES.md) |
+| Cycle 1 Report | Automated tests (67 tests) | [cycle_1_report.md](testing/test_reports/cycle_1_report.md) |
+| Cycle 2 Report | Manual tests (42 tests) | [cycle_2_report.md](testing/test_reports/cycle_2_report.md) |
+| Test Plans | Cycle-specific test plans | [test_plans/](testing/test_plans/) |
 
 ### 2.6 UI Documentation
 | Document | Purpose | Location |
@@ -148,7 +148,7 @@ pytest --cov=app --cov-report=html
 pytest tests/test_auth.py
 ```
 
-See [docs/testing/README.md](testing/README.md) for complete testing guide.
+See [testing/README.md](testing/README.md) for complete testing guide.
 
 ### 4.2 CI/CD Pipeline
 - **Platform**: GitHub Actions
@@ -190,7 +190,7 @@ docker compose logs -f
 | BUG-010 | High | Invalid token doesn't redirect | Clear localStorage |
 | BUG-011 | Medium | UI breaks with F12 DevTools | Refresh page |
 
-**Full Details**: [docs/testing/test_reports/cycle_2_report.md](testing/test_reports/cycle_2_report.md) - Section 9
+**Full Details**: [cycle_2_report.md](testing/test_reports/cycle_2_report.md) - Section 9
 
 ### 5.2 Limitations
 - Single-user deployments only (no multi-tenancy)
@@ -227,7 +227,7 @@ docker compose logs -f
 ✅ Edge cases (invalid files, special characters, large files)  
 ✅ UI tests (mobile responsive, navigation)  
 
-**Complete Details**: [docs/testing/README.md](testing/README.md)
+**Complete Details**: [testing/README.md](testing/README.md)
 
 ---
 
