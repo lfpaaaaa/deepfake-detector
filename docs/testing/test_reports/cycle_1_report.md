@@ -793,7 +793,7 @@ python tests/manual/model_loading.py    # Model loading verification
 ### Appendix C: Related Documentation
 
 **Test Documentation**:
-- [Test Cases](../test_cases.md) - All test scenarios
+- [Test Cases](../TEST_CASES.md) - All test scenarios
 - [Test Plan Cycle 1](../test_plans/cycle_1_basic_functionality.md) - Test plan
 - [Testing README](../README.md) - Testing overview
 
