@@ -7,7 +7,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Optional, Dict
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 

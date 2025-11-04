@@ -1,117 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <!-- Version: 3.0.0 - Mobile-first UI Refresh -->
+    <!-- Version: 3.1.0 - Fixed Navigation & Spacing -->
     <title>DeepfakeBench Video Analysis</title>
-    <link rel="stylesheet" href="/web/css/app.css">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ========== CSS Reset & Base ========== */
         * { box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
+            margin: 0;
             padding: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            width: 100%;
             /* iOS safe-area support */
             padding-bottom: env(safe-area-inset-bottom);
+            /* Force scrollbar to prevent layout shift */
+            overflow-y: scroll;
+            overflow-x: hidden;
         }
         
-        /* ========== Navigation with Drawer ========== */
-        .navbar {
-            background: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            /* Safe-area for notch */
-            padding-top: env(safe-area-inset-top);
-        }
-        
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 12px 16px;
-            position: relative;
-        }
-        
-        .nav-brand {
-            font-size: 20px;
-            font-weight: 700;
-            color: #111827;
-            text-decoration: none;
-            z-index: 1;
-        }
-        
-        /* Desktop nav links */
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .nav-link {
-            padding: 10px 14px;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #111827;
-            transition: all 0.2s;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            /* Minimum touch target */
-            min-height: 44px;
-        }
-        
-        .nav-link:hover {
-            background: #f3f4f6;
-        }
-        
-        .nav-link.active {
-            background: #1f2937;
-            color: #fff;
-        }
-        
-        .nav-link:focus-visible {
-            outline: 3px solid #667eea;
-            outline-offset: 2px;
-        }
-        
-        /* Hamburger menu button */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: background 0.2s;
-            min-width: 44px;
-            min-height: 44px;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .menu-toggle:hover {
-            background: #f3f4f6;
-        }
-        
-        .menu-toggle:focus-visible {
-            outline: 3px solid #667eea;
-            outline-offset: 2px;
-        }
+        /* ========== Mobile Drawer Styles (DaisyUI navbar is used for desktop) ========== */
         
         /* Mobile drawer overlay */
         .drawer-overlay {
@@ -128,7 +45,7 @@
         }
         
         /* Mobile drawer panel */
-        .drawer {
+        .mobile-drawer {
             display: none;
             position: fixed;
             top: 0;
@@ -145,7 +62,7 @@
             transition: transform 0.3s ease-out;
         }
         
-        .drawer.show {
+        .mobile-drawer.show {
             display: block;
             transform: translateX(0);
         }
@@ -200,16 +117,31 @@
             font-size: 16px;
         }
         
+        /* Prevent scroll when drawer open */
+        body.drawer-open {
+            overflow: hidden;
+        }
+        
+        /* Landscape mode centering fix for tablets/phones */
+        @media (max-width: 1023px) and (orientation: landscape) {
+            .main-content {
+                margin-left: auto !important;
+                margin-right: auto !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+                display: flex !important;
+                justify-content: center !important;
+            }
+            
+            .container {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                max-width: 100% !important;
+            }
+        }
+        
         /* Mobile styles */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .menu-toggle {
-                display: flex;
-            }
-            
             .main-content {
                 padding: 16px !important;
             }
@@ -217,28 +149,29 @@
             .container {
                 padding: 20px !important;
             }
-            
-            /* Prevent scroll when drawer open */
-            body.drawer-open {
-                overflow: hidden;
-            }
         }
         
         /* ========== Hero Section ========== */
         .main-content {
-            padding: 20px;
+            padding: 12px 20px 20px 20px; /* Reduced top padding */
+            max-width: 1200px;
+            margin: 0 auto;
+            width: calc(100% - 40px);
         }
         
         .container {
             background: white;
             border-radius: 12px;
-            padding: 30px;
+            padding: 16px 30px 30px 30px; /* Unified top padding */
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            margin: 0 auto;
         }
         
         h1 {
             color: #1f2937;
             text-align: center;
+            margin-top: 0; /* Clear default top margin */
             margin-bottom: 8px;
             font-size: 32px;
             font-weight: 800;
@@ -1224,44 +1157,43 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar with Drawer -->
-    <nav class="navbar" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="/web/index_main.html" class="nav-brand" aria-label="Deepfake Detector Home">🎭 Deepfake Detector</a>
-            
-            <!-- Hamburger menu button (mobile only) -->
+    <!-- Navigation Bar -->
+    <div class="navbar bg-base-100 shadow-lg" role="navigation" aria-label="Main navigation">
+        <div class="flex-1">
+            <a href="/web/index_main.html" class="btn btn-ghost normal-case text-xl" aria-label="Deepfake Detector Home">🎭 Deepfake Detector</a>
+        </div>
+        <!-- Desktop menu -->
+        <div class="hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="/web/index_main.html">🏠 Home</a></li>
+                <li><a href="/web/index.html">🖼️ Images (TruFor)</a></li>
+                <li><a href="/web/deepfakebench.html" class="active" aria-current="page">🎬 Video (DeepfakeBench)</a></li>
+                
+                <li id="nav-history-li" style="display: none;"><a href="/web/history.html" id="nav-history">📜 History</a></li>
+                <li id="nav-login-li" style="display: none;"><a href="/web/login.html" id="nav-login">Login</a></li>
+                <li id="nav-register-li" style="display: none;"><a href="/web/register.html" id="nav-register">Register</a></li>
+                <li id="nav-logout-li" style="display: none;"><a href="#" id="nav-logout">Logout</a></li>
+            </ul>
+        </div>
+        <!-- Mobile hamburger -->
+        <div class="lg:hidden">
             <button 
-                id="menuBtn" 
-                class="menu-toggle" 
+                id="menuToggle" 
+                class="btn btn-ghost" 
                 aria-label="Open navigation menu"
                 aria-expanded="false"
-                aria-controls="drawer">
+                aria-controls="mobileDrawer"
+                style="font-size: 24px; color: #111827;">
                 ☰
             </button>
-            
-            <!-- Desktop nav links -->
-            <div class="nav-links" aria-label="Desktop navigation">
-                <a href="/web/index_main.html" class="nav-link">
-                    <span aria-hidden="true">🏠</span>
-                    <span>Home</span>
-                </a>
-                <a href="/web/index.html" class="nav-link">
-                    <span aria-hidden="true">🖼️</span>
-                    <span>Images (TruFor)</span>
-                </a>
-                <a href="/web/deepfakebench.html" class="nav-link active" aria-current="page">
-                    <span aria-hidden="true">🎬</span>
-                    <span>Video (DeepfakeBench)</span>
-                </a>
-            </div>
         </div>
-    </nav>
+    </div>
     
     <!-- Mobile Drawer Overlay -->
     <div id="drawerOverlay" class="drawer-overlay" aria-hidden="true"></div>
     
     <!-- Mobile Drawer -->
-    <aside id="drawer" class="drawer" role="dialog" aria-labelledby="drawerTitle" aria-modal="true">
+    <aside id="mobileDrawer" class="mobile-drawer" role="dialog" aria-labelledby="drawerTitle" aria-modal="true">
         <div class="drawer-header">
             <h2 id="drawerTitle" class="drawer-title">Navigation</h2>
             <button 
@@ -1283,6 +1215,23 @@
             <a href="/web/deepfakebench.html" class="nav-link active" aria-current="page">
                 <span aria-hidden="true">🎬</span>
                 <span>Video (DeepfakeBench)</span>
+            </a>
+
+            <a href="/web/history.html" class="nav-link" id="nav-mobile-history" style="display: none;">
+                <span aria-hidden="true">📜</span>
+                <span>History</span>
+            </a>
+            <a href="/web/login.html" class="nav-link" id="nav-mobile-login" style="display: none;">
+                <span aria-hidden="true">→</span>
+                <span>Login</span>
+            </a>
+            <a href="/web/register.html" class="nav-link" id="nav-mobile-register" style="display: none;">
+                <span aria-hidden="true">✎</span>
+                <span>Register</span>
+            </a>
+            <a href="#" class="nav-link" id="nav-mobile-logout" style="display: none;">
+                <span aria-hidden="true">←</span>
+                <span>Logout</span>
             </a>
         </nav>
     </aside>
@@ -1492,8 +1441,8 @@
     <script>
         // ========== Navigation Drawer Logic ==========
         (function() {
-            const menuBtn = document.getElementById('menuBtn');
-            const drawer = document.getElementById('drawer');
+            const menuBtn = document.getElementById('menuToggle');
+            const drawer = document.getElementById('mobileDrawer');
             const drawerOverlay = document.getElementById('drawerOverlay');
             const drawerCloseBtn = document.getElementById('drawerCloseBtn');
             const body = document.body;
@@ -2534,6 +2483,73 @@
         
         // ========== Initialize ==========
         loadModels();
+
+        // ========== Navigation Bar Authentication State Management ==========
+        (function() {
+            const token = localStorage.getItem('access_token');
+            
+            // Desktop nav elements
+            const historyLi = document.getElementById('nav-history-li');
+            const loginLi = document.getElementById('nav-login-li');
+            const registerLi = document.getElementById('nav-register-li');
+            const logoutLi = document.getElementById('nav-logout-li');
+            const logoutBtn = document.getElementById('nav-logout');
+            
+            // Mobile nav elements
+            const mobileHistoryLink = document.getElementById('nav-mobile-history');
+            const mobileLoginLink = document.getElementById('nav-mobile-login');
+            const mobileRegisterLink = document.getElementById('nav-mobile-register');
+            const mobileLogoutLink = document.getElementById('nav-mobile-logout');
+
+            if (token) {
+                // User is logged in - show History and Logout
+                if (historyLi) historyLi.style.display = 'block';
+                if (logoutLi) logoutLi.style.display = 'block';
+                if (loginLi) loginLi.style.display = 'none';
+                if (registerLi) registerLi.style.display = 'none';
+
+                if (mobileHistoryLink) mobileHistoryLink.style.display = 'flex';
+                if (mobileLogoutLink) mobileLogoutLink.style.display = 'flex';
+                if (mobileLoginLink) mobileLoginLink.style.display = 'none';
+                if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
+
+                // Logout handler
+                const handleLogout = async (e) => {
+                    e.preventDefault();
+                    
+                    try {
+                        await fetch('/api/auth/logout', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Logout API call failed:', error);
+                    }
+
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/web/login.html';
+                };
+
+                // Bind logout events
+                if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+                if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', handleLogout);
+
+            } else {
+                // User is not logged in - show Login and Register
+                if (historyLi) historyLi.style.display = 'none';
+                if (logoutLi) logoutLi.style.display = 'none';
+                if (loginLi) loginLi.style.display = 'block';
+                if (registerLi) registerLi.style.display = 'block';
+
+                if (mobileHistoryLink) mobileHistoryLink.style.display = 'none';
+                if (mobileLogoutLink) mobileLogoutLink.style.display = 'none';
+                if (mobileLoginLink) mobileLoginLink.style.display = 'flex';
+                if (mobileRegisterLink) mobileRegisterLink.style.display = 'flex';
+            }
+        })();
     </script>
     
     <!-- Model Detail Modal -->

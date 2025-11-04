@@ -6,7 +6,7 @@ Manages detection job history with user isolation
 import json
 import shutil
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Dict, Optional
 from datetime import datetime
 
 
@@ -137,7 +137,7 @@ class HistoryManager:
         all_jobs = []
 
         # Scan all job directories
-        for job_dir in sorted(self.data_dir.iterdir(), reverse=True):
+        for job_dir in self.data_dir.iterdir():
             if not job_dir.is_dir():
                 continue
 
@@ -167,6 +167,9 @@ class HistoryManager:
             }
 
             all_jobs.append(job_summary)
+
+        # Sort by created_at timestamp (newest first)
+        all_jobs.sort(key=lambda x: x["created_at"], reverse=True)
 
         # Apply pagination
         total = len(all_jobs)

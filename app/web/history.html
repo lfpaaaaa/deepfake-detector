@@ -148,11 +148,19 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
+        /* History Table Container for horizontal scroll */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
         /* History Table */
         .history-table {
             width: 100%;
+            min-width: 800px;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         .history-table thead {
@@ -323,8 +331,8 @@
 
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
-            /* Hide desktop table */
-            .history-table {
+            /* Hide desktop table container */
+            .table-container {
                 display: none;
             }
 
@@ -583,42 +591,44 @@
                     return;
                 }
 
-                // Desktop table view
+                // Desktop table view (with horizontal scroll container)
                 const tableHTML = `
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Filename</th>
-                                <th>Type</th>
-                                <th>Model</th>
-                                <th>Status</th>
-                                <th>Verdict</th>
-                                <th>Score</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.jobs.map(job => `
+                    <div class="table-container">
+                        <table class="history-table">
+                            <thead>
                                 <tr>
-                                    <td>${job.filename}</td>
-                                    <td>${job.detection_type}</td>
-                                    <td>${job.model || '-'}</td>
-                                    <td><span class="status-badge status-${job.status}">${job.status}</span></td>
-                                    <td>${job.verdict ? `<span class="verdict-badge verdict-${job.verdict}">${job.verdict}</span>` : '-'}</td>
-                                    <td>${job.score ? (job.score * 100).toFixed(1) + '%' : '-'}</td>
-                                    <td>${new Date(job.created_at).toLocaleString()}</td>
-                                    <td>
-                                        ${job.status === 'completed' ? `
-                                            <button class="action-btn" onclick="downloadPDF('${job.job_id}')">PDF</button>
-                                            <button class="action-btn" onclick="downloadZIP('${job.job_id}')">ZIP</button>
-                                        ` : ''}
-                                        <button class="action-btn delete" onclick="deleteJob('${job.job_id}')">Delete</button>
-                                    </td>
+                                    <th>Filename</th>
+                                    <th>Type</th>
+                                    <th>Model</th>
+                                    <th>Status</th>
+                                    <th>Verdict</th>
+                                    <th>Score</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${data.jobs.map(job => `
+                                    <tr>
+                                        <td>${job.filename}</td>
+                                        <td>${job.detection_type}</td>
+                                        <td>${job.model || '-'}</td>
+                                        <td><span class="status-badge status-${job.status}">${job.status}</span></td>
+                                        <td>${job.verdict ? `<span class="verdict-badge verdict-${job.verdict}">${job.verdict}</span>` : '-'}</td>
+                                        <td>${job.score ? (job.score * 100).toFixed(1) + '%' : '-'}</td>
+                                        <td>${new Date(job.created_at).toLocaleString()}</td>
+                                        <td>
+                                            ${job.status === 'completed' ? `
+                                                <button class="action-btn" onclick="downloadPDF('${job.job_id}')">PDF</button>
+                                                <button class="action-btn" onclick="downloadZIP('${job.job_id}')">ZIP</button>
+                                            ` : ''}
+                                            <button class="action-btn delete" onclick="deleteJob('${job.job_id}')">Delete</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
 
                 // Mobile card view

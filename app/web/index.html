@@ -7,9 +7,27 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* iOS safe-area support */
+        /* Base styles for consistency */
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
+            margin: 0;
+            padding: 0;
             padding-bottom: env(safe-area-inset-bottom);
+            /* Force scrollbar to prevent layout shift */
+            overflow-y: scroll;
+        }
+        
+        /* Match DeepfakeBench container padding */
+        .trufor-spacing {
+            padding-top: 8px !important;
+            padding-bottom: 32px !important;
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+        }
+        
+        /* Ensure h1 has no top margin */
+        .trufor-spacing h1 {
+            margin-top: 0 !important;
         }
         
         /* Navigation Drawer Styles */
@@ -194,20 +212,25 @@
 </head>
 <body class="min-h-screen bg-base-200">
     <!-- Navigation Bar -->
-    <div class="navbar bg-base-100 shadow-lg" role="navigation" aria-label="Main navigation">
+    <div class="navbar bg-base-100 shadow-lg" role="navigation" aria-label="Main navigation" style="padding-top: 8px;">
         <div class="flex-1">
             <a href="/web/index_main.html" class="btn btn-ghost normal-case text-xl" aria-label="Deepfake Detector Home">🎭 Deepfake Detector</a>
         </div>
         <!-- Desktop menu -->
-        <div class="hidden md:flex">
+        <div class="hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
                 <li><a href="/web/index_main.html">🏠 Home</a></li>
                 <li><a href="/web/index.html" class="active" aria-current="page">🖼️ Images (TruFor)</a></li>
                 <li><a href="/web/deepfakebench.html">🎬 Video (DeepfakeBench)</a></li>
+                
+                <li id="nav-history-li" style="display: none;"><a href="/web/history.html" id="nav-history">📜 History</a></li>
+                <li id="nav-login-li" style="display: none;"><a href="/web/login.html" id="nav-login">Login</a></li>
+                <li id="nav-register-li" style="display: none;"><a href="/web/register.html" id="nav-register">Register</a></li>
+                <li id="nav-logout-li" style="display: none;"><a href="#" id="nav-logout">Logout</a></li>
             </ul>
         </div>
         <!-- Mobile hamburger -->
-        <div class="md:hidden">
+        <div class="lg:hidden">
             <button 
                 id="menuToggle" 
                 class="btn btn-ghost" 
@@ -235,22 +258,39 @@
             </button>
         </div>
         <nav class="drawer-nav" aria-label="Mobile navigation">
-            <a href="/web/index_main.html">
+            <a href="/web/index_main.html" class="nav-link">
                 <span aria-hidden="true">🏠</span>
                 <span>Home</span>
             </a>
-            <a href="/web/index.html" class="active" aria-current="page">
+            <a href="/web/index.html" class="nav-link active" aria-current="page">
                 <span aria-hidden="true">🖼️</span>
                 <span>Images (TruFor)</span>
             </a>
-            <a href="/web/deepfakebench.html">
+            <a href="/web/deepfakebench.html" class="nav-link">
                 <span aria-hidden="true">🎬</span>
                 <span>Video (DeepfakeBench)</span>
+            </a>
+
+            <a href="/web/history.html" class="nav-link" id="nav-mobile-history" style="display: none;">
+                <span aria-hidden="true">📜</span>
+                <span>History</span>
+            </a>
+            <a href="/web/login.html" class="nav-link" id="nav-mobile-login" style="display: none;">
+                <span aria-hidden="true">→</span>
+                <span>Login</span>
+            </a>
+            <a href="/web/register.html" class="nav-link" id="nav-mobile-register" style="display: none;">
+                <span aria-hidden="true">✎</span>
+                <span>Register</span>
+            </a>
+            <a href="#" class="nav-link" id="nav-mobile-logout" style="display: none;">
+                <span aria-hidden="true">←</span>
+                <span>Logout</span>
             </a>
         </nav>
     </aside>
     
-    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+    <div class="container mx-auto max-w-6xl trufor-spacing" style="padding-top: 8px !important; padding-bottom: 32px !important; padding-left: 16px !important; padding-right: 16px !important;">
         <!-- Title -->
         <div class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-bold mb-2">🔍 TruFor Detection System</h1>
@@ -1247,7 +1287,88 @@
             link.addEventListener('click', closeDrawer);
         });
     })();
+
+    // Navigation bar authentication state management
+    (function() {
+        const token = localStorage.getItem('access_token');
+        
+        // Desktop nav elements
+        const historyLi = document.getElementById('nav-history-li');
+        const loginLi = document.getElementById('nav-login-li');
+        const registerLi = document.getElementById('nav-register-li');
+        const logoutLi = document.getElementById('nav-logout-li');
+        const logoutBtn = document.getElementById('nav-logout');
+        
+        // Mobile nav elements
+        const mobileHistoryLink = document.getElementById('nav-mobile-history');
+        const mobileLoginLink = document.getElementById('nav-mobile-login');
+        const mobileRegisterLink = document.getElementById('nav-mobile-register');
+        const mobileLogoutLink = document.getElementById('nav-mobile-logout');
+
+        if (token) {
+            // User is logged in - show History and Logout
+            if (historyLi) historyLi.style.display = 'block';
+            if (logoutLi) logoutLi.style.display = 'block';
+            if (loginLi) loginLi.style.display = 'none';
+            if (registerLi) registerLi.style.display = 'none';
+
+            if (mobileHistoryLink) mobileHistoryLink.style.display = 'flex';
+            if (mobileLogoutLink) mobileLogoutLink.style.display = 'flex';
+            if (mobileLoginLink) mobileLoginLink.style.display = 'none';
+            if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
+
+            // Logout handler
+            const handleLogout = async (e) => {
+                e.preventDefault();
+                
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Logout API call failed:', error);
+                }
+
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+                window.location.href = '/web/login.html';
+            };
+
+            // Bind logout events
+            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', handleLogout);
+
+        } else {
+            // User is not logged in - show Login and Register
+            if (historyLi) historyLi.style.display = 'none';
+            if (logoutLi) logoutLi.style.display = 'none';
+            if (loginLi) loginLi.style.display = 'block';
+            if (registerLi) registerLi.style.display = 'block';
+
+            if (mobileHistoryLink) mobileHistoryLink.style.display = 'none';
+            if (mobileLogoutLink) mobileLogoutLink.style.display = 'none';
+            if (mobileLoginLink) mobileLoginLink.style.display = 'flex';
+            if (mobileRegisterLink) mobileRegisterLink.style.display = 'flex';
+        }
+    })();
     </script>
+    
+    <!-- Override Tailwind padding - must be after Tailwind loads -->
+    <style>
+        .trufor-spacing {
+            padding-top: 8px !important;
+            padding-bottom: 32px !important;
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+        }
+        
+        .trufor-spacing h1 {
+            margin-top: 0 !important;
+        }
+    </style>
 </body>
 </html>
 
