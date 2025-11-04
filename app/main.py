@@ -630,7 +630,54 @@ async def detect_deepfake(
         )
 
         logger.info(f"Detection complete for {file.filename}: {result['status']}")
+        
+        # BUGFIX-007: Downsample huge heatmap arrays before sending to frontend
+        # This prevents browser crashes when processing large images
+        def downsample_array(data, max_size=300):
+            """Downsample 2D array to max_size x max_size while preserving aspect ratio"""
+            if not data or not isinstance(data, list):
+                return data
+            
+            import numpy as np
+            arr = np.array(data)
+            if arr.size == 0:
+                return data
+            
+            height, width = arr.shape
+            if height <= max_size and width <= max_size:
+                return data  # No downsampling needed
+            
+            # Calculate new dimensions preserving aspect ratio
+            if width > height:
+                new_width = max_size
+                new_height = max(1, int(max_size * height / width))
+            else:
+                new_height = max_size
+                new_width = max(1, int(max_size * width / height))
+            
+            # Downsample using simple averaging
+            from scipy import ndimage
+            zoom_factors = (new_height / height, new_width / width)
+            downsampled = ndimage.zoom(arr, zoom_factors, order=1)  # Bilinear interpolation
+            
+            return downsampled.tolist()
+        
+        # Downsample large arrays and update image_size accordingly
+        downsampled = False
+        for key in ['prediction_map', 'confidence_map', 'weighted_prediction_map', 'noiseprint_map']:
+            if key in result and result[key]:
+                original_data = result[key]
+                result[key] = downsample_array(original_data, max_size=300)
+                
+                # Update image_size to match downsampled data
+                if not downsampled and result[key] != original_data:
+                    import numpy as np
+                    arr = np.array(result[key])
+                    result["image_size"] = arr.shape  # Update to downsampled size
+                    downsampled = True
+        
         result["job_id"] = job_id  # Add job_id to response
+        
         return JSONResponse(content=result)
 
     except TimeoutError:

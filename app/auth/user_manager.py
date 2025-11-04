@@ -123,9 +123,21 @@ class UserManager:
         if not username or len(username) < 3:
             raise ValueError("Username must be at least 3 characters")
 
-        # Validate password
-        if not password or len(password) < 6:
-            raise ValueError("Password must be at least 6 characters")
+        # ENHANCEMENT-005: Enhanced password policy validation
+        if not password or len(password) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        
+        # Check for at least one uppercase letter
+        if not any(c.isupper() for c in password):
+            raise ValueError("Password must contain at least one uppercase letter")
+        
+        # Check for at least one lowercase letter
+        if not any(c.islower() for c in password):
+            raise ValueError("Password must contain at least one lowercase letter")
+        
+        # Check for at least one digit
+        if not any(c.isdigit() for c in password):
+            raise ValueError("Password must contain at least one number")
 
         # Create new user
         users = self._load_users()
@@ -170,9 +182,21 @@ class UserManager:
         if not self.authenticate_user(username, old_password):
             raise ValueError("Current password is incorrect")
 
-        # Validate new password
-        if not new_password or len(new_password) < 6:
-            raise ValueError("New password must be at least 6 characters")
+        # ENHANCEMENT-005: Enhanced password policy validation
+        if not new_password or len(new_password) < 8:
+            raise ValueError("New password must be at least 8 characters")
+        
+        # Check for at least one uppercase letter
+        if not any(c.isupper() for c in new_password):
+            raise ValueError("New password must contain at least one uppercase letter")
+        
+        # Check for at least one lowercase letter
+        if not any(c.islower() for c in new_password):
+            raise ValueError("New password must contain at least one lowercase letter")
+        
+        # Check for at least one digit
+        if not any(c.isdigit() for c in new_password):
+            raise ValueError("New password must contain at least one number")
 
         # Update password
         users = self._load_users()

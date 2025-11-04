@@ -12,6 +12,8 @@ services:
       - PORT=8000
       - PYTHONUNBUFFERED=1
     volumes:
+      # Code directories - for development (hot reload)
+      - ./app:/app/app
       # Persistent runtime data directories only
       # Model files are baked into the image, not mounted
       - ./logs:/app/logs

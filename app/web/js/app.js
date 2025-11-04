@@ -50,6 +50,14 @@ const DECISION_CONFIG = {
 
 // Decision logic function
 function determineDecision(integrity, evidenceReliability) {
+    // BUGFIX-009: Handle invalid/corrupted data
+    // If integrity or reliability is NaN, null, or clearly invalid, return INCONCLUSIVE
+    if (integrity == null || evidenceReliability == null || 
+        isNaN(integrity) || isNaN(evidenceReliability) ||
+        integrity === 0 || evidenceReliability === 0) {
+        return 'INCONCLUSIVE';
+    }
+    
     const integrityPercent = Math.round(integrity * 100);
     const reliabilityPercent = Math.round(evidenceReliability * 100);
     
@@ -216,7 +224,10 @@ function displayResult(data) {
             elements.confidenceText.textContent = `${reliabilityPercent}%`;
             elements.confidenceBar.value = reliabilityPercent;
         } else {
-            const confidence = Math.round(data.confidence * 100);
+            // Handle invalid or missing confidence data
+            const confidence = (data.confidence != null && !isNaN(data.confidence)) 
+                ? Math.round(data.confidence * 100) 
+                : 0;
             elements.confidenceBar.value = confidence;
             elements.confidenceText.textContent = `${confidence}%`;
         }
@@ -286,7 +297,8 @@ function displayResult(data) {
         elements.resultDesc.textContent = `Request ID: ${data.request_id || 'N/A'}`;
         
         // Update confidence
-        const confidence = Math.round((data.score || 0) * 100);
+        const score = (data.score != null && !isNaN(data.score)) ? data.score : 0;
+        const confidence = Math.round(score * 100);
         elements.confidenceBar.value = confidence;
         elements.confidenceText.textContent = `${confidence}%`;
         
@@ -320,18 +332,24 @@ function displayTruForVisualization(data) {
         const imgHeight = elements.originalImage.naturalHeight;
         
         // Calculate aspect ratio preserving dimensions with max size 300px
+        // BUGFIX-007: Limit max size to prevent browser crash with large images
         const maxSize = 300;
+        const maxCanvasPixels = 300 * 300; // Maximum 90K pixels to prevent memory issues
         let canvasWidth, canvasHeight;
         
         if (imgWidth > imgHeight) {
             // Landscape
-            canvasWidth = maxSize;
-            canvasHeight = Math.round(maxSize * (imgHeight / imgWidth));
+            canvasWidth = Math.min(maxSize, Math.sqrt(maxCanvasPixels * (imgWidth / imgHeight)));
+            canvasHeight = Math.round(canvasWidth * (imgHeight / imgWidth));
         } else {
             // Portrait or square
-            canvasHeight = maxSize;
-            canvasWidth = Math.round(maxSize * (imgWidth / imgHeight));
+            canvasHeight = Math.min(maxSize, Math.sqrt(maxCanvasPixels * (imgHeight / imgWidth)));
+            canvasWidth = Math.round(canvasHeight * (imgWidth / imgHeight));
         }
+        
+        // Ensure dimensions are at least 1px
+        canvasWidth = Math.max(1, Math.floor(canvasWidth));
+        canvasHeight = Math.max(1, Math.floor(canvasHeight));
         
         
         // Set canvas size to match aspect ratio (both element properties and CSS style)

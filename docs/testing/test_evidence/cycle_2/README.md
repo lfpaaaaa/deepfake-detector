@@ -11,8 +11,8 @@
 This README documents all test evidence captured during Cycle 2 testing. Test observations were recorded in real-time during test execution. The detailed test results, analysis, and findings are fully documented in:
 
 - ✅ [Test Report](../test_reports/cycle_2_report.md) - Complete test results and analysis
-- ✅ [Test Execution Checklist](../test_execution/cycle_2_full_checklist.md) - Detailed step-by-step records
 - ✅ [Test Cases](../TEST_CASES.md) - Test case documentation
+- ✅ [Test Plan](../test_plans/cycle_2_expanded.md) - Test planning documentation
 
 These documents provide comprehensive evidence of all 42 tests executed, including detailed descriptions of observations, bugs found, and system behavior verified during testing.
 
@@ -204,9 +204,9 @@ These documents provide comprehensive evidence of all 42 tests executed, includi
 
 ### Evidence Location:
 **Note**: Test observations were documented in real-time during testing. Actual screenshot files were not saved to disk. All test evidence is comprehensively documented in:
-- This README file (detailed observations)
-- `docs/testing/test_reports/cycle_2_report.md` (complete analysis)
-- `docs/testing/test_execution/cycle_2_full_checklist.md` (step-by-step records)
+- This README file (detailed observations and test data)
+- `docs/testing/test_reports/cycle_2_report.md` (complete analysis and findings)
+- `docs/testing/test_plans/cycle_2_expanded.md` (test planning and methodology)
 
 These documents provide complete evidence of all testing activities and findings.
 

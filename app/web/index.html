@@ -672,18 +672,34 @@
             reader.readAsDataURL(file);
             
             // Show results
+            // BUGFIX-009: Handle invalid/corrupted data that returns null/0 values
+            const hasValidData = result.confidence != null && !isNaN(result.confidence) && 
+                                  result.integrity != null && !isNaN(result.integrity) &&
+                                  (result.confidence > 0 || result.integrity > 0);
+            
             const isFake = result.decision === 'fake' || result.is_fake;
             const verdict = document.getElementById('imageVerdict');
-            verdict.className = 'alert mb-4 ' + (isFake ? 'alert-error' : 'alert-success');
             
-            document.getElementById('imageVerdictText').textContent = 
-                isFake ? '⚠️ Likely Manipulated' : '✅ Likely Authentic';
+            // Determine verdict: if no valid data, show inconclusive
+            if (!hasValidData) {
+                verdict.className = 'alert mb-4 alert-warning';
+                document.getElementById('imageVerdictText').textContent = '⚠️ Inconclusive';
+            } else {
+                verdict.className = 'alert mb-4 ' + (isFake ? 'alert-error' : 'alert-success');
+                document.getElementById('imageVerdictText').textContent = 
+                    isFake ? '⚠️ Likely Manipulated' : '✅ Likely Authentic';
+            }
+            
+            // BUGFIX-009: Handle NaN confidence values
+            const confidenceValue = (result.confidence != null && !isNaN(result.confidence)) 
+                ? (result.confidence * 100).toFixed(1) 
+                : '0.0';
             document.getElementById('imageConfidence').textContent = 
-                `Confidence: ${(result.confidence * 100).toFixed(1)}%`;
+                `Confidence: ${confidenceValue}%`;
             document.getElementById('imageScore').textContent = 
                 result.score ? result.score.toFixed(3) : '--';
             document.getElementById('imageConf').textContent = 
-                `${(result.confidence * 100).toFixed(1)}%`;
+                `${confidenceValue}%`;
             document.getElementById('imageIntegrity').textContent = 
                 result.integrity ? result.integrity.toFixed(3) : '--';
             
@@ -723,15 +739,44 @@
             const ctx = canvas.getContext('2d');
             
             const [height, width] = size;
-            canvas.width = width;
-            canvas.height = height;
             
-            const imageData = ctx.createImageData(width, height);
+            // BUGFIX-007: Limit canvas size to prevent browser crash with large images
+            const maxSize = 300;
+            const maxCanvasPixels = 300 * 300; // Maximum 90K pixels
+            let canvasWidth, canvasHeight;
             
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    const value = data[y][x];
-                    const idx = (y * width + x) * 4;
+            // Calculate scaled dimensions while preserving aspect ratio
+            if (width > height) {
+                // Landscape
+                canvasWidth = Math.min(maxSize, Math.sqrt(maxCanvasPixels * (width / height)));
+                canvasHeight = Math.round(canvasWidth * (height / width));
+            } else {
+                // Portrait or square
+                canvasHeight = Math.min(maxSize, Math.sqrt(maxCanvasPixels * (height / width)));
+                canvasWidth = Math.round(canvasHeight * (width / height));
+            }
+            
+            // Ensure dimensions are at least 1px
+            canvasWidth = Math.max(1, Math.floor(canvasWidth));
+            canvasHeight = Math.max(1, Math.floor(canvasHeight));
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            const imageData = ctx.createImageData(canvasWidth, canvasHeight);
+            
+            // Downsample data if necessary
+            const scaleX = width / canvasWidth;
+            const scaleY = height / canvasHeight;
+            
+            for (let y = 0; y < canvasHeight; y++) {
+                for (let x = 0; x < canvasWidth; x++) {
+                    // Map canvas coordinates back to original data coordinates
+                    const srcX = Math.min(Math.floor(x * scaleX), width - 1);
+                    const srcY = Math.min(Math.floor(y * scaleY), height - 1);
+                    
+                    const value = data[srcY][srcX];
+                    const idx = (y * canvasWidth + x) * 4;
                     
                     let r, g, b;
                     if (colormap === 'hot') {
