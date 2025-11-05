@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
 [![Tests](https://img.shields.io/badge/tests-passing-success.svg)](docs/testing/test_reports/cycle_3_report.md)
-[![License](https://img.shields.io/badge/license-Educational-orange.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Educational-orange.svg)](docs/handover/LICENSE)
 
 A production-ready web application for detecting deepfakes in images and videos using state-of-the-art AI models (TruFor + DeepfakeBench).
 
@@ -396,45 +396,16 @@ scripts\start.bat          # Windows
 
 ---
 
-## License and Attribution
+## License
 
-### Our Project
-This project is for **educational and research purposes**.
+This project is licensed under the MIT License. See [LICENSE](docs/handover/LICENSE) file for details.
 
-### Integrated Models
+**Copyright © 2025 The University of Melbourne**
 
-**We only integrated these models - we did NOT train them.**
+**Important Notes**:
+- This license applies to our integration code only
+- Integrated AI models (TruFor and DeepfakeBench) have their own licenses
+- This project is for educational and research purposes
+- We did NOT train these models - all credit goes to original authors
 
-#### TruFor Model
-- **Developed by**: GRIP-UNINA (University of Naples Federico II)
-- **Repository**: https://github.com/grip-unina/TruFor
-- **License**: Check official repository
-- **Citation**:
-```bibtex
-@article{guillaro2023trufor,
-  title={TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection and Localization},
-  author={Guillaro, Fabrizio and Cozzolino, Davide and Sud, Avneesh and Dufour, Nicholas and Verdoliva, Luisa},
-  journal={arXiv preprint arXiv:2212.10957},
-  year={2023}
-}
-```
-
-#### DeepfakeBench Models
-- **Developed by**: SCLBD (Shenzhen Campus of Learning and Big Data)
-- **Repository**: https://github.com/SCLBD/DeepfakeBench
-- **License**: Check official repository
-- **Citation**:
-```bibtex
-@article{yan2023deepfakebench,
-  title={DeepfakeBench: A Comprehensive Benchmark of Deep Learning Methods for Deepfake Detection},
-  author={Yan, Zhiyuan and Zhang, Yong and Fan, Yanbo and Wu, Baoyuan},
-  journal={arXiv preprint arXiv:2307.01426},
-  year={2023}
-}
-```
-
-**All credit for the models goes to the original authors and research teams.**
-
----
-
-## License and Attribution
+For detailed attribution and citations, see [HANDOVER_DOCUMENT.md](docs/handover/HANDOVER_DOCUMENT.md).

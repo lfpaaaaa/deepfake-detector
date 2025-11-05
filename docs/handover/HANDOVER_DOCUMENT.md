@@ -19,6 +19,12 @@
 6. [Installation Guide](#6-installation-guide)
 7. [Changelog](#7-changelog)
 8. [Traceability Matrix](#8-traceability-matrix)
+9. [Handover Checklist](#9-handover-checklist)
+10. [Contact & Support](#10-contact--support)
+11. [Future Recommendations](#11-future-recommendations)
+12. [License and Attribution](#12-license-and-attribution)
+- [Appendix A: Quick Reference](#appendix-a-quick-reference)
+- [Appendix B: Glossary](#appendix-b-glossary)
 
 ---
 
@@ -995,6 +1001,33 @@ This matrix maps user stories to implementation, tests, and documentation.
 - Increase automated test coverage from 70% to 90%
 - Implement proper logging levels (DEBUG, INFO, WARNING, ERROR)
 - Add comprehensive error codes for API responses
+
+---
+
+## 12. License and Attribution
+
+### 12.1 Project License
+
+This project is licensed under the **MIT License**.  
+**Copyright © 2025 The University of Melbourne**
+
+Developed as part of a student assignment by: Baojun Liu, Ruidong Zhang, Yucheng Wang, Yuzhao Ouyang, Xiyu Guan.
+
+📄 See [LICENSE](LICENSE) for full license text.
+
+### 12.2 Third-Party Models
+
+**IMPORTANT**: We integrated existing AI models - we did **NOT** train them. All credit goes to original authors.
+
+- **TruFor** (Image detection)  
+  Repository: https://github.com/grip-unina/TruFor  
+  Developed by: GRIP-UNINA (University of Naples Federico II)
+
+- **DeepfakeBench** (Video detection - 12 models)  
+  Repository: https://github.com/SCLBD/DeepfakeBench  
+  Developed by: SCLBD (Shenzhen Campus of Learning and Big Data)
+
+Check their official repositories for licenses, citations, and technical documentation.
 
 ---
 
