@@ -314,12 +314,18 @@ Create a new account through the registration page, or use the following test cr
 |----------|-------------|----------|
 | Main README | System overview, features, quick start | [README.md](../../README.md) |
 | Weights Download Guide | Model weights download & setup guide | [WEIGHTS_DOWNLOAD_GUIDE.md](../guides/WEIGHTS_DOWNLOAD_GUIDE.md) |
-| Quick Reference V2 | Common tasks and commands | [QUICK_REFERENCE_V2.md](../guides/QUICK_REFERENCE_V2.md) |
-| TruFor Technical Guide | TruFor integration details | [TRUFOR_TECHNICAL_GUIDE.md](../guides/TRUFOR_TECHNICAL_GUIDE.md) |
 | Upgrade Summary V2 | V1.0 → V2.0 migration guide | [UPGRADE_SUMMARY_V2.md](../guides/UPGRADE_SUMMARY_V2.md) |
 | CI Setup Guide | GitHub Actions configuration | [CI_SETUP.md](../testing/CI_SETUP.md) |
 
-### 4.6 Meeting Notes & Communication
+### 4.6 Model Guides
+
+| Guide | Description | Link |
+|-------|-------------|------|
+| TruFor Technical Guide | TruFor integration details | [TRUFOR_TECHNICAL_GUIDE.md](../guides/TRUFOR_TECHNICAL_GUIDE.md) |
+| DeepfakeBench Guide | DeepfakeBench models overview | [vendors/DeepfakeBench/README.md](../../models/vendors/DeepfakeBench/README.md) |
+| CLI Tools Reference | Command-line tools (advanced users) | [tools/README.md](../../tools/README.md) |
+
+### 4.7 Meeting Notes & Communication
 
 | Document | Description | Location |
 |----------|-------------|----------|

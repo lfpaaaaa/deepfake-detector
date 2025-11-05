@@ -207,14 +207,9 @@ docker compose down
 - **[WEIGHTS_DOWNLOAD_GUIDE.md](docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md)** - Complete model setup guide
 - **[HANDOVER_DOCUMENT.md](docs/handover/HANDOVER_DOCUMENT.md)** - Comprehensive project handover
 
-### 🤖 Model Guides
-- **[TruFor Technical Guide](docs/guides/TRUFOR_TECHNICAL_GUIDE.md)** - TruFor integration details
-- **[Quick Reference V2](docs/guides/QUICK_REFERENCE_V2.md)** - Command cheat sheet
-
 ### 🏗️ Architecture & Design
-- **[V3 Domain Model](docs/architecture/v3_domain_model_diagram.md)** - System architecture
-- **[V3 Sequence Diagram](docs/architecture/v3_sequence_diagram.md)** - Interaction flows
-- **[Upgrade Summary V2](docs/guides/UPGRADE_SUMMARY_V2.md)** - V1 → V2 migration
+- **[V3.1 Domain Model](docs/architecture/v3.1_domain_model_diagram.md)** - System architecture (current)
+- **[V3.1 Sequence Diagram](docs/architecture/v3.1_sequence_diagram.md)** - Interaction flows (current)
 
 ### 🧪 Testing & Quality
 - **[Testing README](docs/testing/README.md)** - Testing strategy
