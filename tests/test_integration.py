@@ -29,7 +29,7 @@ def test_user_credentials():
     timestamp = int(time.time())
     return {
         "username": f"test_user_{timestamp}",
-        "password": "test123456",
+        "password": "Test123456",  # Updated to meet password policy: uppercase, lowercase, digit
         "email": f"test_user_{timestamp}@test.com"
     }
 
