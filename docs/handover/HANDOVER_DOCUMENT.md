@@ -894,12 +894,12 @@ This matrix maps user stories to implementation, tests, and documentation.
 2. **Ruidong Zhang** - Scrum Master
 3. **Yucheng Wang** - Database Management
 4. **Yuzhao Ouyang** - Backend Development
-5. **Xiyu Guan** - Product Owner, System Architecture, Full-Stack Development
+5. **Xiyu Guan** - Product Owner
 
 **Primary Contact**: Xiyu Guan  
 **Email**: xiyug@student.unimelb.edu.au  
 **GitHub**: https://github.com/lfpaaaaa  
-**Availability**: Immediate (until [handover date])
+
 
 ### 10.2 Project Resources
 

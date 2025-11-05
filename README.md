@@ -38,7 +38,7 @@ The **Deepfake Detector** provides forensic analysts and researchers with powerf
 - **Ruidong Zhang** - Scrum Master
 - **Yucheng Wang** - Database Management
 - **Yuzhao Ouyang** - Backend Development
-- **Xiyu Guan** - Product Owner, System Architecture, Full-Stack Development
+- **Xiyu Guan** - Product Owner
 
 **GitHub**: https://github.com/lfpaaaaa/deepfake-detector  
 **Contact**: xiyug@student.unimelb.edu.au
@@ -437,28 +437,4 @@ This project is for **educational and research purposes**.
 
 ---
 
-## Support & Contact
-
-**Project Maintainer**: Xiyu Guan  
-**Email**: xiyug@student.unimelb.edu.au  
-**GitHub**: https://github.com/lfpaaaaa/deepfake-detector
-
-**For Help**:
-1. Check [documentation](#documentation) section above
-2. Read [HANDOVER_DOCUMENT.md](docs/handover/HANDOVER_DOCUMENT.md)
-3. Review [test reports](docs/testing/test_reports/cycle_3_report.md)
-4. Contact maintainer via email
-
-**For Model Issues**:
-- TruFor: https://github.com/grip-unina/TruFor/issues
-- DeepfakeBench: https://github.com/SCLBD/DeepfakeBench/issues
-
----
-
-**Last Updated**: November 4, 2025  
-**Version**: 3.1  
-**Status**: ✅ Production Ready
-
----
-
-**⭐ Star this repo if you find it useful!**
+## License and Attribution
