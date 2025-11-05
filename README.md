@@ -21,7 +21,7 @@ A production-ready web application for detecting deepfakes in images and videos 
 - [AI Models](#ai-models)
 - [Documentation](#documentation)
 - [Version History](#version-history)
-- [License](#license-and-attribution)
+- [License](#license)
 
 ---
 

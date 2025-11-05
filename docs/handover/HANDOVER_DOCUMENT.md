@@ -9,20 +9,20 @@
 
 ---
 
-## Table of Contents
+## 📋 Table of Contents
 
-1. [Project Background / Overview](#1-project-background--overview)
-2. [Demo (Link to Hosted Project)](#2-demo-link-to-hosted-project)
-3. [Features (User Stories - Organized in Sprints)](#3-features-user-stories-organized-in-sprints)
-4. [Documentation](#4-documentation)
-5. [System Requirements](#5-system-requirements)
-6. [Installation Guide](#6-installation-guide)
-7. [Changelog](#7-changelog)
-8. [Traceability Matrix](#8-traceability-matrix)
-9. [Handover Checklist](#9-handover-checklist)
-10. [Contact & Support](#10-contact--support)
-11. [Future Recommendations](#11-future-recommendations)
-12. [License and Attribution](#12-license-and-attribution)
+- [Project Background / Overview](#1-project-background--overview)
+- [Demo (Link to Hosted Project)](#2-demo-link-to-hosted-project)
+- [Features (User Stories - Organized in Sprints)](#3-features-user-stories-organized-in-sprints)
+- [Documentation](#4-documentation)
+- [System Requirements](#5-system-requirements)
+- [Installation Guide](#6-installation-guide)
+- [Changelog](#7-changelog)
+- [Traceability Matrix](#8-traceability-matrix)
+- [Handover Checklist](#9-handover-checklist)
+- [Contact & Support](#10-contact--support)
+- [Future Recommendations](#11-future-recommendations)
+- [License and Attribution](#12-license-and-attribution)
 - [Appendix A: Quick Reference](#appendix-a-quick-reference)
 - [Appendix B: Glossary](#appendix-b-glossary)
 
@@ -606,11 +606,13 @@ pytest
 
 ## 7. Changelog
 
-### Version 3.1 (November 4, 2025) - **Current**
+> **Note**: For complete changelog with migration notes, see [CHANGELOG.md](CHANGELOG.md)
 
-**Status**: ✅ Production Ready (100% Test Pass Rate)
+### [3.1.0] - 2025-11-04 (Current)
 
-#### Bug Fixes (9 issues resolved)
+**Status**: ✅ Production Ready | 100% Test Pass Rate
+
+#### Fixed
 1. **BUG-007** 🔴 Critical: Large image browser crashes
    - **Fix**: Backend downsampling (300x300 max) + frontend canvas limits
    - **Impact**: Can now handle images up to 8192x6554 pixels
@@ -643,76 +645,68 @@ pytest
    - **Fix**: Breakpoint adjustment (1024px), landscape centering, table scrolling
    - **Impact**: Perfect mobile experience across all devices
 
-#### Enhancements
-- **ENHANCEMENT-005**: Enhanced password policy
-  - Minimum 8 characters
-  - Requires uppercase, lowercase, and digit
-  - Enforced on both frontend and backend
+#### Changed
+- **Enhanced password policy**: Minimum 8 characters with uppercase, lowercase, and digit requirements (frontend + backend)
+- **Code optimization**: Removed 8 unused items, optimized imports, eliminated duplicate CSS
+- **Internationalization**: Translated all Chinese comments to English
 
-#### Code Quality
-- ✅ Removed 8 unused/redundant code items
-- ✅ Optimized imports across all modules
-- ✅ Eliminated duplicate CSS declarations
-- ✅ Translated all Chinese comments to English
-- ✅ CI/CD pipeline fully passing
-
-#### Documentation Updates
-- ✅ Updated README.md with V3.1 release notes
-- ✅ Completed Cycle 3 test report (100% pass rate)
-- ✅ Updated test plan with new bug findings
-- ✅ Refreshed handover document
-- ✅ Updated UI documentation
+#### Documentation
+- Updated README.md with V3.1 release notes
+- Completed Cycle 3 test report (100% pass rate)
+- Updated test plan with new bug findings
+- Refreshed handover document and UI documentation
 
 ---
 
-### Version 3.0 (October 26, 2025)
+### [3.0.0] - 2025-10-26
 
-**Status**: Testing Complete, Known Issues Documented
+**Status**: Testing Complete | Known Issues Documented
 
-#### Major Features
-- ✅ Complete testing suite (109 tests: 67 automated + 42 manual)
-- ✅ Mobile-responsive UI (16 desktop + 16 mobile screenshots)
-- ✅ GitHub Actions CI/CD pipeline
-- ✅ 12 DeepfakeBench models (removed FFD model)
-- ✅ PDF and ZIP report generation
-- ✅ Detection history with pagination
+#### Added
+- Complete testing suite: 109 tests (67 automated + 42 manual)
+- Mobile-responsive UI with comprehensive testing (32 screenshots)
+- GitHub Actions CI/CD pipeline
+- PDF and ZIP report generation
+- Detection history with pagination
 
-#### Testing Results
+#### Changed
+- Updated DeepfakeBench to 12 models (removed FFD model)
+
+#### Testing
 - **Cycle 1**: 67 automated tests, 100% pass rate
-- **Cycle 2**: 42 manual tests, 88% pass rate (4 known bugs)
+- **Cycle 2**: 42 manual tests, 88% pass rate
 
-#### Known Issues (Resolved in V3.1)
-- BUG-007, BUG-009, BUG-010, BUG-011 (see V3.1 fixes above)
+#### Known Issues
+- BUG-007, BUG-009, BUG-010, BUG-011 → Resolved in v3.1.0
 
 ---
 
-### Version 2.0 (September 2025)
+### [2.0.0] - 2025-09
 
-#### Major Features
-- ✅ Integrated TruFor for image detection
-- ✅ Integrated DeepfakeBench with 13 models
-- ✅ User authentication (JWT)
-- ✅ Role-based access control (Admin/Analyst)
-- ✅ Detection history management
-- ✅ PDF report generation
-- ✅ Docker containerization
+#### Added
+- TruFor model for image forgery detection
+- DeepfakeBench integration (13 models)
+- User authentication with JWT
+- Role-based access control (Admin/Analyst)
+- Detection history management
+- PDF report generation
+- Docker containerization
 
-#### Architecture Changes
-- Migrated from monolithic to modular architecture
-- Added adapter pattern for model integration
+#### Changed
+- Architecture: Migrated from monolithic to modular design
+- Implemented adapter pattern for model integration
 - Implemented repository pattern for history management
 
-**Migration Guide**: [UPGRADE_SUMMARY_V2.md](../guides/UPGRADE_SUMMARY_V2.md)
+**Migration**: See [UPGRADE_SUMMARY_V2.md](../guides/UPGRADE_SUMMARY_V2.md)
 
 ---
 
-### Version 1.0 (Initial Release)
+### [1.0.0] - 2025-08 (Initial Release)
 
-#### Features
+#### Added
 - Basic image detection
 - Single-model detection
 - Simple web interface
-- No authentication
 
 ---
 
