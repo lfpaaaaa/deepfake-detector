@@ -84,14 +84,14 @@ The application features a modern web interface with user authentication, detect
 ```bash
 git clone https://github.com/lfpaaaaa/deepfake-detector.git
 cd deepfake-detector
-   ```
+```
 
 2. Download model weights (see Section 6.2)
 
 3. Start with Docker:
-   ```bash
+```bash
 docker compose up -d --build
-   ```
+```
 
 4. Access at: **http://localhost:8000/web/index_main.html** (Home page)
 
