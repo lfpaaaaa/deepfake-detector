@@ -217,16 +217,17 @@ docker compose logs -f
 
 Open your browser and visit:
 
-**First-time users:**
-1. 📝 **Register**: http://localhost:8000/web/register.html
-   - Create your account
-2. 🔐 **Login**: http://localhost:8000/web/login.html
-   - Login with your credentials
+**🏠 Home Page**: http://localhost:8000/web/index_main.html
 
-**After login:**
-- 🏠 **Main Page**: http://localhost:8000/web/index_main.html (Image detection)
-- 🎬 **DeepfakeBench**: http://localhost:8000/web/deepfakebench.html (Video detection)
-- 📜 **History**: http://localhost:8000/web/history.html (View past detections)
+Or simply: http://localhost:8000 (redirects to home)
+
+**All available pages:**
+1. 🏠 **Home**: http://localhost:8000/web/index_main.html - Landing page
+2. 📝 **Register**: http://localhost:8000/web/register.html - Create account
+3. 🔐 **Login**: http://localhost:8000/web/login.html - User login
+4. 🖼️ **TruFor Detection**: http://localhost:8000/web/index.html - Image detection
+5. 🎬 **DeepfakeBench**: http://localhost:8000/web/deepfakebench.html - Video detection
+6. 📜 **History**: http://localhost:8000/web/history.html - View past detections
 
 #### 6. Stop the Container
 
@@ -261,6 +262,94 @@ lsof -ti:8000 | xargs kill -9
 - ✅ Try: `docker system prune` to free space
 
 **See detailed guide**: [WEIGHTS_DOWNLOAD_GUIDE.md](WEIGHTS_DOWNLOAD_GUIDE.md)
+
+---
+
+### Local Deployment (Advanced Users - Not Recommended)
+
+⚠️ **WARNING**: Local deployment without Docker is **NOT RECOMMENDED** due to complex dependencies and environment setup. Use Docker for the best experience.
+
+**This method is only for:**
+- Developers who need to modify the code
+- Environments where Docker is not available
+- Users who want direct access to Python processes
+
+**Prerequisites**:
+- Python 3.11 or higher installed
+- pip package manager
+- Model weights downloaded (see Step 2 above)
+
+#### Option 1: Using Startup Scripts
+
+**Windows**:
+```cmd
+cd deepfake-detector
+scripts\start.bat
+```
+
+**Linux/macOS**:
+```bash
+cd deepfake-detector
+bash scripts/start.sh
+```
+
+The scripts will:
+1. Create a Python virtual environment (`venv/`)
+2. Install all dependencies from `configs/requirements.txt`
+3. Verify model weights exist
+4. Start the FastAPI server
+
+#### Option 2: Manual Setup
+
+1. **Create Virtual Environment**:
+```bash
+# Linux/macOS
+python3 -m venv venv
+source venv/bin/activate
+
+# Windows
+python -m venv venv
+venv\Scripts\activate
+```
+
+2. **Install Dependencies**:
+```bash
+pip install -r configs/requirements.txt
+```
+
+3. **Verify Model Weights**:
+```bash
+# Should exist
+ls trufor.pth.tar
+ls vendors/DeepfakeBench/training/weights/*.pth
+```
+
+4. **Start Server**:
+```bash
+python scripts/start_trufor.py
+
+# Or manually with uvicorn
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+5. **Access Application**:
+- Open http://localhost:8000/web/index_main.html in your browser (Home page)
+
+#### Troubleshooting Local Deployment
+
+| Problem | Solution |
+|---------|----------|
+| **Python not found** | Install Python 3.11+ from [python.org](https://python.org) |
+| **pip not found** | Reinstall Python with pip, or run `python -m ensurepip` |
+| **Virtual environment fails** | Try `python3 -m venv --clear venv` to force recreation |
+| **Import errors** | Activate virtual environment: `source venv/bin/activate` (Linux) or `venv\Scripts\activate` (Windows) |
+| **Model loading fails** | Verify `trufor.pth.tar` is exactly 248.8 MB and in project root |
+| **Port 8000 in use** | Kill the process or change port: `uvicorn app.main:app --port 8001` |
+| **CUDA errors (GPU)** | Install correct PyTorch for your CUDA version, or use CPU mode |
+
+**If local deployment fails, strongly recommend switching to Docker deployment (see above).**
+
+---
 
 5. **Frame-by-frame analysis** with DeepfakeBench models:
 ```bash
