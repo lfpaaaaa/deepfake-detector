@@ -636,7 +636,7 @@ Fast feedback loop:
 - [TEST_CASES.md](TEST_CASES.md) - Comprehensive test case list
 - [Test Plans](test_plans/) - Cycle-specific test plans
 - [Test Reports](test_reports/) - Test execution results
-- [CI Setup](../../CI_SETUP.md) - CI/CD configuration guide
+- [CI Setup](CI_SETUP.md) - CI/CD configuration guide
 
 ### External Resources
 - [pytest Documentation](https://docs.pytest.org/)

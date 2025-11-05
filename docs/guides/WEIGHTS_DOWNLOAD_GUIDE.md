@@ -28,7 +28,7 @@ unzip TruFor_weights.zip
 unzip vendors.zip
 
 # 4. Verify files
-ls -lh trufor.pth.tar  # Should show ~249 MB
+ls -lh models/trufor.pth.tar  # Should show ~249 MB
 ls vendors/DeepfakeBench/training/weights/*.pth  # Should show 12 files
 
 # 5. Start Docker
@@ -51,12 +51,13 @@ docker compose up -d --build
 
 ### Available Files:
 1. **TruFor_weights.zip** (248.8 MB)
-   - Contains: `trufor.pth.tar`
+   - Contains: `trufor.pth.tar` (extract to `models/` directory)
    - For: Image forgery detection and localization
 
 2. **vendors.zip** (1.1 GB)
-   - Contains: Complete DeepfakeBench framework and 12 model weights
+   - Contains: **Complete DeepfakeBench framework + 12 model weights (already included)**
    - For: Video deepfake detection with multiple models
+   - **Note**: All `.pth` weight files are already in `vendors/DeepfakeBench/training/weights/`
 
 **Important:** These files are **NOT** included in `git clone` - they're in `.gitignore` to keep the repository small.
 
@@ -73,7 +74,7 @@ docker compose up -d --build
 - **Paper**: [TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection and Localization](https://arxiv.org/abs/2212.10957)
 
 #### What We Use
-- **Pre-trained weights**: `trufor.pth.tar`
+- **Pre-trained weights**: `models/trufor.pth.tar`
 - **Source**: Provided by original authors
 - **License**: Check official repository
 - **Our Role**: **Integration only** - we did not train this model
@@ -128,9 +129,10 @@ docker compose up -d --build
 **Important Notes:**
 1. When you `git clone` the repository, model weights are **NOT included** (they're in `.gitignore`)
 2. The compressed files contain:
-   - `TruFor_weights.zip` → `trufor.pth.tar` (single file)
-   - `vendors.zip` → entire `vendors/` folder structure
-3. Extract these files **directly in the project root** before running Docker
+   - `TruFor_weights.zip` → extract to `models/trufor.pth.tar`
+   - `vendors.zip` → **entire `vendors/` folder with 12 model weights already inside**
+3. Extract these files to `models/` directory before running Docker
+4. **No separate weight download needed** - `vendors.zip` already contains all `.pth` files
 
 ---
 
@@ -209,13 +211,13 @@ deepfake-detector/
 # Make sure you're in project root
 cd C:\path\to\deepfake-detector
 
-# Extract TruFor weights
-Expand-Archive -Path "TruFor_weights.zip" -DestinationPath "." -Force
-# This creates: trufor.pth.tar
+# Extract TruFor weights to models/ directory
+Expand-Archive -Path "TruFor_weights.zip" -DestinationPath "models" -Force
+# This creates: models/trufor.pth.tar
 
-# Extract vendors folder
-Expand-Archive -Path "vendors.zip" -DestinationPath "." -Force
-# This creates: vendors/ folder
+# Extract vendors folder to models/ directory
+Expand-Archive -Path "vendors.zip" -DestinationPath "models" -Force
+# This creates: models/vendors/ folder
 
 # Optional: Delete ZIP files after extraction
 Remove-Item TruFor_weights.zip
@@ -228,13 +230,16 @@ Remove-Item vendors.zip
 # Make sure you're in project root
 cd /path/to/deepfake-detector
 
-# Extract TruFor weights
-unzip TruFor_weights.zip
-# This creates: trufor.pth.tar
+# Create models directory if it doesn't exist
+mkdir -p models
 
-# Extract vendors folder
-unzip vendors.zip
-# This creates: vendors/ folder
+# Extract TruFor weights to models/ directory
+unzip TruFor_weights.zip -d models
+# This creates: models/trufor.pth.tar
+
+# Extract vendors folder to models/ directory
+unzip vendors.zip -d models
+# This creates: models/vendors/ folder
 
 # Optional: Delete ZIP files after extraction
 rm TruFor_weights.zip vendors.zip
@@ -248,10 +253,11 @@ rm TruFor_weights.zip vendors.zip
 
 ```
 deepfake-detector/
-├── trufor.pth.tar              ← TruFor model (249 MB) ✅
-├── vendors/                    ← DeepfakeBench folder ✅
-│   └── DeepfakeBench/
-│       ├── analysis/
+├── models/                     ← Model weights directory ✅
+│   ├── trufor.pth.tar         ← TruFor model (249 MB) ✅
+│   └── vendors/               ← DeepfakeBench folder ✅
+│       └── DeepfakeBench/
+│           ├── analysis/
 │       ├── preprocessing/
 │       ├── tools/
 │       └── training/
@@ -281,12 +287,17 @@ deepfake-detector/
 └── ...
 ```
 
+**✅ Verification Checklist:**
+- [ ] `models/trufor.pth.tar` exists (249 MB)
+- [ ] `models/vendors/DeepfakeBench/` directory exists
+- [ ] 12 `.pth` files in `models/vendors/DeepfakeBench/training/weights/`
+
 **Run verification commands:**
 
 #### Windows (PowerShell):
 ```powershell
 # Check TruFor exists
-Get-Item trufor.pth.tar
+Get-Item models\trufor.pth.tar
 # Should show: ~249 MB
 
 # Count DeepfakeBench weights
@@ -297,11 +308,11 @@ Get-Item trufor.pth.tar
 #### Linux/Mac:
 ```bash
 # Check TruFor exists
-ls -lh trufor.pth.tar
+ls -lh models/trufor.pth.tar
 # Should show: ~249 MB
 
 # Count DeepfakeBench weights
-ls vendors/DeepfakeBench/training/weights/*.pth | wc -l
+ls models/vendors/DeepfakeBench/training/weights/*.pth | wc -l
 # Should show: 12
 ```
 
@@ -320,9 +331,8 @@ docker compose up -d --build
 
 **What happens:**
 1. Docker builds the image (~5-10 minutes first time)
-2. Copies `trufor.pth.tar` into container
-3. Copies `vendors/` folder into container
-4. Installs all Python dependencies
+2. Copies `models/` directory (with trufor.pth.tar and vendors/) into container
+3. Installs all Python dependencies
 5. Starts FastAPI server on port 8000
 
 **Wait for startup:**
@@ -484,8 +494,8 @@ docker compose restart
 **Models not loading:**
 ```bash
 # Check if files exist IN container
-docker compose exec deepfake-detector ls -lh /app/trufor.pth.tar
-docker compose exec deepfake-detector ls /app/vendors/DeepfakeBench/training/weights/
+docker compose exec deepfake-detector ls -lh /app/models/trufor.pth.tar
+docker compose exec deepfake-detector ls /app/models/vendors/DeepfakeBench/training/weights/
 
 # If missing, files weren't copied during build
 # Solution: Make sure files exist on host, then rebuild
@@ -512,7 +522,7 @@ docker image prune -a
 
 | Property | Value |
 |----------|-------|
-| Filename | `trufor.pth.tar` |
+| Filename | `models/trufor.pth.tar` |
 | Size | ~249 MB |
 | Format | PyTorch checkpoint |
 | Location | Project root |
@@ -601,8 +611,8 @@ If you use this system in your research, please cite:
 ### Problem: "Model not found" error
 
 **Checklist**:
-- [ ] TruFor: Check `trufor.pth.tar` is in project root
-- [ ] DeepfakeBench: Check `vendors/DeepfakeBench/training/weights/*.pth` exist
+- [ ] TruFor: Check `models/trufor.pth.tar` exists
+- [ ] DeepfakeBench: Check `models/vendors/DeepfakeBench/training/weights/*.pth` exist
 - [ ] Verify file names match exactly (case-sensitive)
 - [ ] Check file sizes match expected values
 
@@ -611,8 +621,8 @@ If you use this system in your research, please cite:
 **Solution**:
 ```bash
 # Make sure files exist before building
-ls -lh trufor.pth.tar
-ls vendors/DeepfakeBench/training/weights/
+ls -lh models/trufor.pth.tar
+ls models/vendors/DeepfakeBench/training/weights/
 
 # Rebuild with --no-cache
 docker compose build --no-cache
@@ -635,15 +645,15 @@ docker compose up -d
    - DeepfakeBench: https://github.com/SCLBD/DeepfakeBench
 
 2. **Read our documentation:**
-   - [README.md](README.md) - Project overview
-   - [MODEL_SETUP.md](docs/MODEL_SETUP.md) - Model configuration
-   - [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md) - DeepfakeBench usage
+   - [README.md](../../README.md) - Project overview
+   - [TRUFOR_TECHNICAL_GUIDE.md](TRUFOR_TECHNICAL_GUIDE.md) - TruFor technical details
+   - See `tools/README.md` for CLI usage (advanced users)
 
 3. **Contact:**
    - Project Maintainer: Xiyu Guan (xiyug@student.unimelb.edu.au)
 
 ---
 
-**Last Updated**: October 25, 2025  
-**Document Version**: 3.0  
+**Last Updated**: November 5, 2025  
+**Document Version**: 3.1  
 **Download Link**: https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing

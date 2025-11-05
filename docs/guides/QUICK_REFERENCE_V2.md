@@ -307,8 +307,7 @@ pip install matplotlib
 ## 📚 More Documentation
 
 - **Quick Start**: `QUICK_START.md`
-- **Complete Documentation**: `FRAME_INFERENCE_SETUP.md`
-- **Batch Processing**: `BATCH_PROCESSING_GUIDE.md`
+- **Complete Documentation**: See `tools/README.md`
 - **Upgrade Notes**: `UPGRADE_SUMMARY_V2.md`
 - **Tool Documentation**: `tools/README.md`
 

@@ -5,6 +5,104 @@ All notable changes to the Deepfake Detection System will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-11-05
+
+### Added
+- 🆕 **Model Directory Structure**
+  - Created `models/.gitkeep` to track empty directory
+  - Added `models/README.md` with download instructions and verification steps
+  - Updated `.gitignore` to properly handle models directory
+
+- 🆕 **Organized Documentation Structure**
+  - Created `docs/guides/` directory for user guides and technical documentation
+  - Created `docs/handover/` directory for project handover documents
+  - Moved CI setup guide to `docs/testing/` for better organization
+  - Streamlined documentation navigation and discoverability
+
+### Changed
+- 📦 **Model Path Restructure** (Breaking Change for Manual Installations)
+  - Moved all model files to centralized `models/` directory
+  - TruFor weights: `trufor.pth.tar` → `models/trufor.pth.tar`
+  - DeepfakeBench: `vendors/DeepfakeBench/` → `models/vendors/DeepfakeBench/`
+  - Updated all code references (19 files) to use new paths
+  - Updated Docker configuration for new directory structure
+  - Enhanced `WEIGHTS_DOWNLOAD_GUIDE.md` with clearer extraction instructions
+
+- 📚 **Documentation Optimization**
+  - Streamlined `README.md` (from 694 lines to 454 lines, -35%)
+  - Consolidated model setup documentation (removed redundant `MODEL_SETUP.md`)
+  - Improved `WEIGHTS_DOWNLOAD_GUIDE.md` with step-by-step instructions
+  - Updated all cross-document links (6 files) to reflect new structure
+  - Clarified that `vendors.zip` includes all 12 model weights (no separate downloads needed)
+
+### Removed
+- ❌ **CLI Documentation** (Web-Only Focus)
+  - Removed `BATCH_PROCESSING_GUIDE.md` (CLI batch processing guide)
+  - Removed `DeepfakeBench_QUICK_START.md` (CLI quick start)
+  - Removed `FRAME_INFERENCE_SETUP.md` (CLI technical setup)
+  - Kept `tools/README.md` for advanced CLI users
+  - Project now focuses on Web interface documentation
+
+- ❌ **Redundant Documentation**
+  - Removed `docs/MODEL_SETUP.md` (merged into `WEIGHTS_DOWNLOAD_GUIDE.md`)
+
+### Fixed
+- 🐛 **Bug Fixes from Cycle 3 Testing** (10 critical issues resolved)
+  - BUG-007: Browser crash with large images (>1MB) - Added canvas size limits
+  - BUG-009: Corrupted files showing "NaN%" - Added null checks
+  - BUG-010: Invalid tokens not redirecting - Added client-side validation
+  - BUG-011: F12 DevTools layout corruption - Fixed table column styling
+  - BUG-012: No registration link on login page - Added registration link
+  - BUG-013: Inconsistent navigation bars - Unified navbar across all pages
+  - BUG-014: History records unsorted - Fixed chronological sorting by timestamp
+  - BUG-015: Mobile responsive issues - Fixed navbar, table overflow, content centering
+  - BUG-016: DeepfakeBench model info modal not showing - Fixed DaisyUI `.modal` class conflict by renaming to `.custom-modal`
+  - ENHANCEMENT-005: Weak password policy - Added uppercase, lowercase, digit requirements
+
+- 🔧 **Configuration and Path Fixes**
+  - Fixed incorrect DeepfakeBench path in `HANDOVER_DOCUMENT.md` environment variables
+  - Updated `.gitignore` to correctly ignore `models/` directory instead of old `vendors/` path
+  - Added Docker volume mount for `models/` directory to enable hot-reload during development
+
+- 🔗 **Link and Reference Fixes**
+  - Fixed invalid internal links in `HANDOVER_DOCUMENT.md`
+  - Fixed `README.md` table of contents link to "License and Attribution"
+  - Updated 20+ documentation cross-references for new file locations
+
+- 🌐 **Code Quality**
+  - Removed all Chinese comments from codebase
+  - Standardized all documentation to English
+  - Fixed inconsistent file paths across documentation
+
+### Infrastructure
+- 🔧 **CI/CD Improvements**
+  - All CI checks passing (100% test coverage maintained)
+  - Fixed missing imports in test files
+  - Updated test password to meet new password policy requirements
+
+### Documentation
+- 📖 **Updated Guides**
+  - `WEIGHTS_DOWNLOAD_GUIDE.md` v3.1 - Complete model setup with new paths
+  - `HANDOVER_DOCUMENT.md` v3.1 - Updated with new structure and traceability matrices
+  - `README.md` v3.1 - Streamlined with focus on Docker deployment
+  - All test documentation updated with new paths
+
+### Migration Notes
+- ⚠️ **For Existing Users**: Manual installations need to reorganize model files:
+  ```bash
+  # Create models directory
+  mkdir -p models
+  
+  # Move TruFor weights
+  mv trufor.pth.tar models/
+  
+  # Move DeepfakeBench
+  mv vendors models/
+  ```
+- ✅ **Docker Users**: Simply rebuild the image with `docker compose up -d --build`
+
+---
+
 ## [3.0.0] - 2025-10-25
 
 ### Added

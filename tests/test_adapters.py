@@ -39,7 +39,7 @@ def test_deepfakebench_adapter_import():
 def test_trufor_model_path():
     """Test TruFor model path configuration"""
     project_root = Path(__file__).parent.parent
-    expected_path = project_root / "trufor.pth.tar"
+    expected_path = project_root / "models/trufor.pth.tar"
     
     # Path configuration should point to project root
     assert expected_path.parent.exists()
@@ -77,7 +77,7 @@ def test_adapter_module_structure():
 @pytest.mark.unit
 def test_model_file_extensions():
     """Test that model files have correct extensions"""
-    trufor_model = "trufor.pth.tar"
+    trufor_model = "models/trufor.pth.tar"
     dfbench_model = "xception_best.pth"
     
     # TruFor uses .pth.tar
@@ -221,7 +221,7 @@ def test_build_dfbench_model_function():
 def test_trufor_model_size():
     """Test that TruFor model file is reasonable size if it exists"""
     project_root = Path(__file__).parent.parent
-    model_path = project_root / "trufor.pth.tar"
+    model_path = project_root / "models/trufor.pth.tar"
     
     if not model_path.exists():
         pytest.skip("TruFor model not present")

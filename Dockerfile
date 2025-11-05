@@ -29,10 +29,10 @@ RUN pip install --no-cache-dir -r configs/requirements.txt
 # Copy all application code and model files
 # This includes:
 # - Application source code (app/)
-# - Model files (trufor.pth.tar, vendors/DeepfakeBench/*)
+# - Model files (models/trufor.pth.tar, models/vendors/DeepfakeBench/*)
 # - Configuration files (configs/)
 # - TruFor framework (TruFor-main/)
-# NOTE: Ensure model files are in place before building the image
+# NOTE: Ensure model files are in models/ directory before building the image
 COPY . .
 
 # Create necessary runtime directories
@@ -42,7 +42,7 @@ RUN mkdir -p logs data/jobs temp
 EXPOSE 8000
 
 # Set environment variables
-ENV MODEL_PATH=trufor.pth.tar \
+ENV MODEL_PATH=models/trufor.pth.tar \
     HOST=0.0.0.0 \
     PORT=8000 \
     PYTHONUNBUFFERED=1

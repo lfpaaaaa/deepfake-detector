@@ -196,8 +196,6 @@ deepfake-detector/
 
 ## 📝 Documentation
 
-- **FRAME_INFERENCE_SETUP.md**: Frame inference setup guide
-- **BATCH_PROCESSING_GUIDE.md**: Batch processing guide
 - **QUICK_START.md**: Quick start guide
 - **IMPLEMENTATION_SUMMARY.md**: Technical implementation summary
 

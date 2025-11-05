@@ -24,14 +24,14 @@ def main():
     
     # Set environment variables for TruFor
     os.environ["MODEL_TYPE"] = "trufor"
-    os.environ["MODEL_PATH"] = "trufor.pth.tar"
+    os.environ["MODEL_PATH"] = "models/trufor.pth.tar"
     
     # Check if model file exists
-    model_path = Path("trufor.pth.tar")
+    model_path = Path("models/trufor.pth.tar")
     if not model_path.exists():
-        print("❌ Error: Model file 'trufor.pth.tar' not found")
-        print("Please ensure the TruFor model file is in the current directory")
-        print("See MODEL_SETUP.md for instructions on downloading the model")
+        print("❌ Error: Model file 'models/trufor.pth.tar' not found")
+        print("Please ensure the TruFor model file is in the models/ directory")
+        print("See docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md for instructions")
         sys.exit(1)
     
     print("🚀 Starting Deepfake Detection Service with TruFor model")

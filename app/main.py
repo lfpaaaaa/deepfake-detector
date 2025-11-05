@@ -67,7 +67,7 @@ async def lifespan(app: FastAPI):
     global detection_adapter
     try:
         # Initialize TruFor model
-        model_path = os.getenv("MODEL_PATH", "trufor.pth.tar")
+        model_path = os.getenv("MODEL_PATH", "models/trufor.pth.tar")
         if os.path.exists(model_path):
             detection_adapter = TruForAdapter(model_path=model_path)
             logger.info("TruFor adapter initialized successfully")
@@ -451,11 +451,11 @@ async def get_models_status(user: dict = Depends(get_current_user)):
     from tools.weight_registry import WEIGHT_REGISTRY
     
     # Check TruFor model
-    trufor_path = Path("trufor.pth.tar")
+    trufor_path = Path("models/trufor.pth.tar")
     trufor_available = trufor_path.exists()
     
     # Check DeepfakeBench models
-    weights_dir = Path("vendors/DeepfakeBench/training/weights")
+    weights_dir = Path("models/vendors/DeepfakeBench/training/weights")
     available_models = []
     
     if weights_dir.exists():
@@ -772,8 +772,8 @@ async def run_video_analysis(job_id: str, input_path: str, output_dir: str):
         logger.info(f"Starting OFFICIAL DeepfakeBench video analysis for job {job_id}")
         
         # Path to inference script
-        inference_script = "vendors/DeepfakeBench/tools/video_inference.py"
-        weights_path = "vendors/DeepfakeBench/training/weights/videomae_pretrained.pth"
+        inference_script = "models/vendors/DeepfakeBench/tools/video_inference.py"
+        weights_path = "models/vendors/DeepfakeBench/training/weights/videomae_pretrained.pth"
         
         # Check if weights exist
         if not os.path.exists(weights_path):

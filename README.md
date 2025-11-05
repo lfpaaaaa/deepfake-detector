@@ -1,672 +1,410 @@
-# Deepfake Detection System
+# 🎭 Deepfake Detector
 
-![CI Tests](https://github.com/lfpaaaaa/deepfake-detector/actions/workflows/ci.yml/badge.svg)
-![Quick Tests](https://github.com/lfpaaaaa/deepfake-detector/actions/workflows/quick-test.yml/badge.svg)
-![Version](https://img.shields.io/badge/version-3.1-blue)
-![Test Coverage](https://img.shields.io/badge/test_coverage-100%25-success)
-![Production](https://img.shields.io/badge/production-ready-brightgreen)
+[![Version](https://img.shields.io/badge/version-3.1-blue.svg)](https://github.com/lfpaaaaa/deepfake-detector)
+[![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
+[![Tests](https://img.shields.io/badge/tests-passing-success.svg)](docs/testing/test_reports/cycle_3_report.md)
+[![License](https://img.shields.io/badge/license-Educational-orange.svg)](LICENSE)
 
-A comprehensive forensic tool for detecting and analyzing deepfake and synthetic media using state-of-the-art AI models.
+A production-ready web application for detecting deepfakes in images and videos using state-of-the-art AI models (TruFor + DeepfakeBench).
 
-> **Latest Update (Nov 4, 2025)**: V3.1 released with 9 bug fixes, enhanced security, and fully responsive mobile design. All tests passed with 100% coverage. Production ready! ✅
+**🎯 Project Status**: ✅ Production Ready (V3.1 - Nov 4, 2025)
 
-## The Project
+---
 
-This project develops a forensic tool to detect and analyse deepfake and synthetic media. The system supports both images and videos, providing automated preprocessing, anomaly detection, and metadata inspection. Results are presented with clear visualisations such as heatmaps and frame comparisons, along with detailed forensic reports. Designed for investigators and analysts, the tool offers a simple web interface, offline usability, and extensible architecture to support future integration of new models and methods.
+## 📋 Table of Contents
 
-### Key Features
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Quick Start](#quick-start)
+- [Technologies](#technologies)
+- [AI Models](#ai-models)
+- [Documentation](#documentation)
+- [Version History](#version-history)
+- [License](#license-and-attribution)
 
-#### 🔐 Security & User Management
-- **User Authentication**: JWT token-based secure login system
-- **Enhanced Password Policy**: Minimum 8 characters with uppercase, lowercase, and digits
-- **User Registration**: Create personal accounts with easy access from login page
-- **Session Management**: 24-hour token expiration with automatic validation
-- **Protected Endpoints**: All detection features require authentication
-- **Token Validation**: Automatic redirect to login on invalid/expired tokens
+---
 
-#### 🤖 AI Detection Models
-- **TruFor Integration**: Advanced forensic framework with pixel-level localization
-- **DeepfakeBench Integration**: 12 state-of-the-art frame-level detection models
-- **Multi-Model Analysis**: Compare results across different detection algorithms
-- **Ensemble Predictions**: Aggregate multiple model outputs for higher accuracy
+## Overview
 
-#### 📊 Analysis & Visualization
-- **Interactive Timeline**: Real-time threshold adjustment with visual feedback
-- **Keyframe Screenshots**: Automatic extraction of suspicious frame segments
-- **Heatmap Generation**: Visual localization of manipulated regions (optimized for large images)
-- **Confidence Mapping**: Pixel-level confidence scores with proper error handling
-- **Dynamic Analysis**: Adjust detection sensitivity on-the-fly
-- **Large Image Support**: Backend downsampling prevents browser crashes on high-resolution images
+The **Deepfake Detector** provides forensic analysts and researchers with powerful tools to identify manipulated media through:
 
-#### 📜 History & Reports
-- **Detection History**: Track all your detection jobs with persistent storage
-- **Chronological Sorting**: Records sorted newest-first for easy access
-- **PDF Reports**: Generate comprehensive analysis reports
-- **ZIP Packages**: Download complete results including images and metadata
-- **Status Tracking**: Monitor pending, processing, and completed jobs
-- **Filter & Search**: Easily find specific detection results
-- **Stable Layout**: F12 DevTools won't break table layouts
+- **TruFor**: Advanced image forgery detection with pixel-level localization
+- **DeepfakeBench**: Ensemble of 12 video deepfake detection models
 
-#### 🎨 Modern Interface
-- **Interactive UI**: Modern web interface with unified navigation across all pages
-- **Fully Responsive**: Optimized for desktop (1920px+), tablet (768px-1024px), and mobile (< 768px)
-- **Adaptive Navigation**: Hamburger menu on devices < 1024px, horizontal menu on larger screens
-- **Landscape Support**: Proper centering and menu display on mobile landscape mode
-- **Card Layout**: Touch-friendly mobile interface for history viewing
-- **Consistent Design**: Unified spacing and styling across all pages
-- **Real-time Updates**: Live progress tracking during analysis
+### The Team
 
-#### 🚀 Deployment & Operations
-- **Offline Operation**: Complete local processing without internet dependency
-- **Docker Support**: One-click deployment with Docker Compose
-- **Batch Processing**: Multi-GPU parallel video processing
-- **CI/CD Pipeline**: Automated testing and quality checks
+- **Xiyu Guan** - Lead Developer, System Architecture, Full-Stack Development
+- **GitHub**: https://github.com/lfpaaaaa/deepfake-detector
+- **Contact**: xiyug@student.unimelb.edu.au
 
-## The Team
+---
 
-Baojun Liu : frontend
+## Key Features
 
-Ruidong Zhang : scrum master
+### 🔐 Security & User Management
+- JWT-based authentication with 24-hour sessions
+- Role-based access control (Admin/Analyst)
+- Enhanced password policy (8+ chars, uppercase, lowercase, digit)
+- Secure token validation and automatic redirects
 
-YuchengWang : database
+### 🤖 AI Detection Models
+- **TruFor** - Image forgery detection with confidence mapping
+- **DeepfakeBench** - 12 specialized video detection models
+- Pixel-level anomaly localization
+- Multi-model ensemble predictions
 
-Yuzhao Ouyang :  backend
+### 📊 Analysis & Visualization
+- Real-time detection progress indicators
+- Confidence heatmaps and score visualizations
+- Frame-by-frame video analysis
+- Suspicious segment identification
 
-Xiyu Guan : Product owner
+### 📜 History & Reports
+- Complete detection history with chronological sorting
+- Professional PDF reports with forensic details
+- ZIP archives with all analysis artifacts
+- Admin can view all users' history
 
-## Technologies
+### 🎨 Modern Interface
+- Responsive design (desktop, tablet, mobile)
+- Drag-and-drop file upload
+- Unified navigation across all pages
+- Dark/light theme support
 
-- **TruFor Model**: State-of-the-art forensic framework for image forgery detection
-- **DeepfakeBench Framework**: 12 advanced frame-level detection models
-- **FastAPI**: Modern Python web framework for APIs
-- **PyTorch**: Deep learning framework for model inference
-- **OpenCV**: Computer vision library for video processing
-- **Tailwind CSS + daisyUI**: Modern UI framework
+### 🚀 Deployment & Operations
+- Docker containerization for easy deployment
+- Volume mounting for development hot-reload
+- CI/CD with GitHub Actions
+- Comprehensive test coverage (100% pass rate)
 
-## Models
-
-### TruFor Model
-- **Architecture**: Transformer-based fusion with dual encoders
-- **Features**: Pixel-level localization, confidence mapping, Noiseprint++ analysis
-- **Output**: Anomaly maps, confidence maps, integrity scores
-- **File**: `trufor.pth.tar`
-- **Download**: [TruFor_weights.zip](https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing) (248.8 MB)
-- **Official Repository**: [TruFor by GRIP-UNINA](https://github.com/grip-unina/TruFor)
-- **Note**: Pre-trained weights provided by original authors, we only integrated the model
-
-### DeepfakeBench Models (12 Frame-Level Detectors)
-- **Current Models (V3.0)**: Xception, MesoNet-4, MesoNet-4 Inception, F3Net, EfficientNet-B4, Capsule Net, SRM, RECCE, SPSL, UCF, CNN-AUG, CORE
-- **Note**: V2.0 had 13 models including FFD, which was removed in V3.0
-- **Location**: `vendors/DeepfakeBench/training/weights/`
-- **Download**: [vendors.zip](https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing) (1.1 GB - includes DeepfakeBench framework and weights)
-- **Official Repository**: [DeepfakeBench by SCLBD](https://github.com/SCLBD/DeepfakeBench)
-- **Note**: Pre-trained weights provided by DeepfakeBench project, we only integrated the framework
-- **Features**: Frame-by-frame analysis, suspicious segment detection, multi-model comparison
-- **Quick Start**: See [QUICK_START.md](QUICK_START.md) or [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)
-- **Usage**: `python tools/predict_frames.py --input video.mp4 --model xception`
+---
 
 ## Quick Start
 
 ### Prerequisites
-- Docker Desktop installed ([Download here](https://www.docker.com/get-started/))
-- At least 3GB free disk space
+- **Docker Desktop** installed ([Download here](https://www.docker.com/get-started/))
+- At least **3GB** free disk space
+- Internet connection for downloading model weights
 
-### Step-by-Step Setup
+### Installation (5 Steps)
 
-#### 1. Clone the Repository
+#### 1. Clone Repository
 ```bash
 git clone https://github.com/lfpaaaaa/deepfake-detector.git
 cd deepfake-detector
 ```
 
-**Note**: The cloned repository does **NOT** include model weights (they are in `.gitignore`). You need to download them separately.
-
 #### 2. Download Model Weights
 
-Visit: [Google Drive - Model Weights](https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A?usp=sharing)
+**📥 Download from Google Drive**: [Model Weights Folder](https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A)
 
 Download these two files:
-- `TruFor_weights.zip` (248.8 MB)
-- `vendors.zip` (1.1 GB)
+- `TruFor_weights.zip` (248.8 MB) - TruFor model weights
+- `vendors.zip` (1.1 GB) - **DeepfakeBench framework + 12 model weights (all included)**
 
-#### 3. Extract and Place Files
+#### 3. Extract Files
 
-**Important**: Extract files **inside** the `deepfake-detector` directory.
+**Windows PowerShell**:
+```powershell
+# Extract to models/ directory
+Expand-Archive -Path "TruFor_weights.zip" -DestinationPath "models" -Force
+Expand-Archive -Path "vendors.zip" -DestinationPath "models" -Force
+```
 
-##### For TruFor (Image Detection):
+**Linux/Mac**:
 ```bash
-# Windows PowerShell:
-Expand-Archive -Path "TruFor_weights.zip" -DestinationPath "."
-# This creates: trufor.pth.tar in project root
-
-# Linux/Mac:
-unzip TruFor_weights.zip
-# This creates: trufor.pth.tar in project root
+# Create models directory and extract
+mkdir -p models
+unzip TruFor_weights.zip -d models
+unzip vendors.zip -d models
 ```
 
-##### For DeepfakeBench (Video Detection):
+**Verify**:
 ```bash
-# Windows PowerShell:
-Expand-Archive -Path "vendors.zip" -DestinationPath "."
-# This creates: vendors/ folder in project root
+# Should exist: models/trufor.pth.tar (~249 MB) and models/vendors/ directory
+ls -lh models/trufor.pth.tar
 
-# Linux/Mac:
-unzip vendors.zip
-# This creates: vendors/ folder in project root
+# Should have 12 .pth files
+ls models/vendors/DeepfakeBench/training/weights/*.pth | wc -l
 ```
 
-**Expected Directory Structure After Extraction:**
-```
-deepfake-detector/
-├── trufor.pth.tar              ← TruFor model (249 MB)
-├── vendors/                    ← DeepfakeBench framework
-│   └── DeepfakeBench/
-│       └── training/
-│           └── weights/
-│               ├── xception_best.pth
-│               ├── meso4_best.pth
-│               ├── f3net_best.pth
-│               └── ... (9 more .pth files)
-├── app/
-├── configs/
-├── docker-compose.yml
-├── Dockerfile
-└── ...
-```
-
-**Verify Installation:**
+#### 4. Start Docker
 ```bash
-# Check TruFor weight exists
-ls -lh trufor.pth.tar
-# Should show: ~249 MB
-
-# Check DeepfakeBench weights exist (Windows)
-dir vendors\DeepfakeBench\training\weights\*.pth
-# Should show: 12 .pth files
-
-# Check DeepfakeBench weights exist (Linux/Mac)
-ls vendors/DeepfakeBench/training/weights/*.pth | wc -l
-# Should show: 12
-```
-
-#### 4. Start Docker Container
-
-```bash
-# Build and start the container
 docker compose up -d --build
 ```
 
-**What this does:**
-- Builds Docker image with all dependencies
-- Copies model weights into the container
-- Starts FastAPI server on port 8000
-- Runs in background (`-d` flag)
-
-**Wait for startup** (~30-60 seconds for first time):
+Wait ~30-60 seconds for first-time startup. Check logs:
 ```bash
-# Check if container is running
-docker compose ps
-
-# View logs
 docker compose logs -f
-
 # Look for: "Application startup complete"
 ```
 
-#### 5. Access the Application
+#### 5. Access Application
 
-Open your browser and visit:
+Open your browser: **http://localhost:8000/web/index_main.html**
 
-**🏠 Home Page**: http://localhost:8000/web/index_main.html
+**First-time setup**:
+1. Click "Register" to create an account
+2. Password must meet policy (8+ chars, uppercase, lowercase, digit)
+3. Login and start detecting!
 
-Or simply: http://localhost:8000 (redirects to home)
-
-**All available pages:**
-1. 🏠 **Home**: http://localhost:8000/web/index_main.html - Landing page
-2. 📝 **Register**: http://localhost:8000/web/register.html - Create account
-3. 🔐 **Login**: http://localhost:8000/web/login.html - User login
-4. 🖼️ **TruFor Detection**: http://localhost:8000/web/index.html - Image detection
-5. 🎬 **DeepfakeBench**: http://localhost:8000/web/deepfakebench.html - Video detection
-6. 📜 **History**: http://localhost:8000/web/history.html - View past detections
-
-#### 6. Stop the Container
-
+### Stop Docker
 ```bash
-# Stop the container
 docker compose down
-
-# Stop and remove all data
-docker compose down -v
 ```
 
-### Troubleshooting
+### Need Help?
 
-**Problem: "Model not found" error**
-- ✅ Make sure `trufor.pth.tar` is in project root
-- ✅ Make sure `vendors/` folder exists with 12 .pth files
-- ✅ Rebuild Docker: `docker compose up -d --build`
-
-**Problem: Port 8000 already in use**
-```bash
-# Windows: Find and kill process
-netstat -ano | findstr :8000
-taskkill /PID <PID> /F
-
-# Linux/Mac: Find and kill process
-lsof -ti:8000 | xargs kill -9
-```
-
-**Problem: Docker build fails**
-- ✅ Make sure Docker Desktop is running
-- ✅ Check disk space (need 3GB+)
-- ✅ Try: `docker system prune` to free space
-
-**See detailed guide**: [WEIGHTS_DOWNLOAD_GUIDE.md](WEIGHTS_DOWNLOAD_GUIDE.md)
+- **Complete Setup Guide**: [docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md](docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md)
+- **Troubleshooting**: See guide above or [docs/handover/HANDOVER_DOCUMENT.md](docs/handover/HANDOVER_DOCUMENT.md)
 
 ---
 
-### Local Deployment (Advanced Users - Not Recommended)
+## Technologies
 
-⚠️ **WARNING**: Local deployment without Docker is **NOT RECOMMENDED** due to complex dependencies and environment setup. Use Docker for the best experience.
-
-**This method is only for:**
-- Developers who need to modify the code
-- Environments where Docker is not available
-- Users who want direct access to Python processes
-
-**Prerequisites**:
-- Python 3.11 or higher installed
-- pip package manager
-- Model weights downloaded (see Step 2 above)
-
-#### Option 1: Using Startup Scripts
-
-**Windows**:
-```cmd
-cd deepfake-detector
-scripts\start.bat
-```
-
-**Linux/macOS**:
-```bash
-cd deepfake-detector
-bash scripts/start.sh
-```
-
-The scripts will:
-1. Create a Python virtual environment (`venv/`)
-2. Install all dependencies from `configs/requirements.txt`
-3. Verify model weights exist
-4. Start the FastAPI server
-
-#### Option 2: Manual Setup
-
-1. **Create Virtual Environment**:
-```bash
-# Linux/macOS
-python3 -m venv venv
-source venv/bin/activate
-
-# Windows
-python -m venv venv
-venv\Scripts\activate
-```
-
-2. **Install Dependencies**:
-```bash
-pip install -r configs/requirements.txt
-```
-
-3. **Verify Model Weights**:
-```bash
-# Should exist
-ls trufor.pth.tar
-ls vendors/DeepfakeBench/training/weights/*.pth
-```
-
-4. **Start Server**:
-```bash
-python scripts/start_trufor.py
-
-# Or manually with uvicorn
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-5. **Access Application**:
-- Open http://localhost:8000/web/index_main.html in your browser (Home page)
-
-#### Troubleshooting Local Deployment
-
-| Problem | Solution |
-|---------|----------|
-| **Python not found** | Install Python 3.11+ from [python.org](https://python.org) |
-| **pip not found** | Reinstall Python with pip, or run `python -m ensurepip` |
-| **Virtual environment fails** | Try `python3 -m venv --clear venv` to force recreation |
-| **Import errors** | Activate virtual environment: `source venv/bin/activate` (Linux) or `venv\Scripts\activate` (Windows) |
-| **Model loading fails** | Verify `trufor.pth.tar` is exactly 248.8 MB and in project root |
-| **Port 8000 in use** | Kill the process or change port: `uvicorn app.main:app --port 8001` |
-| **CUDA errors (GPU)** | Install correct PyTorch for your CUDA version, or use CPU mode |
-
-**If local deployment fails, strongly recommend switching to Docker deployment (see above).**
+| Layer | Stack |
+|-------|-------|
+| **Backend** | Python 3.11, FastAPI, Uvicorn |
+| **Frontend** | HTML5, CSS3, JavaScript (Vanilla), DaisyUI, TailwindCSS |
+| **AI/ML** | PyTorch 2.0+, TruFor, DeepfakeBench (12 models) |
+| **Auth** | JWT (jose), bcrypt, passlib |
+| **Database** | JSON file storage (users, sessions, jobs) |
+| **Deployment** | Docker, Docker Compose |
+| **CI/CD** | GitHub Actions |
+| **Testing** | pytest, FastAPI TestClient |
 
 ---
 
-5. **Frame-by-frame analysis** with DeepfakeBench models:
-```bash
-# Single video analysis with visualization
-python tools/predict_frames.py --input video.mp4 --model xception --fps 10 --save-vis
+## AI Models
 
-# Batch processing multiple videos
-python tools/batch_predict.py --input-dir data/videos --model xception --workers 4 --gpus 0,1
+### TruFor (Image Detection)
+- **File**: `models/trufor.pth.tar` (~249 MB)
+- **Features**: Pixel-level forgery localization, confidence maps, Noiseprint++ analysis
+- **Official**: https://github.com/grip-unina/TruFor
+- **Paper**: [TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection](https://arxiv.org/abs/2212.10957)
 
-# List available models
-python tools/list_models.py
+### DeepfakeBench (Video Detection)
+- **12 Models**: Xception, EfficientNet-B4, F3Net, MesoNet-4, Capsule, SRM, RECCE, SPSL, UCF, CNN-AUG, CORE, MesoNet-4 Inception
+- **Total Size**: ~780 MB
+- **Official**: https://github.com/SCLBD/DeepfakeBench
+- **Paper**: [DeepfakeBench: A Comprehensive Benchmark](https://arxiv.org/abs/2307.01426)
 
-# Aggregate results
-python tools/aggregate_runs.py --root runs/image_infer --out summary.csv
-```
-### Common Commands
-- **View logs:** `docker-compose logs -f`
-- **Stop services:** `docker-compose down`
-- **Restart services:** `docker-compose restart`
+**Download Link**: https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A
 
-**Full documentation:** `DOCKER_README.md`
+**⚠️ Important**: We **only integrated** these models. We did **NOT** train them. All credit goes to original authors.
 
-### 📁 Model Files Required
-- `trufor.pth.tar` (~500MB) - Primary TruFor model for image/video forensics
-- DeepfakeBench weights (13 files, ~50-200MB each) - Frame-level detectors
-  - Location: `vendors/DeepfakeBench/training/weights/`
-  - Models: `xception_best.pth`, `meso4_best.pth`, `f3net_best.pth`, etc.
+---
 
-See [MODEL_SETUP.md](docs/MODEL_SETUP.md) for detailed setup instructions and [TRUFOR_TECHNICAL_GUIDE.md](docs/TRUFOR_TECHNICAL_GUIDE.md) for technical implementation details.
+## Documentation
 
-For DeepfakeBench frame-level detection:
-- **Quick Start**: [QUICK_START.md](QUICK_START.md)
-- **Full Documentation**: [FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)
-- **Batch Processing**: [BATCH_PROCESSING_GUIDE.md](BATCH_PROCESSING_GUIDE.md) 
-- **Tool Documentation**: [tools/README.md](tools/README.md)
+### 📖 Getting Started
+- **[WEIGHTS_DOWNLOAD_GUIDE.md](docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md)** - Complete model setup guide
+- **[HANDOVER_DOCUMENT.md](docs/handover/HANDOVER_DOCUMENT.md)** - Comprehensive project handover
 
-### UI Development
+### 🤖 Model Guides
+- **[TruFor Technical Guide](docs/guides/TRUFOR_TECHNICAL_GUIDE.md)** - TruFor integration details
+- **[Quick Reference V2](docs/guides/QUICK_REFERENCE_V2.md)** - Command cheat sheet
 
-For updating UI, remember to run:
-```bash
-npm run build
-``` 
-to compile the latest `app-compiled.css`
+### 🏗️ Architecture & Design
+- **[V3 Domain Model](docs/architecture/v3_domain_model_diagram.md)** - System architecture
+- **[V3 Sequence Diagram](docs/architecture/v3_sequence_diagram.md)** - Interaction flows
+- **[Upgrade Summary V2](docs/guides/UPGRADE_SUMMARY_V2.md)** - V1 → V2 migration
 
-## Detection Methods
+### 🧪 Testing & Quality
+- **[Testing README](docs/testing/README.md)** - Testing strategy
+- **[Cycle 3 Test Report](docs/testing/test_reports/cycle_3_report.md)** - Latest results (100% pass)
+- **[Test Cases](docs/testing/TEST_CASES.md)** - All 28 test scenarios
 
-### 1. TruFor Detection (Image & Video Forensics)
-- **Model**: `trufor.pth.tar`
-- **Architecture**: Transformer-based fusion with dual encoders
-- **Features**: 
-  - Pixel-level localization with heatmaps
-  - Confidence mapping
-  - Noiseprint++ analysis
-  - Both image and video support
-- **Use Case**: Detailed forensic analysis with visual evidence
+### 📱 UI Documentation
+- **[UI Features](docs/ui/UI_FEATURES.md)** - Frontend features guide
+- **[UI Screenshots](docs/ui/)** - 32 screenshots (16 desktop + 16 mobile)
 
-### 2. DeepfakeBench Detection (Video Frame Analysis)
-- **Models**: 13 specialized detectors (Xception, F3Net, EfficientNet-B4, etc.)
-- **Features**:
-  - Frame-by-frame deepfake detection
-  - Interactive timeline with threshold slider
-  - Automatic keyframe extraction
-  - Suspicious segment identification
-  - Real-time threshold adjustment
-  - Dynamic keyframe generation
-- **Use Case**: Video-specific deepfake detection with detailed temporal analysis
+### 🔧 Operations
+- **[CI Setup Guide](docs/testing/CI_SETUP.md)** - GitHub Actions configuration
+- **[Changelog](docs/handover/CHANGELOG.md)** - Version history details
 
-Both methods operate completely offline with no internet connection required.
+---
 
-## Web Interface Navigation
+## Version History
 
-The system provides three main interfaces accessible through a unified navigation bar:
+| Version | Date | Highlights |
+|---------|------|------------|
+| **V3.1** 🎉 | **Nov 4, 2025** | **9 bugs fixed, enhanced security, 100% test pass, responsive design** |
+| V3.0 | Oct 26, 2025 | Complete testing (109 tests), mobile UI, 12 models, CI/CD |
+| V2.0 | Sep 2025 | TruFor + DeepfakeBench integration, JWT auth, PDF reports |
+| V1.0 | Initial | Basic detection system |
 
-1. **Home** (`/web/index_main.html`) - Landing page with method selection
-2. **TruFor Detection** (`/web/index.html`) - Image and video forensic analysis
-3. **DeepfakeBench** (`/web/deepfakebench.html`) - Frame-level video analysis
+### V3.1 Highlights (Current Release)
 
-### Key Features
-- **Unified Navigation**: Easy switching between detection methods
-- **Drag & Drop Upload**: Intuitive file upload interface
-- **Real-time Progress**: Live analysis progress indicators
-- **Interactive Results**: 
-  - Timeline visualization with adjustable threshold
-  - Keyframe screenshots of suspicious segments
-  - Detailed segment analysis
-  - Downloadable results
+**🐛 Critical Bugs Fixed**:
+- ✅ **BUG-007**: Large image crashes (backend downsampling)
+- ✅ **BUG-009**: NaN% confidence display (validation checks)
+- ✅ **BUG-010**: Invalid token handling (client-side validation)
+- ✅ **BUG-011**: F12 DevTools layout issues (CSS fixes)
+- ✅ **BUG-012**: Missing registration link (UX improvement)
+- ✅ **BUG-013**: Navigation spacing inconsistency (unified CSS)
+- ✅ **BUG-014**: History sorting disorder (timestamp sorting)
+- ✅ **BUG-015**: Responsive layout issues (breakpoint adjustments)
 
-## API Endpoints
+**🔒 Enhancements**:
+- Enhanced password policy (min 8 chars, uppercase, lowercase, digit)
 
-### TruFor API
-- `POST /detect` - Upload and analyze media
-- `GET /health` - Health check
+**✅ Quality Assurance**:
+- **Test Pass Rate**: 100% (Cycle 3)
+- **Tests Run**: 121 (67 automated + 42 manual + 12 verification)
+- **Code Quality**: Removed 8 unused items, optimized imports
+- **Production Status**: ✅ Ready for deployment
 
-### DeepfakeBench API
-- `GET /api/deepfakebench/models` - List available models
-- `POST /api/deepfakebench/analyze` - Start video analysis
-- `GET /api/deepfakebench/jobs/{job_id}` - Get analysis status
-- `POST /api/deepfakebench/jobs/{job_id}/extract-keyframe` - Extract frame at timestamp
-- `GET /video/jobs/{job_id}/keyframes/{filename}` - Serve keyframe images
+**📋 Full Details**: [Cycle 3 Test Report](docs/testing/test_reports/cycle_3_report.md)
+
+---
 
 ## Project Structure
 
 ```
 deepfake-detector/
-├── app/
-│   ├── adapters/           # Model adapters
-│   │   ├── trufor_adapter.py
-│   │   └── deepfakebench_adapter.py
-│   ├── web/                # Web interfaces
-│   │   ├── index_main.html      # Landing page
-│   │   ├── index.html           # TruFor interface
-│   │   └── deepfakebench.html   # DeepfakeBench interface
-│   └── main.py             # FastAPI application
-├── tools/                  # CLI tools
-│   ├── predict_frames.py   # Frame-level inference
-│   ├── batch_predict.py    # Batch processing
-│   └── aggregate_runs.py   # Result aggregation
-├── models/                 # Model weights
-│   └── trufor.pth.tar
-├── vendors/DeepfakeBench/  # DeepfakeBench framework
-│   └── training/weights/   # DeepfakeBench model weights
-├── data/jobs/              # Analysis results
-└── docs/                   # Documentation
+├── app/                          # FastAPI application
+│   ├── adapters/                 # Model wrappers (TruFor, DeepfakeBench)
+│   ├── auth/                     # JWT authentication
+│   ├── history/                  # Detection history management
+│   ├── reports/                  # PDF/ZIP generation
+│   ├── web/                      # Frontend (HTML/CSS/JS)
+│   └── main.py                   # API endpoints (1288 lines)
+├── docs/                         # Documentation
+│   ├── guides/                   # User guides
+│   │   ├── WEIGHTS_DOWNLOAD_GUIDE.md
+│   │   └── QUICK_REFERENCE_V2.md
+│   ├── architecture/             # System design diagrams
+│   ├── testing/                  # Test plans and reports
+│   ├── ui/                       # UI screenshots and docs
+│   ├── guides/                   # User guides & tech docs
+│   │   ├── WEIGHTS_DOWNLOAD_GUIDE.md
+│   │   ├── TRUFOR_TECHNICAL_GUIDE.md
+│   │   ├── UPGRADE_SUMMARY_V2.md
+│   │   └── QUICK_REFERENCE_V2.md
+│   ├── handover/                 # Project handover
+│   │   ├── HANDOVER_DOCUMENT.md
+│   │   └── CHANGELOG.md
+│   ├── testing/                  # Testing docs
+│   │   ├── CI_SETUP.md
+│   │   └── ...
+├── tests/                        # Automated tests (pytest)
+├── tools/                        # CLI detection tools
+├── models/                       # Model weights directory (user must download)
+│   ├── trufor.pth.tar           # TruFor model weights
+│   └── vendors/                 # DeepfakeBench models
+│       └── DeepfakeBench/       # 12 detection models
+├── docker-compose.yml            # Docker configuration
+├── Dockerfile                    # Docker image definition
+└── README.md                     # This file
 ```
 
-## LAN Access Guide
+---
 
-To access the web interface from other devices on your local network (e.g., mobile phones, tablets):
+## API Endpoints
 
-### 1. Find Your Computer's IPv4 Address
+### Authentication
+- `POST /register` - Create new user account
+- `POST /token` - Login and get JWT token
+- `GET /api/auth/me` - Get current user info
 
-**Windows (PowerShell):**
-```powershell
-ipconfig
-# Look for "IPv4 Address" under your active network adapter (e.g., 192.168.1.100)
-```
+### Detection
+- `POST /detect` - Analyze image (TruFor)
+- `POST /api/deepfakebench/analyze` - Analyze video (DeepfakeBench)
+- `GET /api/deepfakebench/jobs/{job_id}` - Check analysis status
 
-**macOS/Linux:**
+### History & Reports
+- `GET /api/history` - Get detection history
+- `GET /api/history/{job_id}` - Get specific job details
+- `GET /api/history/{job_id}/pdf` - Download PDF report
+- `GET /api/history/{job_id}/zip` - Download ZIP archive
+
+### Models
+- `GET /api/models/status` - Check model availability
+- `GET /api/deepfakebench/models` - List all 12 models
+
+**Full API Documentation**: http://localhost:8000/docs (Swagger UI)
+
+---
+
+## Web Interface
+
+### Pages
+1. **Home** (`/web/index_main.html`) - Landing page with method selection
+2. **Register** (`/web/register.html`) - Create new account
+3. **Login** (`/web/login.html`) - User authentication
+4. **TruFor Detection** (`/web/index.html`) - Image analysis
+5. **DeepfakeBench** (`/web/deepfakebench.html`) - Video analysis
+6. **History** (`/web/history.html`) - View past detections
+
+### Key Features
+- **Unified Navigation**: Consistent navbar across all pages
+- **Drag & Drop Upload**: Intuitive file upload
+- **Real-time Progress**: Live detection status
+- **Interactive Results**: Adjustable thresholds, keyframe extraction
+- **Responsive Design**: Works on desktop, tablet, and mobile
+
+---
+
+## Common Commands
+
+### Docker
 ```bash
-ifconfig
-# Look for "inet" address under your active network interface (e.g., en0 or wlan0)
+# Start services
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# Clean up
+docker system prune -a
 ```
 
-### 2. Configure Firewall
-
-**Windows:**
-```powershell
-# Allow inbound connections on port 8000
-New-NetFirewallRule -DisplayName "Deepfake Detector" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
-```
-
-**macOS:**
-- System Preferences → Security & Privacy → Firewall → Firewall Options
-- Add Python and allow incoming connections
-
-**Linux (ufw):**
+### Testing
 ```bash
-sudo ufw allow 8000/tcp
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=app --cov-report=html
+
+# Run specific test file
+pytest tests/test_auth.py
 ```
 
-### 3. Start the Server
-
-The server is already configured to accept LAN connections (`host="0.0.0.0"`):
-
+### Development
 ```bash
-python scripts/start_trufor.py
+# Local development (requires Python 3.11+)
+python -m uvicorn app.main:app --reload
+
+# Or use startup scripts
+bash scripts/start.sh      # Linux/Mac
+scripts\start.bat          # Windows
 ```
 
-### 4. Access from Other Devices
-
-On your mobile phone or other device **connected to the same Wi-Fi network**, open your browser and navigate to:
-
-```
-http://YOUR_IPV4_ADDRESS:8000/web/index_main.html
-```
-
-For example, if your IPv4 is `192.168.1.100`:
-```
-http://192.168.1.100:8000/web/index_main.html
-```
-
-### Available Pages:
-- Main page: `http://YOUR_IP:8000/web/index_main.html`
-- TruFor Detection: `http://YOUR_IP:8000/web/index.html`
-- DeepfakeBench: `http://YOUR_IP:8000/web/deepfakebench.html`
-
-### Troubleshooting:
-- ✅ Ensure both devices are on the **same Wi-Fi network**
-- ✅ Verify firewall rules allow port 8000
-- ✅ Check if the server is running: `http://YOUR_IP:8000/health`
-- ✅ Try disabling VPN if enabled
-
-## Documentation
-
-### 📖 Getting Started
-- **[QUICK_START.md](QUICK_START.md)** - Quick start guide
-- **[FRAME_INFERENCE_SETUP.md](FRAME_INFERENCE_SETUP.md)** - Frame-level detection setup
-- **[BATCH_PROCESSING_GUIDE.md](BATCH_PROCESSING_GUIDE.md)** - Batch processing guide
-
-### 🏗️ Architecture
-- **[V3 Domain Model](docs/architecture/v3_domain_model_diagram.md)** - V3 system architecture and components
-- **[V3 Sequence Diagram](docs/architecture/v3_sequence_diagram.md)** - V3 interaction flows
-- **[V2 Domain Model](docs/architecture/v2_domain_model_diagram.md)** - V2 architecture (legacy)
-- **[V2 Sequence Diagram](docs/architecture/v2_sequence_diagram.md)** - V2 flows (legacy)
-
-### 🤖 Models & Setup
-- **[MODEL_SETUP.md](docs/MODEL_SETUP.md)** - Model setup instructions
-- **[TRUFOR_TECHNICAL_GUIDE.md](docs/TRUFOR_TECHNICAL_GUIDE.md)** - TruFor technical details
-- **[WEIGHTS_DOWNLOAD_GUIDE.md](WEIGHTS_DOWNLOAD_GUIDE.md)** - Model weights download guide
-
-### 📱 Features & UI
-- **[UI_FEATURES.md](UI_FEATURES.md)** - User interface features documentation
-- **[UPGRADE_SUMMARY_V2.md](UPGRADE_SUMMARY_V2.md)** - V2.0 upgrade summary
-- **[QUICK_REFERENCE_V2.md](QUICK_REFERENCE_V2.md)** - V2.0 quick reference
-
-### 🔄 CI/CD & Testing
-- **[CI_SETUP.md](CI_SETUP.md)** - Continuous integration setup guide
-- **[tests/README.md](tests/README.md)** - Testing documentation
-- **[Test Plans](docs/testing/test_plans/)** - Detailed test cycle plans
-- **[Test Reports](docs/testing/test_reports/)** - Complete test execution reports
-
-## Quality Assurance
-
-### Test Coverage (Cycle 3 - Nov 4, 2025)
-- ✅ **Bug Fix Verification**: 5/5 (100%)
-- ✅ **Regression Testing**: 6/6 (100%)
-- ✅ **Overall Pass Rate**: 12/12 (100%)
-- ✅ **New Bugs Found**: 4 (all fixed during testing)
-- ✅ **Production Status**: Ready for deployment
-
-### Critical Bugs Fixed
-1. **BUG-007** (🔴 Critical): Large image browser crashes - Fixed with backend downsampling
-2. **BUG-009** (🟡 Medium): NaN% confidence display - Fixed with validation checks
-3. **BUG-010** (🔴 Critical): Invalid token handling - Fixed with client-side validation
-4. **BUG-011** (🟢 Low): F12 DevTools layout issues - Fixed with CSS adjustments
-5. **BUG-012** (🟡 Medium): Missing registration link - Fixed with UX improvement
-6. **BUG-013** (🟢 Low): Navigation spacing inconsistency - Fixed with unified CSS
-7. **BUG-014** (🟡 Medium): History sorting disorder - Fixed with timestamp sorting
-8. **BUG-015** (🟡 Medium): Responsive layout issues - Fixed with breakpoint adjustments
-
-### Enhancement
-- **ENHANCEMENT-005**: Enhanced password policy (min 8 chars, uppercase, lowercase, digit)
-
-### Code Quality
-- ✅ Removed 8 unused/redundant code items
-- ✅ All imports optimized
-- ✅ CSS duplicates eliminated
-- ✅ Code reviewed and cleaned
-
-**Test Documentation**:
-- 📋 [Cycle 3 Test Plan](docs/testing/test_plans/cycle_3_bugfix_verification.md)
-- 📊 [Cycle 3 Test Report](docs/testing/test_reports/cycle_3_report.md)
-
-## Version History
-
-| Version | Date | Key Features |
-|---------|------|--------------|
-| V1.0 | Initial | Basic ResNet detection |
-| V2.0 | Oct 2025 | TruFor integration, Enhanced UI, Modal dialogs |
-| V3.0 | Oct 2025 | Authentication, History, DeepfakeBench (12 models), Mobile UI, CI/CD |
-| **V3.1** | **Nov 2025** | **Bug fixes, Enhanced security, Responsive design, 100% test coverage** |
-
-### V3.0 Highlights (Oct 2025)
-- 🔐 Complete JWT authentication system
-- 📜 Detection history with PDF/ZIP reports
-- 🎬 12 DeepfakeBench models for video analysis
-- 📱 Mobile-responsive interface
-- 🔄 CI/CD pipeline with automated testing
-
-### V3.1 Highlights (Nov 2025) - Current Release
-- 🐛 **Critical Bug Fixes**: Large image crashes, NaN displays, token validation
-- 🔒 **Enhanced Security**: Stronger password policy (8+ chars, mixed case, digits)
-- 📱 **Responsive Design**: Fixed mobile layout issues (portrait & landscape)
-- 📊 **History Improvements**: Chronological sorting, registration link accessibility
-- 🎨 **UI Consistency**: Unified navigation bar spacing across all pages
-- ✅ **Quality Assurance**: 100% test coverage, all 9 bugs resolved
-- 🧹 **Code Quality**: Removed 8 unused/redundant code items
-- 📐 **Mobile Optimization**: Breakpoint adjusted to 1024px for better tablet/phone experience
-
-**What's Fixed in V3.1**:
-- ✅ Large images (>1MB) no longer crash the browser
-- ✅ Corrupted files show proper error messages instead of "NaN%"
-- ✅ Invalid tokens automatically redirect to login page
-- ✅ History records sorted newest-first for better usability
-- ✅ Mobile devices (landscape mode) display correct navigation menu
-- ✅ All pages have consistent visual appearance
+---
 
 ## License and Attribution
 
 ### Our Project
-This project is for educational and research purposes.
+This project is for **educational and research purposes**.
 
 ### Integrated Models
 
-**We integrated but did NOT train the following models:**
+**We only integrated these models - we did NOT train them.**
 
 #### TruFor Model
 - **Developed by**: GRIP-UNINA (University of Naples Federico II)
 - **Repository**: https://github.com/grip-unina/TruFor
-- **Paper**: [TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection](https://arxiv.org/abs/2212.10957)
-- **License**: Check original repository
-- **Our Role**: Integration only
-
-#### DeepfakeBench Models
-- **Developed by**: SCLBD (Shenzhen Campus of Learning and Big Data)
-- **Repository**: https://github.com/SCLBD/DeepfakeBench
-- **Paper**: [DeepfakeBench: A Comprehensive Benchmark](https://arxiv.org/abs/2307.01426)
-- **License**: Check original repository
-- **Our Role**: Integration only
-
-**All model weights are provided by the original authors. We only integrated these models into our detection system.**
-
-### Citations
-
-If you use this system in research, please cite the original model papers:
-
-**TruFor:**
+- **License**: Check official repository
+- **Citation**:
 ```bibtex
 @article{guillaro2023trufor,
   title={TruFor: Leveraging All-Round Clues for Trustworthy Image Forgery Detection and Localization},
@@ -676,7 +414,11 @@ If you use this system in research, please cite the original model papers:
 }
 ```
 
-**DeepfakeBench:**
+#### DeepfakeBench Models
+- **Developed by**: SCLBD (Shenzhen Campus of Learning and Big Data)
+- **Repository**: https://github.com/SCLBD/DeepfakeBench
+- **License**: Check official repository
+- **Citation**:
 ```bibtex
 @article{yan2023deepfakebench,
   title={DeepfakeBench: A Comprehensive Benchmark of Deep Learning Methods for Deepfake Detection},
@@ -686,9 +428,32 @@ If you use this system in research, please cite the original model papers:
 }
 ```
 
+**All credit for the models goes to the original authors and research teams.**
+
 ---
 
-**Current Version**: 3.1 (Stable)  
+## Support & Contact
+
+**Project Maintainer**: Xiyu Guan  
+**Email**: xiyug@student.unimelb.edu.au  
+**GitHub**: https://github.com/lfpaaaaa/deepfake-detector
+
+**For Help**:
+1. Check [documentation](#documentation) section above
+2. Read [HANDOVER_DOCUMENT.md](docs/handover/HANDOVER_DOCUMENT.md)
+3. Review [test reports](docs/testing/test_reports/cycle_3_report.md)
+4. Contact maintainer via email
+
+**For Model Issues**:
+- TruFor: https://github.com/grip-unina/TruFor/issues
+- DeepfakeBench: https://github.com/SCLBD/DeepfakeBench/issues
+
+---
+
 **Last Updated**: November 4, 2025  
-**Test Status**: ✅ All tests passed - Production ready  
-**Maintained by**: [Xiyu Guan](mailto:xiyug@student.unimelb.edu.au)
+**Version**: 3.1  
+**Status**: ✅ Production Ready
+
+---
+
+**⭐ Star this repo if you find it useful!**

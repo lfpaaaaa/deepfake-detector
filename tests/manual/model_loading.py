@@ -29,7 +29,7 @@ def test_trufor_loading():
             return True
         else:
             print("❌ TruFor model not available")
-            print(f"   Expected path: trufor.pth.tar")
+            print(f"   Expected path: models/trufor.pth.tar")
             print("\n   📥 To download TruFor model:")
             print("      See docs/TRUFOR_TECHNICAL_GUIDE.md")
             return False
@@ -152,7 +152,7 @@ def check_weight_files():
     project_root = Path(__file__).parent.parent
     
     # Check TruFor
-    trufor_path = project_root / "trufor.pth.tar"
+    trufor_path = project_root / "models/trufor.pth.tar"
     if trufor_path.exists():
         size_mb = trufor_path.stat().st_size / (1024 * 1024)
         print(f"✅ TruFor weight: {trufor_path.name} ({size_mb:.1f} MB)")

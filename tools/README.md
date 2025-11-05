@@ -288,8 +288,8 @@ python tools/fuse_scores.py \
 ## 🔗 Related Resources
 
 - [DeepfakeBench GitHub](https://github.com/SCLBD/DeepfakeBench)
-- Project Documentation: `docs/MODEL_SETUP.md`
-- Weight Download Guide: `WEIGHTS_DOWNLOAD_GUIDE.md`
+- Project Documentation: `../README.md`
+- Weight Download Guide: `../docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md`
 
 ## 📄 License
 

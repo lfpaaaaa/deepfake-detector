@@ -43,7 +43,7 @@ class TruForAdapter:
     Adapter for TruFor model integration
     """
     
-    def __init__(self, model_path: str = "trufor.pth.tar", device: str = "auto"):
+    def __init__(self, model_path: str = "models/trufor.pth.tar", device: str = "auto"):
         """
         Initialize TruFor adapter
         

@@ -162,7 +162,7 @@ Report generation on mobile:
 ## 🔗 Related Documentation
 
 - **UI Features Guide**: [UI_FEATURES.md](UI_FEATURES.md) - Detailed feature descriptions
-- **Handover Document**: [../HANDOVER_DOCUMENT.md](../HANDOVER_DOCUMENT.md) - Project handover
+- **Handover Document**: [../handover/HANDOVER_DOCUMENT.md](../handover/HANDOVER_DOCUMENT.md) - Project handover
 - **Testing Reports**: [../testing/test_reports/](../testing/test_reports/) - UI testing results
 - **Architecture**: [../architecture/](../architecture/) - System design
 

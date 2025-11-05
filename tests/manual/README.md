@@ -54,8 +54,8 @@ python tests/manual/model_loading.py
 
 **Requirements**:
 - Model weights must be present
-- `trufor.pth.tar` in project root
-- DeepfakeBench weights in `vendors/DeepfakeBench/training/weights/`
+- `models/trufor.pth.tar` exists
+- DeepfakeBench weights in `models/vendors/DeepfakeBench/training/weights/`
 
 ---
 

@@ -56,7 +56,7 @@ class DeepfakeBenchAdapter:
         self.model = None
         self.transform_fn = None
         self.input_size = None
-        self.weights_dir = "vendors/DeepfakeBench/training/weights"
+        self.weights_dir = "models/vendors/DeepfakeBench/training/weights"
         
         logger.info(f"Initializing DeepfakeBench adapter with model: {model_key}, device: {self.device}")
         self._load_model()
@@ -447,7 +447,7 @@ class DeepfakeBenchAdapter:
                     break
             
             if weight_file:
-                weight_path = os.path.join("vendors/DeepfakeBench/training/weights", weight_file)
+                weight_path = os.path.join("models/vendors/DeepfakeBench/training/weights", weight_file)
                 available = os.path.exists(weight_path)
             else:
                 available = False

@@ -1,5 +1,9 @@
 # CI/CD Setup Guide
 
+**Version**: 3.1  
+**Last Updated**: November 5, 2025  
+**Status**: ✅ All CI checks passing (100% test coverage)
+
 ## GitHub Actions CI Configuration
 
 This project uses GitHub Actions for continuous integration and testing.
@@ -100,17 +104,51 @@ Some tests may be skipped in CI due to:
 
 This is expected and okay!
 
+## Recent Updates (v3.1.0)
+
+### ✅ CI Improvements
+- All 67 automated tests passing
+- 100% test coverage maintained
+- Fixed missing imports in test files
+- Updated test fixtures to meet new password policy requirements
+- All security scans passing (Trivy)
+
+### 🔧 Configuration Updates
+- Updated for new `models/` directory structure
+- Docker build optimized for model file paths
+- All linter checks passing
+
 ## Best Practices
 
 1. ✅ **Run quick tests locally** before pushing
 2. ✅ **Check CI results** before merging PRs
 3. ✅ **Add tests** for new features
 4. ✅ **Keep requirements.txt** up to date
-5. ✅ **Don't commit** large model files
+5. ✅ **Don't commit** large model files (models are in `.gitignore`)
+6. ✅ **Ensure models/ directory** structure is correct for Docker builds
+
+## CI Test Results (Latest)
+
+### ✅ Cycle 3 Testing (v3.1.0)
+- **Total Tests**: 67 automated tests
+- **Pass Rate**: 100% (67/67 passed)
+- **Code Coverage**: 70%+ (target: ≥60%)
+- **Security**: 0 vulnerabilities
+- **Build Time**: ~4-5 minutes
+
+**Full Results**: See [test_reports/cycle_3_report.md](test_reports/cycle_3_report.md)
 
 ## Need Help?
 
-- GitHub Actions docs: https://docs.github.com/en/actions
-- pytest docs: https://docs.pytest.org/
-- flake8 docs: https://flake8.pycqa.org/
+- **Testing Strategy**: [README.md](README.md) - Complete testing documentation
+- **Test Reports**: [test_reports/](test_reports/) - Detailed test results
+- **GitHub Actions**: https://docs.github.com/en/actions
+- **pytest**: https://docs.pytest.org/
+- **flake8**: https://flake8.pycqa.org/
+
+---
+
+**Document Version**: 3.1  
+**Last Updated**: November 5, 2025  
+**Maintainer**: Xiyu Guan (xiyug@student.unimelb.edu.au)
 

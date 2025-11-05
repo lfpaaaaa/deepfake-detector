@@ -4,7 +4,7 @@
 models:
   trufor:
     enabled: true
-    path: "trufor.pth.tar"
+    path: "models/trufor.pth.tar"
     confidence_threshold: 0.5
     portrait_detection: true
   

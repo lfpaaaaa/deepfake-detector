@@ -109,7 +109,7 @@
 - **Users**: Multiple test accounts (111, admin, testuser2, testuser3)
 
 ### 2.3 Model Configuration
-- **TruFor Model**: trufor.pth.tar (loaded and functional)
+- **TruFor Model**: models/trufor.pth.tar (loaded and functional)
 - **DeepfakeBench Models**: 12/12 models available
   - Xception, MesoNet-4, F3Net, EfficientNet-B4, Capsule Net, RECCE, SPSL, UCF, CNN-AUG, CORE, SRM, MesoNet-4 Inception
 

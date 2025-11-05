@@ -4,7 +4,7 @@
 **Version**: 3.1  
 **Document Date**: November 4, 2025  
 **Prepared By**: Xiyu Guan  
-**Email**: xiyug@student.unimelb.edu.au  
+**Email**: xiyug@student.unimelb.edu.au
 **Repository**: https://github.com/lfpaaaaa/deepfake-detector
 
 ---
@@ -13,7 +13,7 @@
 
 1. [Project Background / Overview](#1-project-background--overview)
 2. [Demo (Link to Hosted Project)](#2-demo-link-to-hosted-project)
-3. [Features (User Stories - Organized in Sprints)](#3-features-user-stories---organized-in-sprints)
+3. [Features (User Stories - Organized in Sprints)](#3-features-user-stories-organized-in-sprints)
 4. [Documentation](#4-documentation)
 5. [System Requirements](#5-system-requirements)
 6. [Installation Guide](#6-installation-guide)
@@ -75,16 +75,16 @@ The application features a modern web interface with user authentication, detect
 **Note**: This project is designed for local/private deployment. To run a demo:
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/lfpaaaaa/deepfake-detector.git
-   cd deepfake-detector
+```bash
+git clone https://github.com/lfpaaaaa/deepfake-detector.git
+cd deepfake-detector
    ```
 
 2. Download model weights (see Section 6.2)
 
 3. Start with Docker:
    ```bash
-   docker compose up -d --build
+docker compose up -d --build
    ```
 
 4. Access at: **http://localhost:8000/web/index_main.html** (Home page)
@@ -306,16 +306,12 @@ Create a new account through the registration page, or use the following test cr
 
 | Document | Description | Location |
 |----------|-------------|----------|
-| Main README | System overview, features, quick start | [README.md](../README.md) |
-| Weights Download Guide | Step-by-step model weight setup | [WEIGHTS_DOWNLOAD_GUIDE.md](../WEIGHTS_DOWNLOAD_GUIDE.md) |
-| Quick Reference V2 | Common tasks and commands | [QUICK_REFERENCE_V2.md](../QUICK_REFERENCE_V2.md) |
-| TruFor Technical Guide | TruFor integration details | [TRUFOR_TECHNICAL_GUIDE.md](TRUFOR_TECHNICAL_GUIDE.md) |
-| Model Setup Guide | DeepfakeBench setup instructions | [MODEL_SETUP.md](MODEL_SETUP.md) |
-| DeepfakeBench Quick Start | How to use DeepfakeBench models | [DeepfakeBench_QUICK_START.md](../DeepfakeBench_QUICK_START.md) |
-| Frame Inference Setup | Video frame processing guide | [FRAME_INFERENCE_SETUP.md](../FRAME_INFERENCE_SETUP.md) |
-| Batch Processing Guide | Batch detection workflows | [BATCH_PROCESSING_GUIDE.md](../BATCH_PROCESSING_GUIDE.md) |
-| Upgrade Summary V2 | V1.0 → V2.0 migration guide | [UPGRADE_SUMMARY_V2.md](../UPGRADE_SUMMARY_V2.md) |
-| CI Setup Guide | GitHub Actions configuration | [CI_SETUP.md](../CI_SETUP.md) |
+| Main README | System overview, features, quick start | [README.md](../../README.md) |
+| Weights Download Guide | Model weights download & setup guide | [WEIGHTS_DOWNLOAD_GUIDE.md](../guides/WEIGHTS_DOWNLOAD_GUIDE.md) |
+| Quick Reference V2 | Common tasks and commands | [QUICK_REFERENCE_V2.md](../guides/QUICK_REFERENCE_V2.md) |
+| TruFor Technical Guide | TruFor integration details | [TRUFOR_TECHNICAL_GUIDE.md](../guides/TRUFOR_TECHNICAL_GUIDE.md) |
+| Upgrade Summary V2 | V1.0 → V2.0 migration guide | [UPGRADE_SUMMARY_V2.md](../guides/UPGRADE_SUMMARY_V2.md) |
+| CI Setup Guide | GitHub Actions configuration | [CI_SETUP.md](../testing/CI_SETUP.md) |
 
 ### 4.6 Meeting Notes & Communication
 
@@ -382,7 +378,7 @@ See [`configs/requirements.txt`](../configs/requirements.txt) for complete list.
 | Model | File Size | Source |
 |-------|-----------|--------|
 | **TruFor** | 1.2 GB | Download from Google Drive |
-| **DeepfakeBench (12 models)** | ~8 GB total | Download from Google Drive |
+| **DeepfakeBench (12 models)** | Included in vendors.zip (1.1 GB) | Download from Google Drive |
 
 **Download Link**: https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A
 
@@ -416,12 +412,14 @@ cd deepfake-detector
 
 #### Step 2: Download Model Weights
 
-Follow the detailed instructions in [`WEIGHTS_DOWNLOAD_GUIDE.md`](../WEIGHTS_DOWNLOAD_GUIDE.md).
+Follow the detailed instructions in [`WEIGHTS_DOWNLOAD_GUIDE.md`](guides/WEIGHTS_DOWNLOAD_GUIDE.md).
 
 **Quick Steps**:
 1. Visit: https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A
-2. Download `trufor.pth.tar` (1.2 GB) → Place in project root
-3. Download `weights.zip` (8 GB) → Extract to `vendors/DeepfakeBench/training/weights/`
+2. Download 2 files:
+   - `TruFor_weights.zip` (249 MB)
+   - `vendors.zip` (1.1 GB) - **Includes complete DeepfakeBench framework + 12 model weights**
+3. Extract both to `models/` directory
 
 #### Step 3: Build and Start Docker Container
 ```bash
@@ -521,8 +519,8 @@ PORT=8000
 RELOAD=false
 
 # Model Paths (defaults usually work)
-TRUFOR_WEIGHTS_PATH=./trufor.pth.tar
-DEEPFAKEBENCH_WEIGHTS_DIR=./vendors/DeepfakeBench/training/weights
+TRUFOR_WEIGHTS_PATH=./models/trufor.pth.tar
+DEEPFAKEBENCH_WEIGHTS_DIR=./models/vendors/DeepfakeBench/training/weights
 ```
 
 #### 6.3.2 Docker Configuration
@@ -591,7 +589,7 @@ pytest
 | Issue | Solution |
 |-------|----------|
 | **Port 8000 already in use** | Change port in `docker-compose.yml` or stop conflicting service |
-| **Model weights not found** | Verify files exist: `trufor.pth.tar` and `vendors/DeepfakeBench/training/weights/*.pth` |
+| **Model weights not found** | Verify files exist: `models/trufor.pth.tar` and `models/vendors/DeepfakeBench/training/weights/*.pth` |
 | **Docker build fails** | Ensure Docker has sufficient memory (8GB+). Check `docker system df` |
 | **CUDA out of memory** | Reduce batch size in `configs/config.yaml` or switch to CPU mode |
 | **Permission denied** | Add user to docker group: `sudo usermod -aG docker $USER` (then logout/login) |
@@ -698,7 +696,7 @@ pytest
 - Added adapter pattern for model integration
 - Implemented repository pattern for history management
 
-**Migration Guide**: [UPGRADE_SUMMARY_V2.md](../UPGRADE_SUMMARY_V2.md)
+**Migration Guide**: [UPGRADE_SUMMARY_V2.md](../guides/UPGRADE_SUMMARY_V2.md)
 
 ---
 
@@ -1029,8 +1027,11 @@ git status                        # Check working directory
 
 ```
 deepfake-detector/
-├── trufor.pth.tar                          ← TruFor model (1.2GB)
-├── vendors/DeepfakeBench/training/weights/ ← 12 DeepfakeBench models (~8GB)
+├── models/                                 ← Model weights directory (user downloads)
+│   ├── trufor.pth.tar                     ← TruFor model (249MB)
+│   └── vendors/                           ← DeepfakeBench models
+│       └── DeepfakeBench/                 ← 12 detection models
+├── TruFor-main/                            ← TruFor framework source
 ├── data/
 │   ├── users.json                          ← User accounts
 │   ├── jobs/                               ← Detection results

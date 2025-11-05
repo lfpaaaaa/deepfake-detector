@@ -42,8 +42,8 @@ if errorlevel 1 (
 )
 
 REM Check if model weights exist
-if not exist "trufor.pth.tar" (
-    echo ERROR: trufor.pth.tar not found!
+if not exist "models\trufor.pth.tar" (
+    echo ERROR: models\trufor.pth.tar not found!
     echo Please download model weights first.
     echo See: WEIGHTS_DOWNLOAD_GUIDE.md
     pause

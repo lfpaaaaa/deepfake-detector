@@ -48,8 +48,8 @@
 **Prerequisites**:
 - ✅ Cycle 1 completed with 100% pass rate
 - ⚠️ Model weights downloaded and placed correctly:
-  - `trufor.pth.tar` in project root
-  - `vendors/DeepfakeBench/training/weights/*.pth` present
+  - `models/trufor.pth.tar` exists
+  - `models/vendors/DeepfakeBench/training/weights/*.pth` present
 - ⚠️ Test data prepared (sample images and videos)
 - ✅ Docker environment working
 - ✅ All Cycle 1 bugs fixed

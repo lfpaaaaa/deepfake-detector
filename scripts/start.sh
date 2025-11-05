@@ -40,8 +40,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Check if model weights exist
-if [ ! -f "trufor.pth.tar" ]; then
-    echo "ERROR: trufor.pth.tar not found!"
+if [ ! -f "models/trufor.pth.tar" ]; then
+    echo "ERROR: models/trufor.pth.tar not found!"
     echo "Please download model weights first."
     echo "See: WEIGHTS_DOWNLOAD_GUIDE.md"
     exit 1

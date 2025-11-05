@@ -44,10 +44,11 @@ env/
 *.ckpt
 *.weights
 *.pt
-models/*.pth
 
-# Vendors directory (contains large model files)
-vendors/
+# Models directory (contains large model files)
+models/
+!models/.gitkeep
+!models/README.md
 
 # Data directories
 data/jobs/*
