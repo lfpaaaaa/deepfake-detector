@@ -2,7 +2,7 @@
 
 **Project**: Deepfake Detector  
 **Version**: 3.1  
-**Document Date**: November 4, 2025  
+**Document Date**: November 5, 2025  
 **Prepared By**: Xiyu Guan  
 **Email**: xiyug@student.unimelb.edu.au
 **Repository**: https://github.com/lfpaaaaa/deepfake-detector
@@ -261,10 +261,12 @@ Create a new account through the registration page, or use the following test cr
 
 | Document | Description | Location |
 |----------|-------------|----------|
-| V3 Domain Model | Current system architecture with all components | [docs/architecture/v3_domain_model_diagram.md](architecture/v3_domain_model_diagram.md) |
-| V3 Sequence Diagram | Interaction flows for detection workflows | [docs/architecture/v3_sequence_diagram.md](architecture/v3_sequence_diagram.md) |
-| V2 Domain Model | Previous architecture (for reference) | [docs/architecture/v2_domain_model_diagram.md](architecture/v2_domain_model_diagram.md) |
-| V2 Sequence Diagram | Previous interaction flows (for reference) | [docs/architecture/v2_sequence_diagram.md](architecture/v2_sequence_diagram.md) |
+| V3.1 Domain Model | Current system architecture (with bug fixes) | [docs/architecture/v3.1_domain_model_diagram.md](architecture/v3.1_domain_model_diagram.md) |
+| V3.1 Sequence Diagram | Current interaction flows (with enhancements) | [docs/architecture/v3.1_sequence_diagram.md](architecture/v3.1_sequence_diagram.md) |
+| V3 Domain Model | Previous architecture (for reference) | [docs/architecture/v3_domain_model_diagram.md](architecture/v3_domain_model_diagram.md) |
+| V3 Sequence Diagram | Previous interaction flows (for reference) | [docs/architecture/v3_sequence_diagram.md](architecture/v3_sequence_diagram.md) |
+| V2 Domain Model | Historical architecture (for reference) | [docs/architecture/v2_domain_model_diagram.md](architecture/v2_domain_model_diagram.md) |
+| V2 Sequence Diagram | Historical interaction flows (for reference) | [docs/architecture/v2_sequence_diagram.md](architecture/v2_sequence_diagram.md) |
 | Use Case Diagram (PlantUML) | Use case relationships | [docs/architecture/User Case Diagram.puml](architecture/User%20Case%20Diagram.puml) |
 | Use Case Diagram (PNG) | Visual use case diagram | [docs/architecture/User Case Diagram.png](architecture/User%20Case%20Diagram.png) |
 | Motivational Model | Project motivation and goals | [docs/architecture/motivational model.png](architecture/motivational%20model.png) |
@@ -440,7 +442,8 @@ docker compose up -d --build
 
 #### Step 4: Access Application
 Open your browser and navigate to:
-- **Main Application**: http://localhost:8000
+- **Main Application (Home)**: http://localhost:8000/web/index_main.html
+- **Or Root URL** (redirects to home): http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
 #### Step 5: Create First User
@@ -797,10 +800,10 @@ This matrix maps user stories to implementation, tests, and documentation.
 
 | Document | Source/Generator | Last Updated |
 |----------|------------------|--------------|
-| **README.md** | Manual (project overview) | Nov 4, 2025 (V3.1) |
-| **HANDOVER_DOCUMENT.md** | Manual (this document) | Nov 4, 2025 (V3.1) |
+| **README.md** | Manual (project overview) | Nov 5, 2025 (V3.1) |
+| **HANDOVER_DOCUMENT.md** | Manual (this document) | Nov 5, 2025 (V3.1) |
 | **Test Reports** | Manual + pytest output | Nov 4, 2025 (Cycle 3) |
-| **Architecture Diagrams** | PlantUML + Manual drawing | Oct 26, 2025 (V3.0) |
+| **Architecture Diagrams** | Mermaid diagrams (V3.1) | Nov 5, 2025 (V3.1) |
 | **UI Screenshots** | Manual capture (32 screenshots) | Oct 26, 2025 (V3.0) |
 | **API Documentation** | FastAPI auto-generated | Real-time (http://localhost:8000/docs) |
 | **Meeting Notes** | Manual (client meetings) | Various dates |
@@ -1147,9 +1150,8 @@ deepfake-detector/
 ---
 
 **Document Version**: 3.1  
-**Last Updated**: November 4, 2025  
-**Status**: ✅ Production Ready  
-**Next Review Date**: December 4, 2025 (1 month)
+**Last Updated**: November 5, 2025  
+**Status**: ✅ Production Ready (Final Release)
 
 ---
 
