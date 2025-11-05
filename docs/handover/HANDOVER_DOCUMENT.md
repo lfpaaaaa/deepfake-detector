@@ -886,10 +886,17 @@ This matrix maps user stories to implementation, tests, and documentation.
 
 ## 10. Contact & Support
 
-### 10.1 Current Maintainer
+### 10.1 Development Team
 
-**Name**: Xiyu Guan  
-**Role**: Lead Developer  
+**Team Members**:
+
+1. **Baojun Liu** - Frontend Development
+2. **Ruidong Zhang** - Scrum Master
+3. **Yucheng Wang** - Database Management
+4. **Yuzhao Ouyang** - Backend Development
+5. **Xiyu Guan** - Product Owner, System Architecture, Full-Stack Development
+
+**Primary Contact**: Xiyu Guan  
 **Email**: xiyug@student.unimelb.edu.au  
 **GitHub**: https://github.com/lfpaaaaa  
 **Availability**: Immediate (until [handover date])

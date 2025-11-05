@@ -34,9 +34,14 @@ The **Deepfake Detector** provides forensic analysts and researchers with powerf
 
 ### The Team
 
-- **Xiyu Guan** - Lead Developer, System Architecture, Full-Stack Development
-- **GitHub**: https://github.com/lfpaaaaa/deepfake-detector
-- **Contact**: xiyug@student.unimelb.edu.au
+- **Baojun Liu** - Frontend Development
+- **Ruidong Zhang** - Scrum Master
+- **Yucheng Wang** - Database Management
+- **Yuzhao Ouyang** - Backend Development
+- **Xiyu Guan** - Product Owner, System Architecture, Full-Stack Development
+
+**GitHub**: https://github.com/lfpaaaaa/deepfake-detector  
+**Contact**: xiyug@student.unimelb.edu.au
 
 ---
 
