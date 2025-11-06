@@ -278,9 +278,17 @@ This section highlights the most important documents for understanding and maint
 |-----------|---------|-------------|
 | **CPU** | 4 cores @ 2.5 GHz | 8 cores @ 3.0 GHz |
 | **RAM** | 8 GB | 16 GB or more |
+| **Docker Memory** | ⚠️ **6 GB allocated to Docker** | 8 GB or more |
 | **GPU** | Not required (CPU mode) | NVIDIA GPU with 4GB VRAM (for faster processing) |
 | **Disk Space** | 10 GB free | 20 GB free |
 | **Network** | Internet for initial setup | Internet for updates |
+
+> **⚠️ Critical Memory Requirements**:
+> - **Minimum**: 6GB RAM allocated to Docker (TruFor will work, but detection results may have slight numerical variations)
+> - **Recommended**: 8GB+ RAM (for stable and consistent detection results)
+> - **Below 6GB**: Image detection will fail with "failed to fetch" errors
+> 
+> **Note**: Different memory allocations may produce slightly different confidence scores (typically ±1-3%) due to floating-point precision and memory optimization differences. This is expected behavior.
 
 ### 5.2 Software Requirements
 
@@ -351,13 +359,33 @@ See [`configs/requirements.txt`](../configs/requirements.txt) for complete list.
 
 This is the fastest way to get the system running.
 
-#### Step 1: Clone Repository
+#### Step 1: Configure Docker Memory
+
+**⚠️ Critical Step**: Configure Docker to allocate sufficient RAM.
+
+**Windows/Mac (Docker Desktop)**:
+1. Open Docker Desktop
+2. Go to **Settings** → **Resources** → **Memory**
+3. Set memory to:
+   - **6 GB** (minimum) - TruFor will work, but results may vary slightly
+   - **8 GB** (recommended) - Stable and consistent results
+   - **12 GB+** (optimal) - Best performance
+4. Click **Apply & Restart**
+
+**Linux (Docker Engine)**:
+- No configuration needed (uses all available system memory)
+
+> **Important Notes**:
+> - **Below 6GB**: Image detection will fail with "failed to fetch" errors
+> - **6GB vs 8GB**: You may notice slight variations (±1-3%) in confidence scores due to memory optimization and floating-point precision differences. This is expected behavior and doesn't affect the overall verdict (Real/Fake).
+
+#### Step 2: Clone Repository
 ```bash
 git clone https://github.com/lfpaaaaa/deepfake-detector.git
 cd deepfake-detector
 ```
 
-#### Step 2: Download Model Weights
+#### Step 3: Download Model Weights
 
 Follow the detailed instructions in [`WEIGHTS_DOWNLOAD_GUIDE.md`](guides/WEIGHTS_DOWNLOAD_GUIDE.md).
 
@@ -368,12 +396,12 @@ Follow the detailed instructions in [`WEIGHTS_DOWNLOAD_GUIDE.md`](guides/WEIGHTS
    - `vendors.zip` (1.1 GB) - **Includes complete DeepfakeBench framework + 12 model weights**
 3. Extract both to `models/` directory
 
-#### Step 3: Build and Start Docker Container
+#### Step 4: Build and Start Docker Container
 ```bash
 docker compose up -d --build
 ```
 
-#### Step 4: Access Application
+#### Step 5: Access Application
 
 **Local Access (Same Device):**
 Open your browser and navigate to:
@@ -410,7 +438,7 @@ The application is accessible from other devices on your local network:
 
 **Note**: Docker binds to `0.0.0.0` by default, enabling LAN access automatically.
 
-#### Step 5: Create First User
+#### Step 6: Create First User
 1. Click "Register" on the login page
 2. Fill in credentials (password must meet policy: 8+ chars, uppercase, lowercase, digit)
 3. Login and start detecting!

@@ -89,8 +89,14 @@ The **Deepfake Detector** provides forensic analysts and researchers with powerf
 
 ### Prerequisites
 - **Docker Desktop** installed ([Download here](https://www.docker.com/get-started/))
+- At least **6GB RAM** allocated to Docker (minimum for TruFor model)
 - At least **3GB** free disk space
 - Internet connection for downloading model weights
+
+> ⚠️ **Memory Requirement**: 
+> - **Minimum**: 6GB RAM (TruFor will work, but results may have slight variations)
+> - **Recommended**: 8GB+ RAM (for stable and consistent detection results)
+> - **Below 6GB**: Image detection will fail with "failed to fetch" errors
 
 ### Installation (5 Steps)
 
