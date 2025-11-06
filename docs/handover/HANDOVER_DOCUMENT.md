@@ -374,10 +374,41 @@ docker compose up -d --build
 ```
 
 #### Step 4: Access Application
+
+**Local Access (Same Device):**
 Open your browser and navigate to:
 - **Main Application (Home)**: http://localhost:8000/web/index_main.html
 - **Or Root URL** (redirects to home): http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
+
+**LAN Access (Other Devices on Same Network):**
+
+The application is accessible from other devices on your local network:
+
+1. **Find Your IP Address:**
+   ```bash
+   # Windows
+   ipconfig
+   # Look for "IPv4 Address" (e.g., 192.168.1.100)
+   
+   # Linux/Mac
+   ip addr show
+   # or
+   ifconfig
+   # Look for inet address (e.g., 192.168.1.100)
+   ```
+
+2. **Access from Other Devices:**
+   - Replace `localhost` with your IP address
+   - Example: `http://192.168.1.100:8000/web/index_main.html`
+   - Works on phones, tablets, other computers on same WiFi/LAN
+
+3. **Firewall Configuration:**
+   - **Windows**: Allow port 8000 through Windows Defender Firewall
+   - **Linux**: `sudo ufw allow 8000/tcp` (if using UFW)
+   - **macOS**: System Preferences → Security & Privacy → Firewall
+
+**Note**: Docker binds to `0.0.0.0` by default, enabling LAN access automatically.
 
 #### Step 5: Create First User
 1. Click "Register" on the login page
