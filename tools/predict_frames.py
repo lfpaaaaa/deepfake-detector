@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tools.weight_registry import WEIGHT_REGISTRY
 from tools.build_dfbench_model import build_model_and_transforms
 
-DFB_WEIGHTS_DIR = "vendors/DeepfakeBench/training/weights"
+DFB_WEIGHTS_DIR = "models/vendors/DeepfakeBench/training/weights"
 
 
 def load_checkpoint(model: torch.nn.Module, ckpt_path: str):

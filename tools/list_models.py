@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from tools.weight_registry import WEIGHT_REGISTRY
 
-DFB_WEIGHTS_DIR = "vendors/DeepfakeBench/training/weights"
+DFB_WEIGHTS_DIR = "models/vendors/DeepfakeBench/training/weights"
 
 
 def format_size(bytes_size):

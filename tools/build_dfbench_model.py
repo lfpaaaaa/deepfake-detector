@@ -11,7 +11,7 @@ import yaml
 from typing import Tuple, Optional, Callable
 
 # Add DeepfakeBench to Python path
-DFB_ROOT = os.path.join(os.path.dirname(__file__), "..", "vendors", "DeepfakeBench")
+DFB_ROOT = os.path.join(os.path.dirname(__file__), "..", "models", "vendors", "DeepfakeBench")
 sys.path.insert(0, DFB_ROOT)
 
 # Also add the training directory so modules can import each other
@@ -85,7 +85,7 @@ def _load_config(model_key: str) -> dict:
                         f"Model '{model_key}' requires ImageNet pretrained weights, but file not found: {pretrained_path}\n"
                         f"Please download 'xception-b5690688.pth' from:\n"
                         f"https://download.pytorch.org/models/xception-b5690688.pth\n"
-                        f"And place it in: vendors/DeepfakeBench/training/pretrained/"
+                        f"And place it in: models/vendors/DeepfakeBench/training/pretrained/"
                     )
             else:
                 raise ValueError(

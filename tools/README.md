@@ -16,7 +16,7 @@ This toolset allows you to perform frame-by-frame deepfake detection on videos u
 Confirm that weight files are placed in the correct location:
 
 ```bash
-ls vendors/DeepfakeBench/training/weights/
+ls models/vendors/DeepfakeBench/training/weights/
 ```
 
 You should see the following files:
@@ -220,7 +220,7 @@ python tools/predict_frames.py \
 **Solution:**
 1. Check if model name is correct (refer to supported models table)
 2. Confirm DeepfakeBench code is complete
-3. Check if `vendors/DeepfakeBench/training/detectors/` contains corresponding `xxx_detector.py`
+3. Check if `models/vendors/DeepfakeBench/training/detectors/` contains corresponding `xxx_detector.py`
 
 ### Issue: Weight Loading Failed
 
