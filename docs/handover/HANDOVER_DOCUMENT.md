@@ -1,10 +1,9 @@
-# Project Handover Document
+# Deepfake Detector - Project Handover
 
-**Project**: Deepfake Detector  
 **Version**: 3.1  
-**Document Date**: November 5, 2025  
+**Date**: November 5, 2025  
 **Prepared By**: Xiyu Guan  
-**Email**: xiyug@student.unimelb.edu.au
+**Email**: xiyug@student.unimelb.edu.au  
 **Repository**: https://github.com/lfpaaaaa/deepfake-detector
 
 ---
@@ -245,95 +244,29 @@ Create a new account through the registration page, or use the following test cr
 
 ---
 
-## 4. Documentation
+## 4. Key Documentation
 
-### 4.1 User Stories & Requirements
+This section highlights the most important documents for understanding and maintaining the system.
 
-| Document | Description | Location |
-|----------|-------------|----------|
-| User Story Map | Visual mapping of user stories and features | [docs/usecases/User_Story_Map.md](usecases/User_Story_Map.md) |
-| User Stories (CSV) | Structured user stories in CSV format | [docs/usecases/User Story.csv](usecases/User%20Story.csv) |
-| User Stories (PNG) | Visual representation of user stories | [docs/usecases/User Story.png](usecases/User%20Story.png) |
-| Personas | Target user profiles (Forensic Analyst, Admin) | [docs/usecases/personas.md](usecases/personas.md) |
-| We-Do-Be-Feel Table | User journey and emotional mapping | [docs/usecases/We-Do-Be-Feel-Table.doc](usecases/We-Do-Be-Feel-Table.doc) |
+### Essential Documents
 
-### 4.2 Architecture Documentation
+| Document | Purpose | Location |
+|----------|---------|----------|
+| **README.md** | System overview, quick start, features | [README.md](../../README.md) |
+| **WEIGHTS_DOWNLOAD_GUIDE.md** | Model setup and installation | [docs/guides/WEIGHTS_DOWNLOAD_GUIDE.md](../guides/WEIGHTS_DOWNLOAD_GUIDE.md) |
+| **Architecture Diagrams (V3.1)** | System design and workflows | [docs/architecture/](../architecture/) |
+| **Testing Documentation** | Test strategy, reports, and evidence | [docs/testing/](../testing/) |
+| **UI Features Guide** | Frontend documentation with screenshots | [docs/ui/UI_FEATURES.md](../ui/UI_FEATURES.md) |
+| **API Documentation** | Interactive API docs (Swagger) | http://localhost:8000/docs |
 
-| Document | Description | Location |
-|----------|-------------|----------|
-| V3.1 Domain Model | Current system architecture (with bug fixes) | [docs/architecture/v3.1_domain_model_diagram.md](architecture/v3.1_domain_model_diagram.md) |
-| V3.1 Sequence Diagram | Current interaction flows (with enhancements) | [docs/architecture/v3.1_sequence_diagram.md](architecture/v3.1_sequence_diagram.md) |
-| V3 Domain Model | Previous architecture (for reference) | [docs/architecture/v3_domain_model_diagram.md](architecture/v3_domain_model_diagram.md) |
-| V3 Sequence Diagram | Previous interaction flows (for reference) | [docs/architecture/v3_sequence_diagram.md](architecture/v3_sequence_diagram.md) |
-| V2 Domain Model | Historical architecture (for reference) | [docs/architecture/v2_domain_model_diagram.md](architecture/v2_domain_model_diagram.md) |
-| V2 Sequence Diagram | Historical interaction flows (for reference) | [docs/architecture/v2_sequence_diagram.md](architecture/v2_sequence_diagram.md) |
-| Use Case Diagram (PlantUML) | Use case relationships | [docs/architecture/User Case Diagram.puml](architecture/User%20Case%20Diagram.puml) |
-| Use Case Diagram (PNG) | Visual use case diagram | [docs/architecture/User Case Diagram.png](architecture/User%20Case%20Diagram.png) |
-| Motivational Model | Project motivation and goals | [docs/architecture/motivational model.png](architecture/motivational%20model.png) |
+### Additional Resources
 
-### 4.3 Test Documentation
+- **User Stories & Requirements**: [docs/usecases/](../usecases/)
+- **Meeting Notes**: [docs/meetings/](../meetings/)
+- **Technical Guides**: [docs/guides/](../guides/)
+- **Team Communication**: [docs/Team internal communication/](../Team%20internal%20communication/)
 
-| Document | Description | Location |
-|----------|-------------|----------|
-| Testing Strategy | Complete testing approach and methodology | [docs/testing/README.md](testing/README.md) |
-| Test Cases | All 28 test scenarios with steps and criteria | [docs/testing/TEST_CASES.md](testing/TEST_CASES.md) |
-| **Cycle 1 Test Plan** | Basic functionality test plan | [docs/testing/test_plans/cycle_1_basic_functionality.md](testing/test_plans/cycle_1_basic_functionality.md) |
-| **Cycle 1 Test Report** | Automated tests (67 tests, 100% pass) | [docs/testing/test_reports/cycle_1_report.md](testing/test_reports/cycle_1_report.md) |
-| **Cycle 2 Test Plan (Expanded)** | Comprehensive manual testing | [docs/testing/test_plans/cycle_2_expanded.md](testing/test_plans/cycle_2_expanded.md) |
-| **Cycle 2 Test Plan (Models)** | Model integration testing | [docs/testing/test_plans/cycle_2_model_integration.md](testing/test_plans/cycle_2_model_integration.md) |
-| **Cycle 2 Test Report** | Manual/integration tests (42 tests, 88% pass) | [docs/testing/test_reports/cycle_2_report.md](testing/test_reports/cycle_2_report.md) |
-| **Cycle 2 Test Evidence** | Screenshots and observations | [docs/testing/test_evidence/cycle_2/README.md](testing/test_evidence/cycle_2/README.md) |
-| **Cycle 3 Test Plan** | Bug fix verification plan | [docs/testing/test_plans/cycle_3_bugfix_verification.md](testing/test_plans/cycle_3_bugfix_verification.md) |
-| **Cycle 3 Test Report** | Final verification (12 tests, 100% pass) | [docs/testing/test_reports/cycle_3_report.md](testing/test_reports/cycle_3_report.md) |
-
-**Summary**: 
-- **Total Tests**: 121 (67 automated + 42 manual + 12 verification)
-- **Final Pass Rate**: 100% (Cycle 3)
-- **Code Coverage**: 70% (Cycle 1 automated)
-
-### 4.4 UI Documentation
-
-| Document | Description | Location |
-|----------|-------------|----------|
-| UI Features Guide | Detailed frontend feature documentation | [docs/ui/UI_FEATURES.md](ui/UI_FEATURES.md) |
-| UI Screenshots Index | Categorized screenshot documentation | [docs/ui/README.md](ui/README.md) |
-| Desktop Screenshots | 16 PNG files (desktop UI at 1920x1080) | [docs/ui/](ui/) (files 20-35.png) |
-| Mobile Screenshots | 16 JPG files (mobile UI at various resolutions) | [docs/ui/](ui/) (files 36-51.jpg) |
-
-**Screenshot Coverage**:
-- Login & Registration
-- Home Dashboard
-- Image Detection (TruFor)
-- Video Detection (DeepfakeBench)
-- Detection History
-- Mobile Responsive Layouts
-- Navigation & Menus
-- Error Handling
-
-### 4.5 Technical Guides
-
-| Document | Description | Location |
-|----------|-------------|----------|
-| Main README | System overview, features, quick start | [README.md](../../README.md) |
-| Weights Download Guide | Model weights download & setup guide | [WEIGHTS_DOWNLOAD_GUIDE.md](../guides/WEIGHTS_DOWNLOAD_GUIDE.md) |
-| Upgrade Summary V2 | V1.0 → V2.0 migration guide | [UPGRADE_SUMMARY_V2.md](../guides/UPGRADE_SUMMARY_V2.md) |
-| CI Setup Guide | GitHub Actions configuration | [CI_SETUP.md](../testing/CI_SETUP.md) |
-
-### 4.6 Model Guides
-
-| Guide | Description | Link |
-|-------|-------------|------|
-| TruFor Technical Guide | TruFor integration details | [TRUFOR_TECHNICAL_GUIDE.md](../guides/TRUFOR_TECHNICAL_GUIDE.md) |
-| DeepfakeBench Guide | DeepfakeBench models overview | [vendors/DeepfakeBench/README.md](../../models/vendors/DeepfakeBench/README.md) |
-| CLI Tools Reference | Command-line tools (advanced users) | [tools/README.md](../../tools/README.md) |
-
-### 4.7 Meeting Notes & Communication
-
-| Document | Description | Location |
-|----------|-------------|----------|
-| Client Meeting 1 | Initial requirements gathering | [docs/meetings/client_meeting_1.txt](meetings/client_meeting_1.txt) |
-| Client Meeting 2 (PPT) | Progress review presentation | [docs/meetings/Client_meeting_2.pptx](meetings/Client_meeting_2.pptx) |
-| Team Communication | Internal team discussions (8 screenshots) | [docs/Team internal communication/](Team%20internal%20communication/) |
+**Note**: All documentation is organized in the `docs/` directory. Explore subdirectories for detailed technical information.
 
 ---
 
