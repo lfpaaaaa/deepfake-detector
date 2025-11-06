@@ -12,8 +12,8 @@
 
 - [Project Background / Overview](#1-project-background--overview)
 - [Demo (Link to Hosted Project)](#2-demo-link-to-hosted-project)
-- [Features (User Stories - Organized in Sprints)](#3-features-user-stories-organized-in-sprints)
-- [Documentation](#4-documentation)
+- [Features (User Stories - Organized in Sprints)](#3-features-user-stories---organized-in-sprints)
+- [Key Documentation](#4-key-documentation)
 - [System Requirements](#5-system-requirements)
 - [Installation Guide](#6-installation-guide)
 - [Changelog](#7-changelog)
@@ -845,15 +845,6 @@ This matrix maps user stories to implementation, tests, and documentation.
 - [ ] Review all documentation files
 - [ ] Understand architecture diagrams
 - [ ] Read test reports (Cycles 1-3)
-
-### 9.5 Post-Handover Support
-
-- [ ] **Week 1-2**: Daily check-ins (Slack/email)
-- [ ] **Week 3-4**: On-demand support (response within 24 hours)
-- [ ] **Month 2**: Periodic check-in (once per week)
-- [ ] **Month 3+**: As-needed support (best effort)
-
-**Contact Method**: Email xiyug@student.unimelb.edu.au
 
 ---
 
