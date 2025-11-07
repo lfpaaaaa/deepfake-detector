@@ -1,6 +1,6 @@
 # 🎭 Deepfake Detector
 
-[![Version](https://img.shields.io/badge/version-3.1-blue.svg)](https://github.com/lfpaaaaa/deepfake-detector)
+[![Version](https://img.shields.io/badge/version-3.1-blue.svg)](https://github.com/fsrconsulting/deepfake-detector)
 [![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
 [![Tests](https://img.shields.io/badge/tests-passing-success.svg)](docs/testing/test_reports/cycle_3_report.md)
@@ -40,7 +40,7 @@ The **Deepfake Detector** provides forensic analysts and researchers with powerf
 - **Yuzhao Ouyang** - Backend Development
 - **Xiyu Guan** - Product Owner
 
-**GitHub**: https://github.com/lfpaaaaa/deepfake-detector  
+**GitHub**: https://github.com/fsrconsulting/deepfake-detector  
 **Contact**: xiyug@student.unimelb.edu.au
 
 ---
@@ -102,7 +102,7 @@ The **Deepfake Detector** provides forensic analysts and researchers with powerf
 
 #### 1. Clone Repository
 ```bash
-git clone https://github.com/lfpaaaaa/deepfake-detector.git
+git clone https://github.com/fsrconsulting/deepfake-detector.git
 cd deepfake-detector
 ```
 

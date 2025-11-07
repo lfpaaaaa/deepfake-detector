@@ -6,7 +6,7 @@ For users who just want to get started quickly:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/lfpaaaaa/deepfake-detector.git
+git clone https://github.com/fsrconsulting/deepfake-detector.git
 cd deepfake-detector
 
 # 2. Download from Google Drive (in browser):
@@ -140,7 +140,7 @@ docker compose up -d --build
 
 ```bash
 # Clone the project
-git clone https://github.com/lfpaaaaa/deepfake-detector.git
+git clone https://github.com/fsrconsulting/deepfake-detector.git
 
 # Navigate to project directory
 cd deepfake-detector

@@ -35,8 +35,8 @@ This project uses GitHub Actions for continuous integration and testing.
 Add these badges to your README.md:
 
 ```markdown
-![CI Tests](https://github.com/lfpaaaaa/deepfake-detector/actions/workflows/ci.yml/badge.svg)
-![Quick Tests](https://github.com/lfpaaaaa/deepfake-detector/actions/workflows/quick-test.yml/badge.svg)
+![CI Tests](https://github.com/fsrconsulting/deepfake-detector/actions/workflows/ci.yml/badge.svg)
+![Quick Tests](https://github.com/fsrconsulting/deepfake-detector/actions/workflows/quick-test.yml/badge.svg)
 ```
 
 ## Local Testing

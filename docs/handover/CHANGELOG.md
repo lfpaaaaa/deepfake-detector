@@ -297,5 +297,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 **Maintained by**: Xiyu Guan  
-**Repository**: https://github.com/lfpaaaaa/deepfake-detector
+**Repository**: https://github.com/fsrconsulting/deepfake-detector
 

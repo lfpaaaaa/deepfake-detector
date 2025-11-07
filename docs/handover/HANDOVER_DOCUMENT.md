@@ -4,7 +4,7 @@
 **Date**: November 5, 2025  
 **Prepared By**: Xiyu Guan  
 **Email**: xiyug@student.unimelb.edu.au  
-**Repository**: https://github.com/lfpaaaaa/deepfake-detector
+**Repository**: https://github.com/fsrconsulting/deepfake-detector
 
 ---
 
@@ -362,7 +362,7 @@ This is the fastest way to get the system running.
 
 #### Step 2: Clone Repository
 ```bash
-git clone https://github.com/lfpaaaaa/deepfake-detector.git
+git clone https://github.com/fsrconsulting/deepfake-detector.git
 cd deepfake-detector
 ```
 
@@ -878,7 +878,7 @@ This matrix maps user stories to implementation, tests, and documentation.
 
 | Resource | Link |
 |----------|------|
-| **GitHub Repository** | https://github.com/lfpaaaaa/deepfake-detector |
+| **GitHub Repository** | https://github.com/fsrconsulting/deepfake-detector |
 | **Model Weights** | https://drive.google.com/drive/folders/117IJoriB7kJB9vWQOuj7_S6lNRSOyZ_A |
 | **TruFor Official** | https://grip-unina.github.io/TruFor/ |
 | **DeepfakeBench Official** | https://github.com/SCLBD/DeepfakeBench |
