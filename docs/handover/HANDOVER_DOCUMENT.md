@@ -69,40 +69,21 @@ The application features a modern web interface with user authentication, detect
 
 ## 2. Demo (Link to Hosted Project)
 
-### 2.1 Repository Access
+**🎬 Installation & Usage Demo Video**:  
+🔗 [Watch Demo on Google Drive](https://drive.google.com/file/d/15fNn-ZjCa4mg5L0uoaxZBU7k1uy3Eq41/view?usp=sharing)
 
-- **GitHub Repository**: https://github.com/lfpaaaaa/deepfake-detector
-- **Branch**: `main` (production-ready)
-- **Status**: ✅ All CI checks passing
+This comprehensive video demonstrates the complete system workflow:
+- ✅ Installation process (Docker setup, model weights download)
+- ✅ User registration and login
+- ✅ TruFor image detection workflow
+- ✅ DeepfakeBench video analysis workflow
+- ✅ Detection report generation and history review
 
-### 2.2 Live Demo Instructions
+**Duration**: 18 minutes (⏩ Skip Docker build process at ~7-8 min mark to save time)
 
-**Note**: This project is designed for local/private deployment. To run a demo:
-
-1. Clone the repository:
-```bash
-git clone https://github.com/lfpaaaaa/deepfake-detector.git
-cd deepfake-detector
-```
-
-2. Download model weights (see Section 6.2)
-
-3. Start with Docker:
-```bash
-docker compose up -d --build
-```
-
-4. Access at: **http://localhost:8000/web/index_main.html** (Home page)
-
-   Or simply: **http://localhost:8000** (redirects to home)
-
-### 2.3 Demo Credentials
-
-Create a new account through the registration page, or use the following test credentials:
-
-- **Username**: `demo_user`
-- **Password**: `Demo123456` (meets security policy: uppercase, lowercase, digit)
-- **Role**: Analyst (can view own detection history)
+> 💡 **Tips**: 
+> - The Docker build process takes 7-8 minutes - feel free to skip this section in the video
+> - For detailed installation steps, refer to [Section 6: Installation Guide](#6-installation-guide)
 
 ---
 
